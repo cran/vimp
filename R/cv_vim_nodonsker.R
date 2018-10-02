@@ -55,7 +55,7 @@
 #' smooth <- (x[,1]/5)^2*(x[,1]+7)/5 + (x[,2]/3)^2
 #'
 #' ## generate Y ~ Normal (smooth, 1)
-#' y <- smooth + stats::rnorm(n, 0, 1)
+#' y <- as.matrix(smooth + stats::rnorm(n, 0, 1))
 #' 
 #' ## set up a library for SuperLearner
 #' learners <- c("SL.mean", "SL.gam")
@@ -63,7 +63,8 @@
 #' ## -----------------------------------------
 #' ## using Super Learner
 #' ## -----------------------------------------
-#' est <- cv_vim(Y = y, X = x, indx = 2, V = 5, 
+#' set.seed(4747)
+#' est <- cv_vim_nodonsker(Y = y, X = x, indx = 2, V = 5, 
 #' type = "regression", run_regression = TRUE, 
 #' SL.library = learners, alpha = 0.05)
 #' 
@@ -71,7 +72,9 @@
 #' ## doing things by hand, and plugging them in
 #' ## ------------------------------------------
 #' ## set up the folds
+#' indx <- 2
 #' V <- 5
+#' set.seed(4747)
 #' folds <- rep(seq_len(V), length = n)
 #' folds <- sample(folds)
 #' ## get the fitted values by fitting the super learner on each pair
@@ -79,21 +82,21 @@
 #' fhat_red <- list()
 #' for (v in 1:V) {
 #'     ## fit super learner
-#'     fit <- SuperLearner::SuperLearner(Y = Y[folds != v, , drop = FALSE],
-#'      X = X[folds != v, , drop = FALSE], SL.library = SL.library, ...)
+#'     fit <- SuperLearner::SuperLearner(Y = y[folds != v, , drop = FALSE],
+#'      X = x[folds != v, , drop = FALSE], SL.library = learners, cvControl = list(V = 5))
 #'     fitted_v <- SuperLearner::predict.SuperLearner(fit)$pred
 #'     ## get predictions on the validation fold
 #'     fhat_ful[[v]] <- SuperLearner::predict.SuperLearner(fit, 
-#'      newdata = X[folds == v, , drop = FALSE])$pred
+#'      newdata = x[folds == v, , drop = FALSE])$pred
 #'     ## fit the super learner on the reduced covariates
 #'     red <- SuperLearner::SuperLearner(Y = fitted_v,
-#'      X = X[folds != v, -indx, drop = FALSE], SL.library = SL.library, ...)
+#'      X = x[folds != v, -indx, drop = FALSE], SL.library = learners, cvControl = list(V = 5))
 #'     ## get predictions on the validation fold
 #'     fhat_red[[v]] <- SuperLearner::predict.SuperLearner(red, 
-#'      newdata = X[folds == v, -indx, drop = FALSE])$pred
+#'      newdata = x[folds == v, -indx, drop = FALSE])$pred
 #' }
-#' est <- cv_vim(Y = y, f1 = fhat_ful, f2 = fhat_red, indx = 2,
-#' V = 5, type = "regression", run_regression = FALSE, alpha = 0.05)
+#' est <- cv_vim_nodonsker(Y = y, f1 = fhat_ful, f2 = fhat_red, indx = 2,
+#' V = 5, folds = folds, type = "regression", run_regression = FALSE, alpha = 0.05)
 #' }
 #'
 #' @seealso \code{\link[SuperLearner]{SuperLearner}} for specific usage of the \code{SuperLearner} function and package.
@@ -117,8 +120,6 @@ cv_vim_nodonsker <- function(Y, X, f1, f2, indx = 1, V = 10, folds = NULL, type 
     ## fit the super learner on each full/reduced pair
     fhat_ful <- list()
     fhat_red <- list()
-    preds_ful <- list()
-    preds_red <- list()
     for (v in 1:V) {
         ## fit super learner
         fit <- SuperLearner::SuperLearner(Y = Y[folds != v, , drop = FALSE],
@@ -127,9 +128,18 @@ cv_vim_nodonsker <- function(Y, X, f1, f2, indx = 1, V = 10, folds = NULL, type 
         ## get predictions on the validation fold
         fhat_ful[[v]] <- SuperLearner::predict.SuperLearner(fit, 
                                                             newdata = X[folds == v, , drop = FALSE])$pred
-        ## fit the super learner on the reduced covariates
-        red <- SuperLearner::SuperLearner(Y = fitted_v,
-                                          X = X[folds != v, -indx, drop = FALSE], SL.library = SL.library, ...)
+        ## fit the super learner on the reduced covariates:
+        ## always use gaussian; if first regression was mean, use Y instead
+        arg_lst <- list(...)
+        if (length(unique(fitted_v)) == 1) {
+          arg_lst$Y <- Y[folds != v, , drop = FALSE]
+        } else {
+          arg_lst$family <- stats::gaussian()
+          arg_lst$Y <- fitted_v 
+        }
+        arg_lst$X <- X[folds != v, -indx, drop = FALSE]
+        arg_lst$SL.library <- SL.library
+        red <- do.call(SuperLearner::SuperLearner, arg_lst)
         ## get predictions on the validation fold
         fhat_red[[v]] <- SuperLearner::predict.SuperLearner(red, 
                                                             newdata = X[folds == v, -indx, drop = FALSE])$pred
@@ -143,8 +153,8 @@ cv_vim_nodonsker <- function(Y, X, f1, f2, indx = 1, V = 10, folds = NULL, type 
     if (is.null(f1)) stop("You must specify a list of predicted values from a regression of Y on X.")
     if (is.null(f2)) stop("You must specify a list of predicted values from a regression of the fitted values from the Y on X regression on the reduced set of covariates.")
     if (is.null(folds)) stop("You must specify a vector of folds.")
-    if (length(f1) != length(V)) stop("The number of folds from the full regression must be the same length as the number of folds.")
-    if (length(f2) != length(V)) stop("The number of folds from the reduced regression must be the same length as the number of folds.")
+    if (length(f1) != V) stop("The number of folds from the full regression must be the same length as the number of folds.")
+    if (length(f2) != V) stop("The number of folds from the reduced regression must be the same length as the number of folds.")
 
     ## set up the fitted value objects (both are lists of lists!)
     fhat_ful <- f1
@@ -178,7 +188,7 @@ cv_vim_nodonsker <- function(Y, X, f1, f2, indx = 1, V = 10, folds = NULL, type 
   ## create the output and return it
   output <- list(call = cl, s = indx,
                  SL.library = SL.library,
-                 full_fit = list("train" = fhat_ful, "test" = preds_ful), red_fit = list("train" = fhat_red, "test" = preds_red), 
+                 full_fit = fhat_ful, red_fit = fhat_red, 
                  est = est,
                  naive = naive,
                  naives = naive_cv,
