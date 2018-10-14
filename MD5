@@ -1,9 +1,9 @@
-80796de34c003886592bfa22b3671fa0 *DESCRIPTION
+8cf46b97c2d410c9bedb87deec4e0dcc *DESCRIPTION
 ffa5f39e45e2528017523b060e048a35 *LICENSE
 406b74aa80fb3c78906d627c6bfbabac *NAMESPACE
-1e5ae6008c1c7dd2f9ec71674624776f *R/average_vim.R
-f26c97e70f361419573672e7b9dc56c9 *R/cv_vim.R
-dbf8e974463a1a6065b89171f3b1da09 *R/cv_vim_nodonsker.R
+085360dbb8dcb22a05a463b0847034d3 *R/average_vim.R
+2e185aea38bcc96ecbe0473b4e46aded *R/cv_vim.R
+80f49580a7108efd46990148fdb059b7 *R/cv_vim_nodonsker.R
 87a32035051ab39007f6b809f7dabc7b *R/format.vim.R
 74bd86c6a99213c480c159ee3601d49b *R/merge_vim.R
 ea16148cc50c00c96d9b617ed2cb2613 *R/onestep_based_estimator.R
@@ -21,10 +21,10 @@ d016ad364340c06ea927e1a4a0f4ea9f *inst/doc/introduction.R
 909e0e9007933f461e80186473433676 *inst/doc/introduction.html
 9f35785bf8cc161593625d9ac3c8de1d *inst/doc/introduction_to_vimp.R
 6cd4c53104fa368ceccebd70bf8ef1fc *inst/doc/introduction_to_vimp.Rmd
-7785cf1b03fe98e7377ddd0cfc33694d *inst/doc/introduction_to_vimp.html
+4fc893ab3e39671765c0449f3a7950df *inst/doc/introduction_to_vimp.html
 8727d0cc88ad458a028eeaaf160c0d2a *man/average_vim.Rd
-b7aa38c1f0596f2b118d8cd9e1be33ae *man/cv_vim.Rd
-b52d628ecbeec8004a36c52267cd0bd5 *man/cv_vim_nodonsker.Rd
+c16e285755b6571bdc7e8964aa0abab9 *man/cv_vim.Rd
+10d6514ab57628a462c7d56f10890de3 *man/cv_vim_nodonsker.Rd
 6e67f9d307ac47311b52222125087041 *man/format.vim.Rd
 f5094df0265105c1eab9f928fd24d8c1 *man/merge_vim.Rd
 29c36fdbc05a295338df2d0345e740bc *man/onestep_based_estimator.Rd
