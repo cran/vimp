@@ -1,8 +1,9 @@
-context("test_average_vimp_regression.R")
+context("Test averaging of difference nonparametric R^2 values")
 
 ## load required functions and packages
 library("testthat")
 library("SuperLearner")
+library("gam")
 library("vimp")
 
 ## generate the data
@@ -17,7 +18,7 @@ y <- (x[,1]/5)^2*(x[,1]+7)/5 + (x[,2]/3)^2 + rnorm(n, 0, 1)
 samp <- sample(1:n, n/2, replace = FALSE)
 
 ## set up a library for SuperLearner
-learners <- "SL.gam"
+learners <- c("SL.step", "SL.gam", "SL.mean")
 
 ## fit the data with all covariates
 full_fit_1 <- SuperLearner(Y = y[samp], X = x[samp, ], SL.library = learners)
@@ -39,5 +40,7 @@ test_that("Test averaging of ANOVA-based variable importance", {
   est_2 <- vimp_regression(Y = y[-samp], f1 = full_fitted_2, f2 = reduced_fitted_2, run_regression = FALSE, indx = 2)
 
   est <- average_vim(est_1, est_2)
-  expect_equal(est$est, (500/729)/(1 + 2497/7875 + 500/729), tolerance = 0.02)
+  expect_equal(est$est, (500/729)/(1 + 2497/7875 + 500/729), tolerance = 0.1)
+  expect_length(est$mat, 4)
+  expect_output(print(est), "\n\nVariable importance estimates:\n", fixed = TRUE)
 })
