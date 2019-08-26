@@ -1,4 +1,4 @@
-9eaf9d69ab7c159569677dd91e9c9e7b *DESCRIPTION
+eb512fb89fb0d8b5de4053c8c8e1df3f *DESCRIPTION
 ffa5f39e45e2528017523b060e048a35 *LICENSE
 406b74aa80fb3c78906d627c6bfbabac *NAMESPACE
 085360dbb8dcb22a05a463b0847034d3 *R/average_vim.R
@@ -18,7 +18,7 @@ c3e480aa272f0908d7c551ca2fb909ef *R/print.vim.R
 dcf39e96786a4b2c8856243788e5e61f *build/vignette.rds
 513a473fa36fd41932d4fdd9034d0d06 *inst/doc/introduction_to_vimp.R
 474e7ce1a4de8562c51dde294b302fef *inst/doc/introduction_to_vimp.Rmd
-6e9cb13d87d96bf0c87e4bba8ddc8c17 *inst/doc/introduction_to_vimp.html
+14f097a42e1ee13fba41a4db6d435a4f *inst/doc/introduction_to_vimp.html
 8727d0cc88ad458a028eeaaf160c0d2a *man/average_vim.Rd
 c16e285755b6571bdc7e8964aa0abab9 *man/cv_vim.Rd
 10d6514ab57628a462c7d56f10890de3 *man/cv_vim_nodonsker.Rd
@@ -34,10 +34,10 @@ c5c9ec218714189c826de1385ccde4c7 *man/plot.vim.Rd
 217cdfc3867f0077ed7d06446ffabc32 *man/vimp_se.Rd
 a884d5f081faeef8e8cdeff7b6237112 *man/vimp_update.Rd
 af9ea167bd9bf11aa82ef9fca60ce0e0 *tests/testthat.R
-5b7fbbea6378e4eabf9b27e652eb617b *tests/testthat/test_average_vimp_regression.R
-62d92e52a17642407a6db0ea265467ca *tests/testthat/test_cv_vim.R
-8937d9e169c21cc373f4e9ac136e6884 *tests/testthat/test_merge_vimp_regression.R
-687460e8b1344237392d51dbcf23456d *tests/testthat/test_vimp_regression.R
+776199962cc81763947c8f0c1d4ce436 *tests/testthat/test_average_vimp_regression.R
+f2038941a196e4b1fdd16dbf5ee7ea08 *tests/testthat/test_cv_vim.R
+969542fba5dda3e2c7c7f5202e9dd493 *tests/testthat/test_merge_vimp_regression.R
+f74049c285df81e6d2b6845cba0a580c *tests/testthat/test_vimp_regression.R
 fabc617c41c6b6d2967e596adbffa1ca *vignettes/introduction_files/figure-html/unnamed-chunk-13-1.png
 43cc192ea97826f26ae4be347c9c9b56 *vignettes/introduction_files/figure-html/unnamed-chunk-14-1.png
 ac7d7c0f180a435d1cfe1d6f5ae34b10 *vignettes/introduction_files/figure-html/unnamed-chunk-21-1.png
