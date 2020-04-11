@@ -7,12 +7,12 @@
 average_vim(..., weights = rep(1/length(list(...)), length(list(...))))
 }
 \arguments{
-\item{...}{an arbitrary number of \code{vim} objects}
+\item{...}{an arbitrary number of \code{vim} objects.}
 
 \item{weights}{how to average the vims together, and must sum to 1; defaults to 1/(number of vims) for each vim, corresponding to the arithmetic mean}
 }
 \value{
-an object of class \code{vim} containing the (weighted) average of the individual importance estimates, as well as the appropriate standard error and confidence interval. 
+an object of class \code{vim} containing the (weighted) average of the individual importance estimates, as well as the appropriate standard error and confidence interval.
 This results in a list containing:
 \itemize{
  \item{call}{ - the call to \code{average_vim()}}
@@ -27,6 +27,7 @@ This results in a list containing:
  \item{full_mod}{ - a list of the objects returned by the estimation procedure for the full data regression (if applicable)}
  \item{red_mod}{ - a list of the objects returned by the estimation procedure for the reduced data regression (if applicable)}
  \item{alpha}{ - the level, for confidence interval calculation}
+ \item{y}{ - a list of the outcomes}
 }
 }
 \description{
@@ -34,7 +35,7 @@ Average the output from multiple calls to \code{vimp_regression}, for different 
 }
 \examples{
 library(SuperLearner)
-library(gam)
+library(ranger)
 ## generate the data
 p <- 2
 n <- 100
@@ -47,19 +48,20 @@ smooth <- (x[,1]/5)^2*(x[,1]+7)/5 + (x[,2]/3)^2
 y <- smooth + stats::rnorm(n, 0, 1)
 
 ## set up a library for SuperLearner
-learners <- "SL.gam"
+learners <- "SL.ranger"
 
 ## get estimates on independent splits of the data
 samp <- sample(1:n, n/2, replace = FALSE)
 
-## using Super Learner
-est_2 <- vimp_regression(Y = y[samp], X = x[samp, ], indx = 2, 
+## using Super Learner (with a small number of folds, for illustration only)
+est_2 <- vimp_regression(Y = y[samp], X = x[samp, ], indx = 2, V = 2,
            run_regression = TRUE, alpha = 0.05,
-           SL.library = learners, cvControl = list(V = 10))
+           SL.library = learners, cvControl = list(V = 5))
 
-est_1 <- vimp_regression(Y = y[-samp], X = x[-samp, ], indx = 2, 
+est_1 <- vimp_regression(Y = y[-samp], X = x[-samp, ], indx = 2, V = 2,
            run_regression = TRUE, alpha = 0.05,
-           SL.library = learners, cvControl = list(V = 10))
+           SL.library = learners, cvControl = list(V = 5))
 
 ests <- average_vim(est_1, est_2, weights = c(1/2, 1/2))
+
 }

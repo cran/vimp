@@ -23,7 +23,7 @@ from the individual \code{vim} objects. This results in a list containing:
  \item{update}{- a list with the influence curve-based updates}
  \item{se}{- a vector with the standard errors}
  \item{ci}{- a matrix with the CIs}
- \item{mat}{ - a matrix with the estimated variable importance, the standard errors, and the \eqn{(1-\alpha) \times 100}\% confidence intervals}
+ \item{mat}{ - a tibble with the estimated variable importance, the standard errors, and the \eqn{(1-\alpha) \times 100}\% confidence intervals}
  \item{full_mod}{ - a list of the objects returned by the estimation procedure for the full data regression (if applicable)}
  \item{red_mod}{ - a list of the objects returned by the estimation procedure for the reduced data regression (if applicable)}
  \item{alpha}{ - a list of the levels, for confidence interval calculation}
@@ -35,7 +35,7 @@ merge into a single \code{vim} object; mostly used for plotting results.
 }
 \examples{
 library(SuperLearner)
-library(gam)
+library(ranger)
 ## generate the data
 ## generate X
 p <- 2
@@ -49,16 +49,16 @@ smooth <- (x[,1]/5)^2*(x[,1]+7)/5 + (x[,2]/3)^2
 y <- smooth + stats::rnorm(n, 0, 1)
 
 ## set up a library for SuperLearner
-learners <- "SL.gam"
+learners <- "SL.ranger"
 
-## using Super Learner
-est_2 <- vimp_regression(Y = y, X = x, indx = 2, 
+## using Super Learner (with a small number of folds, for illustration only)
+est_2 <- vimp_regression(Y = y, X = x, indx = 2, V = 2,
            run_regression = TRUE, alpha = 0.05,
-           SL.library = learners, cvControl = list(V = 10))
+           SL.library = learners, cvControl = list(V = 5))
 
-est_1 <- vimp_regression(Y = y, X = x, indx = 1, 
-           run_regression = TRUE, alpha = 0.05, 
-           SL.library = learners, cvControl = list(V = 10))
+est_1 <- vimp_regression(Y = y, X = x, indx = 1, V = 2,
+           run_regression = TRUE, alpha = 0.05,
+           SL.library = learners, cvControl = list(V = 5))
 
 ests <- merge_vim(est_1, est_2)
 }
