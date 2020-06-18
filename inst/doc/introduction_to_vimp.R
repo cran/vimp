@@ -36,7 +36,7 @@ library("SuperLearner")
 library("gam")
 library("xgboost")
 SL.xgboost1 <- function(..., max_depth = 1, ntree = 500, shrinkage = 0.1){
-  SL.xgboost(..., max_depth = max_depth, ntree = ntree, shrinkage = shrinkage)
+  SL.xgboost(..., objective = 'reg:squarederror', max_depth = max_depth, ntree = ntree, shrinkage = shrinkage)
 }
 
 ## ----est-1--------------------------------------------------------------------

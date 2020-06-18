@@ -1,7 +1,7 @@
-#' Nonparametric Variable Importance Estimates using Cross-validation
+#' Nonparametric Variable Importance Estimates and Inference using Cross-fitting
 #'
 #' Compute estimates and confidence intervals for the
-#' nonparametric variable importance parameter of interest, using cross-validation.
+#' nonparametric variable importance parameter of interest, using cross-fitting.
 #' This essentially involves splitting the data into V train/test splits; train the learners on the training data, evaluate importance on the test data; and average over these splits.
 #'
 #' @param Y the outcome.
@@ -24,9 +24,20 @@
 #'
 #' @return An object of class \code{vim}. See Details for more information.
 #'
-#' @details See the paper by Williamson, Gilbert, Simon, and Carone for more
-#' details on the mathematics behind this function, and the validity
+#' @details We define the population variable importance measure (VIM) for the group 
+#' of features (or single feature) \eqn{s} with respect to the predictiveness measure
+#' \eqn{V} by \deqn{\psi_{0,s} := V(f_0, P_0) - V(f_{0,s}, P_0),} where \eqn{f_0} is 
+#' the population predictiveness maximizing function, \eqn{f_{0,s}} is the population
+#' predictiveness maximizing function that is only allowed to access the features with
+#' index not in \eqn{s}, and \eqn{P_0} is the true data-generating distribution. Cross-fitted
+#' VIM estimates are obtained by first splitting the data into \eqn{K} folds; then using each
+#' fold in turn as a hold-out set, constructing estimators \eqn{f_{n,k}} and \eqn{f_{n,k,s}} of 
+#' \eqn{f_0} and \eqn{f_{0,s}}, respectively on the training data and estimator \eqn{P_{n,k}} of 
+#' \eqn{P_0} using the test data; and finally, computing \deqn{\psi_{n,s} := K^{(-1)}\sum_{k=1}^K \{V(f_{n,k},P_{n,k}) - V(f_{n,k,s}, P_{n,k})\}} 
+#' See the paper by Williamson, Gilbert, Simon, and Carone for more
+#' details on the mathematics behind the \code{cv_vim} function, and the validity
 #' of the confidence intervals.
+#' 
 #' In the interest of transparency, we return most of the calculations
 #' within the \code{vim} object. This results in a list containing:
 #' \itemize{
@@ -137,22 +148,6 @@ cv_vim <- function(Y, X, f1, f2, indx = 1, V = length(unique(folds)), folds = NU
 
     ## if we need to run the regression, fit Super Learner with the given library
     if (run_regression) {
-        ## create folds for cross-fitting
-        .make_folds <- function(y, V, stratified = FALSE) {
-            folds <- vector("numeric", length(y))
-            if (stratified) {
-                folds_1 <- rep(seq_len(V), length = sum(y == 1))
-                folds_0 <- rep(seq_len(V), length = sum(y == 0))
-                folds_1 <- sample(folds_1)
-                folds_0 <- sample(folds_0)
-                folds[y == 1] <- folds_1
-                folds[y == 0] <- folds_0
-            } else {
-                folds <- rep(seq_len(V), length = length(y))
-                folds <- sample(folds)
-            }
-            return(folds)
-        }
         ## set up the cross-validation
         outer_folds <- .make_folds(Y, V = 2, stratified = stratified)
         inner_folds_1 <- .make_folds(Y[outer_folds == 1, , drop = FALSE], V = V, stratified = stratified)
