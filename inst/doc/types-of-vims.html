@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Brian D. Williamson" />
+
+<meta name="date" content="2021-01-08" />
+
+<title>Types of VIMs</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      pre > code.sourceCode { white-space: pre; position: relative; }
+      pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+      pre > code.sourceCode > span:empty { height: 1.2em; }
+      code.sourceCode > span { color: inherit; text-decoration: inherit; }
+      div.sourceCode { margin: 1em 0; }
+      pre.sourceCode { margin: 0; }
+      @media screen {
+      div.sourceCode { overflow: auto; }
+      }
+      @media print {
+      pre > code.sourceCode { white-space: pre-wrap; }
+      pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+      }
+      pre.numberSource code
+        { counter-reset: source-line 0; }
+      pre.numberSource code > span
+        { position: relative; left: -4em; counter-increment: source-line; }
+      pre.numberSource code > span > a:first-child::before
+        { content: counter(source-line);
+          position: relative; left: -1em; text-align: right; vertical-align: baseline;
+          border: none; display: inline-block;
+          -webkit-touch-callout: none; -webkit-user-select: none;
+          -khtml-user-select: none; -moz-user-select: none;
+          -ms-user-select: none; user-select: none;
+          padding: 0 4px; width: 4em;
+          color: #aaaaaa;
+        }
+      pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+      div.sourceCode
+        {   }
+      @media screen {
+      pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+      }
+      code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+      code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+      code span.at { color: #7d9029; } /* Attribute */
+      code span.bn { color: #40a070; } /* BaseN */
+      code span.bu { } /* BuiltIn */
+      code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+      code span.ch { color: #4070a0; } /* Char */
+      code span.cn { color: #880000; } /* Constant */
+      code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+      code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+      code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+      code span.dt { color: #902000; } /* DataType */
+      code span.dv { color: #40a070; } /* DecVal */
+      code span.er { color: #ff0000; font-weight: bold; } /* Error */
+      code span.ex { } /* Extension */
+      code span.fl { color: #40a070; } /* Float */
+      code span.fu { color: #06287e; } /* Function */
+      code span.im { } /* Import */
+      code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+      code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+      code span.op { color: #666666; } /* Operator */
+      code span.ot { color: #007020; } /* Other */
+      code span.pp { color: #bc7a00; } /* Preprocessor */
+      code span.sc { color: #4070a0; } /* SpecialChar */
+      code span.ss { color: #bb6688; } /* SpecialString */
+      code span.st { color: #4070a0; } /* String */
+      code span.va { color: #19177c; } /* Variable */
+      code span.vs { color: #4070a0; } /* VerbatimString */
+      code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Types of VIMs</h1>
+<h4 class="author">Brian D. Williamson</h4>
+<h4 class="date">2021-01-08</h4>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(<span class="st">&quot;vimp&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(<span class="st">&quot;SuperLearner&quot;</span>)</span></code></pre></div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>In the <a href="introduction-to-vimp.html">main vignette</a>, I discussed variable importance defined using R-squared. I also mentioned that all of the analyses were carried out using a <em>condititonal</em> variable importance measure. In this document, I will discuss all three types of variable importance that may be computed using <code>vimp</code>.</p>
+<p>In general, I define variable importance as a function of the true population distribution (denoted by <span class="math inline">\(P_0\)</span>) and a predictiveness measure <span class="math inline">\(V\)</span> – large values of <span class="math inline">\(V\)</span> are assumed to be better. Currently, the measures <span class="math inline">\(V\)</span> implemented in <code>vimp</code> are <span class="math inline">\(R^2\)</span>, classification accuracy, area under the receiver operating characteristic curve (AUC), and deviance. For a fixed function <span class="math inline">\(f\)</span>, the predictiveness is given by <span class="math inline">\(V(f, P)\)</span>, where large values imply that <span class="math inline">\(f\)</span> is a good predictor of the outcome. The best possible prediction function, <span class="math inline">\(f_0\)</span>, is the <em>oracle</em> model – i.e., the prediction function that I would use if I had access to the distribution <span class="math inline">\(P_0\)</span>. Often, <span class="math inline">\(f_0\)</span> is the true conditional mean (e.g., for <span class="math inline">\(R^2\)</span>). Then the <em>total oracle predictiveness</em> can be defined as <span class="math inline">\(V(f_0, P_0)\)</span>. This is the best possible value of predictiveness.</p>
+<p>I define variable importance measures (VIMs) as contrasts in oracle predictivness. The oracle models that I plug in determine what type of variable importance is being considered, as I outline below. For the remainder of this document, suppose that I have <span class="math inline">\(p\)</span> variables, and an index set <span class="math inline">\(s\)</span> of interest (containing some subset of the <span class="math inline">\(p\)</span> variables). Throughout this document, I will use the South African heart disease study data <span class="citation">(Hastie, Tibshirani, and Friedman 2009)</span> to illustrate how each VIM may be estimated (freely available from the <a href="https://web.stanford.edu/~hastie/ElemStatLearn/datasets/SAheart.data">Elements of Statistical Learning website</a>; more information about these data is available <a href="https://web.stanford.edu/~hastie/ElemStatLearn/datasets/SAheart.info.txt">here</a>). Throughout, I will also use a simple library of learners for the Super Learner (this is for illustration only; in practice, I suggest using a large library of learners, as outlined in the <a href="introduction-to-vimp.html">main vignette</a>).</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co">## read in the data from the Elements website</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">library</span>(<span class="st">&quot;RCurl&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a>heart_data &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">text =</span> <span class="kw">getURL</span>(<span class="st">&quot;http://web.stanford.edu/~hastie/ElemStatLearn/datasets/SAheart.data&quot;</span>), <span class="dt">header =</span> <span class="ot">TRUE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co">## minor data cleaning</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>heart &lt;-<span class="st"> </span>heart_data[, <span class="dv">2</span><span class="op">:</span><span class="kw">dim</span>(heart_data)[<span class="dv">2</span>]]</span>
+<span id="cb2-6"><a href="#cb2-6"></a>heart<span class="op">$</span>famhist &lt;-<span class="st"> </span><span class="kw">ifelse</span>(heart<span class="op">$</span>famhist <span class="op">==</span><span class="st"> &quot;Present&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb2-7"><a href="#cb2-7"></a>x &lt;-<span class="st"> </span>heart[, <span class="op">-</span><span class="kw">ncol</span>(heart)]</span>
+<span id="cb2-8"><a href="#cb2-8"></a>learners<span class="fl">.2</span> &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;SL.ranger&quot;</span>)</span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="kw">set.seed</span>(<span class="dv">12345</span>)</span></code></pre></div>
+</div>
+<div id="conditional-vims" class="section level2">
+<h2>Conditional VIMs</h2>
+<p>The <em>reduced oracle predictiveness</em> is defined as <span class="math inline">\(V(f_{0,-s}, P_0)\)</span>, where <span class="math inline">\(f_{0,-s}\)</span> is the best possible prediction function that <em>does not use the covariates with index in <span class="math inline">\(s\)</span></em>. Then the conditional VIM is defined as <span class="math display">\[V(f_0, P_0) - V(f_{0,-s}, P_0).\]</span> This is the measure of importance that I estimated in the <a href="introduction-to-vimp.html">main vignette</a>. To estimate the conditional VIM for family history of heart disease, I can use the following code:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># note the use of a small V and a small number of SL folds, for illustration only</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>V &lt;-<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>sl_cvcontrol &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">V =</span> <span class="dv">2</span>)</span>
+<span id="cb3-4"><a href="#cb3-4"></a>fam_vim_cond &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">5</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="co">#&gt; Warning in cv_vim(Y = Y, X = X, f1 = f1, f2 = f2, indx = indx, V = V, type =</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co">#&gt; &quot;r_squared&quot;, : Original estimate &lt; 0; returning zero.</span></span></code></pre></div>
+</div>
+<div id="marginal-vims" class="section level2">
+<h2>Marginal VIMs</h2>
+<p>The <em>marginal oracle predictiveness</em> is defined as <span class="math inline">\(V(f_{0,s}, P_0)\)</span>, where <span class="math inline">\(f_{0,s}\)</span> is the best possible prediction function that <em>only uses the covariates with index in <span class="math inline">\(s\)</span></em>. The <em>null oracle predictiveness</em> is defined as <span class="math inline">\(V(f_{0, \emptyset}, P_0)\)</span>, where <span class="math inline">\(f_{0,\emptyset}\)</span> is the best possible prediction function that <em>uses no covariates</em> (i.e., is fitting the mean). Then the marginal VIM is defined as <span class="math display">\[V(f_{0,s}, P_0) - V(f_{0,\emptyset}, P_0).\]</span> To estimate the marginal VIM for family history of heart disease, I can use the following code:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># note the use of a small V and a small number of SL folds, for illustration only</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>fam_vim_marg &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x[, <span class="dv">5</span>, <span class="dt">drop =</span> <span class="ot">FALSE</span>], <span class="dt">indx =</span> <span class="dv">1</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+</div>
+<div id="shapley-vims" class="section level2">
+<h2>Shapley VIMs</h2>
+<p>The Shapley population VIM (SPVIM) generalizes the marginal and conditional VIMs by averaging over all possible subsets. More specifically, the SPVIM for feature <span class="math inline">\(j\)</span> is given by <span class="math display">\[\sum_{s \subseteq \{1,\ldots,p\} \setminus \{j\}} \binom{p-1}{\lvert s \rvert}^{-1}\{V(f_{0, s \cup \{j\}}, P_0)) - V(f_{0,s}, P_0)\};\]</span> this is the average gain in predictiveness from adding feature <span class="math inline">\(j\)</span> to each possible grouping of the other features. To estimate the SPVIM for family history of heart disease, I can use the following code (note that <code>sp_vim</code> returns VIM estimates for all features):</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>all_vim_spvim &lt;-<span class="st"> </span><span class="kw">sp_vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol, <span class="dt">env =</span> <span class="kw">environment</span>())</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt; Warning in sp_vim(Y = heart$chd, X = x, type = &quot;r_squared&quot;, SL.library =</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt; learners.2, : One or more original estimates &lt; 0; returning zero for these</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt; indices.</span></span></code></pre></div>
+</div>
+<div id="adjusting-for-confounders" class="section level2">
+<h2>Adjusting for confounders</h2>
+<p>In some cases, there may be confounding factors that you want to adjust for in all cases. For example, in HIV vaccine studies, we often adjust for baseline demographic variables, including age and behavioral factors. If this is the case, then the null predictiveness above can be modified to be <span class="math inline">\(V(f_{0,c}, P_0)\)</span>, where <span class="math inline">\(c\)</span> is the index set of all confounders.</p>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>The three VIMs defined here may be different for a given feature of interest. Indeed, we can see this for family history of heart disease in the South African heart disease study data:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>fam_vim_cond</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="co">#&gt; Variable importance estimates:</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt;       Estimate SE         95% CI         VIMP &gt; 0 p-value  </span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt; s = 5 0        0.06716226 [0, 0.1316356] FALSE    0.8431478</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>fam_vim_marg</span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; Variable importance estimates:</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt;       Estimate   SE         95% CI         VIMP &gt; 0 p-value   </span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt; s = 1 0.08166248 0.04701503 [0, 0.1738103] TRUE     0.04208914</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co"># note: need to look at row for s = 5</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a>all_vim_spvim</span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt; Variable importance estimates:</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt;       Estimate   SE         95% CI                   VIMP &gt; 0 p-value     </span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt; s = 1 0.00000000 0.03979799 [0.00000000, 0.07800263] FALSE    3.725468e-01</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt; s = 2 0.04045153 0.03747541 [0.00000000, 0.11390199] FALSE    7.852825e-02</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt; s = 3 0.03793171 0.04292007 [0.00000000, 0.12205350] FALSE    1.190519e-01</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt; s = 4 0.01213748 0.03699908 [0.00000000, 0.08465435] FALSE    2.500157e-01</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt; s = 5 0.12856253 0.02591122 [0.07777747, 0.17934760]  TRUE    3.987260e-08</span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt; s = 6 0.00870792 0.02847462 [0.00000000, 0.06451715] FALSE    2.258975e-01</span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt; s = 7 0.00000000 0.04400392 [0.00000000, 0.08624610] FALSE    3.842072e-01</span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt; s = 8 0.00000000 0.03148677 [0.00000000, 0.06171293] FALSE    3.412430e-01</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt; s = 9 0.12350424 0.03513627 [0.05463841, 0.19237006]  TRUE    5.952758e-05</span></span></code></pre></div>
+<p>This is simply a function of the fact that the VIMs are different population parameters. All three likely provide useful information in practice:</p>
+<ul>
+<li>the marginal VIM provides information about the predictiveness of the covariate in isolation;</li>
+<li>the conditional VIM provides information about the predictiveness of the covariate adjusting for all other covariates; and</li>
+<li>the SPVIM provides information about the predictiveness of the covariate averaged over all sets of adjustment variables.</li>
+</ul>
+<p>To choose a VIM, identify which of these three (there may be more than one) that best addresses your scientific question.</p>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2 class="unnumbered">References</h2>
+<div id="refs" class="references hanging-indent">
+<div id="ref-hastie2009">
+<p>Hastie, T, R Tibshirani, and J Friedman. 2009. <em>The Elements of Statistical Learning</em>.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

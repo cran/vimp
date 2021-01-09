@@ -1,3 +1,84 @@
+# vimp 2.1.6
+
+## Major changes
+
+None
+
+## Minor changes
+
+* Updated links to DOIs and package vignettes throughout
+* Updated all tests in `testthat/` to use `glm` rather than `xgboost` (increases speed)
+* Updated all examples to use `glm` rather than `xgboost` or `ranger` (increases speed, even though the regression is now misspecified for the truth)
+* Removed `forcats` from vignette
+
+# vimp 2.1.5
+
+## Major changes
+
+None
+
+## Minor changes
+
+* Fixed a bug where if the number of rows in the different folds (for cross-fitting or sample-splitting) differed, the matrix of fold-specific EIFs had the wrong number of rows
+* Changes to internals of `measure_accuracy` and `measure_auc` for project-wide consistency
+* Update all tests in `testthat/` to not explicitly load `xgboost`
+
+# vimp 2.1.4
+
+## Major changes
+
+None
+
+## Minor changes
+
+* Fixed a bug where if the number of rows in the different folds (for cross-fitting or sample-splitting) differed, the EIF had the wrong number of rows
+
+# vimp 2.1.3
+
+## Major changes
+
+None
+
+## Minor changes
+
+* Compute logit transforms using `stats::qlogis` and `stats::plogis` rather than bespoke functions
+
+# vimp 2.1.2
+
+## Major changes
+
+None
+
+## Minor changes
+
+* Bugfix from 2.1.1.1: compute the correction correctly
+
+# vimp 2.1.1.1
+
+## Major changes
+
+None
+
+## Minor changes
+
+* Allow confidence interval (CI) and inverse probability of coarsening corrections on different scales (e.g., log) to ensure that estimates and CIs lie in the parameter space
+
+# vimp 2.1.1
+
+## Major changes
+
+* Compute one-step estimators of variable importance if inverse probability of censoring weights are entered. You input the weights, indicator of coarsening,  and observed variables, and `vimp` will handle the rest.
+
+## Minor changes
+
+* Created new vignettes "Types of VIMs" and "Using precomputed regression function estimates in `vimp`"
+* Updated main vignette to only use `run_regression = TRUE` for simplicity
+* Added argument `verbose` to `sp_vim`; if `TRUE`, messages are printed throughout fitting that display progress and `verbose` is passed to `SuperLearner`
+* Change names of internal functions from `cv_predictiveness_point_est` and  `predictiveness_point_est` to `est_predictiveness_cv` and `est_predictiveness`, respectively
+* Removed functions `cv_predictiveness_update`, `cv_vimp_point_est`, `cv_vimp_update`, `predictiveness_update`, `vimp_point_est`, `vimp_update`; this functionality is now in `est_predictiveness_cv` and `est_predictiveness` (for the `*update*` functions) or directly in `vim` or `cv_vim` (for the `*vimp*` functions)
+* Removed functions `predictiveness_se` and `predictiveness_ci` (functionality is now in `vimp_se` and `vimp_ci`, respectively)
+* Changed `weights` argument to `ipc_weights`, clarifying that these weights are meant to be used as inverse probability of coarsening (e.g., censoring) weights
+
 # vimp 2.1.0
 
 ## Major changes

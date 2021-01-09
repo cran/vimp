@@ -13,14 +13,13 @@ merge_vim(...)
 an object of class \code{vim} containing all of the output
 from the individual \code{vim} objects. This results in a list containing:
 \itemize{
- \item{call}{ - the call to \code{merge_vim()}}
  \item{s}{ - a list of the column(s) to calculate variable importance for}
  \item{SL.library}{ - a list of the libraries of learners passed to \code{SuperLearner}}
  \item{full_fit}{ - a list of the fitted values of the chosen method fit to the full data}
  \item{red_fit}{ - a list of the fitted values of the chosen method fit to the reduced data}
  \item{est}{- a vector with the corrected estimates}
  \item{naive}{- a vector with the naive estimates}
- \item{update}{- a list with the influence curve-based updates}
+ \item{eif}{- a list with the influence curve-based updates}
  \item{se}{- a vector with the standard errors}
  \item{ci}{- a matrix with the CIs}
  \item{mat}{ - a tibble with the estimated variable importance, the standard errors, and the \eqn{(1-\alpha) \times 100}\% confidence intervals}
@@ -34,24 +33,23 @@ Take the output from multiple different calls to \code{vimp_regression} and
 merge into a single \code{vim} object; mostly used for plotting results.
 }
 \examples{
-library(SuperLearner)
-library(ranger)
-## generate the data
-## generate X
+# generate the data
+# generate X
 p <- 2
 n <- 100
 x <- data.frame(replicate(p, stats::runif(n, -5, 5)))
 
-## apply the function to the x's
+# apply the function to the x's
 smooth <- (x[,1]/5)^2*(x[,1]+7)/5 + (x[,2]/3)^2
 
-## generate Y ~ Normal (smooth, 1)
+# generate Y ~ Normal (smooth, 1)
 y <- smooth + stats::rnorm(n, 0, 1)
 
-## set up a library for SuperLearner
-learners <- "SL.ranger"
+# set up a library for SuperLearner; note simple library for speed
+library("SuperLearner")
+learners <- c("SL.glm", "SL.mean")
 
-## using Super Learner (with a small number of folds, for illustration only)
+# using Super Learner (with a small number of folds, for illustration only)
 est_2 <- vimp_regression(Y = y, X = x, indx = 2, V = 2,
            run_regression = TRUE, alpha = 0.05,
            SL.library = learners, cvControl = list(V = 2))

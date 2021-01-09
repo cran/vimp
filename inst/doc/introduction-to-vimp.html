@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Brian D. Williamson" />
+
+<meta name="date" content="2021-01-08" />
+
+<title>Introduction to vimp</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      pre > code.sourceCode { white-space: pre; position: relative; }
+      pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+      pre > code.sourceCode > span:empty { height: 1.2em; }
+      code.sourceCode > span { color: inherit; text-decoration: inherit; }
+      div.sourceCode { margin: 1em 0; }
+      pre.sourceCode { margin: 0; }
+      @media screen {
+      div.sourceCode { overflow: auto; }
+      }
+      @media print {
+      pre > code.sourceCode { white-space: pre-wrap; }
+      pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+      }
+      pre.numberSource code
+        { counter-reset: source-line 0; }
+      pre.numberSource code > span
+        { position: relative; left: -4em; counter-increment: source-line; }
+      pre.numberSource code > span > a:first-child::before
+        { content: counter(source-line);
+          position: relative; left: -1em; text-align: right; vertical-align: baseline;
+          border: none; display: inline-block;
+          -webkit-touch-callout: none; -webkit-user-select: none;
+          -khtml-user-select: none; -moz-user-select: none;
+          -ms-user-select: none; user-select: none;
+          padding: 0 4px; width: 4em;
+          color: #aaaaaa;
+        }
+      pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+      div.sourceCode
+        {   }
+      @media screen {
+      pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+      }
+      code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+      code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+      code span.at { color: #7d9029; } /* Attribute */
+      code span.bn { color: #40a070; } /* BaseN */
+      code span.bu { } /* BuiltIn */
+      code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+      code span.ch { color: #4070a0; } /* Char */
+      code span.cn { color: #880000; } /* Constant */
+      code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+      code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+      code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+      code span.dt { color: #902000; } /* DataType */
+      code span.dv { color: #40a070; } /* DecVal */
+      code span.er { color: #ff0000; font-weight: bold; } /* Error */
+      code span.ex { } /* Extension */
+      code span.fl { color: #40a070; } /* Float */
+      code span.fu { color: #06287e; } /* Function */
+      code span.im { } /* Import */
+      code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+      code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+      code span.op { color: #666666; } /* Operator */
+      code span.ot { color: #007020; } /* Other */
+      code span.pp { color: #bc7a00; } /* Preprocessor */
+      code span.sc { color: #4070a0; } /* SpecialChar */
+      code span.ss { color: #bb6688; } /* SpecialString */
+      code span.st { color: #4070a0; } /* String */
+      code span.va { color: #19177c; } /* Variable */
+      code span.vs { color: #4070a0; } /* VerbatimString */
+      code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Introduction to <code>vimp</code></h1>
+<h4 class="author">Brian D. Williamson</h4>
+<h4 class="date">2021-01-08</h4>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p><code>vimp</code> is a package that computes nonparametric estimates of variable importance and provides valid inference on the true importance. The package supports flexible estimation of variable importance based on the difference in nonparametric <span class="math inline">\(R^2\)</span>, classification accuracy, and area under the receiver operating characteristic curve (AUC). These quantities are all nonparametric generalizations of the usual measures in simple parametric models (e.g., linear models). For more details, see the accompanying manuscripts <span class="citation">Williamson, Gilbert, Carone, et al. (2020)</span>, <span class="citation">Williamson, Gilbert, Simon, et al. (2020)</span>, and <span class="citation">Williamson and Feng (2020)</span>.</p>
+<p>Variable importance estimates may be computed quickly, depending on the techniques used to estimate the underlying conditional means — if these techniques are slow, then the variable importance procedure will be slow.</p>
+<p>The code can handle arbitrary dimensions of features, and may be used to estimate the importance of any single feature or group of features for predicting the outcome. The package also includes functions for cross-validated importance.</p>
+<p>The author and maintainer of the <code>vimp</code> package is <a href="https://bdwilliamson.github.io/">Brian Williamson</a>. The methods implemented here have also been implemented in Python under the package <a href="https://github.com/bdwilliamson/vimpy"><code>vimpy</code></a>.</p>
+</div>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>A stable version of the package may be downloaded and installed from CRAN. Type the following command in your R console to install the stable version of <code>vimp</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;vimp&quot;</span>)</span></code></pre></div>
+<p>A development version of the package may be downloaded and installed from GitHub using the <code>devtools</code> package. Type the following command in your R console to install the development version of <code>vimp</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># only run if you don&#39;t have devtools</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="co"># previously installed</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co"># install.packages(&quot;devtools&quot;)</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;bdwilliamson/vimp&quot;</span>)</span></code></pre></div>
+</div>
+<div id="quick-start" class="section level2">
+<h2>Quick Start</h2>
+<p>This section should serve as a quick guide to using the <code>vimp</code> package — we will cover the main functions for estimating <span class="math inline">\(R^2\)</span>-based variable importance using a simulated data example. More details are given in the next section.</p>
+<p>First, load the <code>vimp</code> package:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">library</span>(<span class="st">&quot;vimp&quot;</span>)</span></code></pre></div>
+<pre><code>## vimp version 2.1.6: Perform Inference on Algorithm-Agnostic Variable Importance</code></pre>
+<pre><code>## Package created on 2021-01-08</code></pre>
+<p>Next, create some data:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># -------------------------------------------------------------</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="co"># problem setup</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co"># -------------------------------------------------------------</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co"># set up the data</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="kw">set.seed</span>(<span class="dv">5678910</span>)</span>
+<span id="cb6-6"><a href="#cb6-6"></a>n &lt;-<span class="st"> </span><span class="dv">1000</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a>p &lt;-<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a>s &lt;-<span class="st"> </span><span class="dv">1</span> <span class="co"># desire importance for X_1</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a>x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">replicate</span>(p, <span class="kw">runif</span>(n, <span class="dv">-1</span>, <span class="dv">1</span>)))</span>
+<span id="cb6-10"><a href="#cb6-10"></a>y &lt;-<span class="st"> </span>(x[,<span class="dv">1</span>])<span class="op">^</span><span class="dv">2</span><span class="op">*</span>(x[,<span class="dv">1</span>]<span class="op">+</span><span class="dv">7</span><span class="op">/</span><span class="dv">5</span>) <span class="op">+</span><span class="st"> </span>(<span class="dv">25</span><span class="op">/</span><span class="dv">9</span>)<span class="op">*</span>(x[,<span class="dv">2</span>])<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co"># set up folds for hypothesis testing</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a>folds &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">rep</span>(<span class="kw">seq_len</span>(<span class="dv">2</span>), <span class="dt">length =</span> <span class="kw">length</span>(y)))</span></code></pre></div>
+<p>This creates a matrix of covariates <code>x</code> with two columns, a vector <code>y</code> of normally-distributed outcome values, and a set of folds for a sample of <code>n = 100</code> study participants.</p>
+<p>The workhorse function of <code>vimp</code>, for <span class="math inline">\(R^2\)</span>-based variable importance, is <code>vimp_rsquared</code>. There are two ways to compute variable importance: in the first method, you allow <code>vimp</code> to run regressions for you and return variable importance; in the second method (discussed in <a href="precomputed-regressions.html">“Using precomputed regression function estimates in <code>vimp</code>”</a>), you run the regressions yourself and plug these into <code>vimp</code>. I will focus on the first method here. The basic arguments are</p>
+<ul>
+<li>Y: the outcome (in this example, <code>y</code>)</li>
+<li>X: the covariates (in this example, <code>x</code>)</li>
+<li>indx: the covariate(s) of interest for evaluating importance (here, either 1 or 2)</li>
+<li>run_regression: a logical value telling <code>vimp_rsquared</code> whether or not to run a regression of Y on X (<code>TRUE</code> in this example)</li>
+<li>SL.library: a “library” of learners to pass to the function <code>SuperLearner</code> (since <code>run_regression = TRUE</code>)</li>
+<li>V: the number of folds to use for cross-fitted variable importance</li>
+</ul>
+<p>This second-to-last argument, <code>SL.library</code>, determines the estimators you want to use for the conditional mean of Y given X. Estimates of variable importance rely on good estimators of the conditional mean, so we suggest using flexible estimators and model stacking to do so. One option for this is the <code>SuperLearner</code> package; load that package using</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">library</span>(<span class="st">&quot;SuperLearner&quot;</span>)</span></code></pre></div>
+<pre><code>## Loading required package: nnls</code></pre>
+<pre><code>## Super Learner</code></pre>
+<pre><code>## Version: 2.0-27-9000</code></pre>
+<pre><code>## Package created on 2019-08-12</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># load specific algorithms</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="kw">library</span>(<span class="st">&quot;ranger&quot;</span>)</span></code></pre></div>
+<p>The code</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>est_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> y, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">1</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="dt">SL.library =</span> <span class="kw">c</span>(<span class="st">&quot;SL.ranger&quot;</span>, <span class="st">&quot;SL.mean&quot;</span>), <span class="dt">V =</span> <span class="dv">2</span>, <span class="dt">env =</span> <span class="kw">environment</span>())</span></code></pre></div>
+<p>uses the Super Learner to fit the required regression functions, and computes an estimate of variable importance for the importance of <span class="math inline">\(X_1\)</span>. We can visualize the estimate, standard error, and confidence interval by printing or typing the object name:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>est_<span class="dv">1</span></span></code></pre></div>
+<pre><code>## Variable importance estimates:
+##       Estimate  SE        95% CI                  VIMP &gt; 0 p-value     
+## s = 1 0.1320347 0.0401547 [0.05333291, 0.2107364] TRUE     0.0004653858</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">print</span>(est_<span class="dv">1</span>)</span></code></pre></div>
+<pre><code>## Variable importance estimates:
+##       Estimate  SE        95% CI                  VIMP &gt; 0 p-value     
+## s = 1 0.1320347 0.0401547 [0.05333291, 0.2107364] TRUE     0.0004653858</code></pre>
+<p>This output shows that we have estimated the importance of <span class="math inline">\(X_1\)</span> to be 0.132, with a 95% confidence interval of [0.053, 0.211].</p>
+</div>
+<div id="detailed-guide" class="section level2">
+<h2>Detailed guide</h2>
+<p>In this section, we provide a fuller example of estimating <span class="math inline">\(R^2\)</span>-based variable importance in the context of the South African heart disease study data <span class="citation">(Hastie, Tibshirani, and Friedman 2009)</span>.</p>
+<p>Often when working with data we attempt to estimate the conditional mean of the outcome <span class="math inline">\(Y\)</span> given features <span class="math inline">\(X\)</span>, defined as <span class="math inline">\(\mu_P(x) = E_P(Y \mid X = x)\)</span>.</p>
+<p>There are many tools for estimating this conditional mean. We might choose a classical parametric tool such as linear regression. We might also want to be model-agnostic and use a more nonparametric approach to estimate the conditional mean. However,</p>
+<ul>
+<li>This involves using some nonparametric smoothing technique, which requires: (1) choosing a technique, and (2) selecting tuning parameters</li>
+<li>Naive optimal tuning balances out the bias and variance of the smoothing estimator. Is this the correct trade-off for estimating the conditional mean?</li>
+</ul>
+<p>Once we have a good estimate of the conditional mean, it is often of scientific interest to understand which features contribute the most to the variation in <span class="math inline">\(\mu_P\)</span>. Specifically, we might consider <span class="math display">\[\mu_{P, s}(x) = E_P(Y \mid X_{(-s)} = x_{(-s)}),\]</span> where for a vector <span class="math inline">\(v\)</span> and a set of indices <span class="math inline">\(s\)</span>, <span class="math inline">\(v_{-(s)}\)</span> denotes the elements of <span class="math inline">\(v\)</span> with index not in <span class="math inline">\(s\)</span>. By comparing <span class="math inline">\(\mu_{P, s}\)</span> to <span class="math inline">\(\mu_P\)</span> we can evaluate the importance of the <span class="math inline">\(s\)</span>th element (or group of elements).</p>
+<p>Assume that our data are generated according to the mechanism <span class="math inline">\(P_0\)</span>. We define the population <span class="math inline">\(R^2\)</span> value of a given regression function <span class="math inline">\(\mu\)</span> as <span class="math inline">\(R^2(\mu, P_0) = 1 - \frac{E_{P_0}\{Y - \mu(X)\}^2}{var_{P_0}(Y)}\)</span>, where the numerator of this expression is the population mean squared error and the denominator is the population variance. We can then define a nonparametric measure of variable importance, <span class="math display">\[\psi_{0, s} = R^2(\mu_{P_0}, P_0) - R^2(\mu_{P_0,s}, P_0),\]</span> which is the proportion of the variability in the outcome explained by including <span class="math inline">\(X_j\)</span> in our chosen estimation technique.</p>
+<p>This document introduces you to the basic tools in <code>vimp</code> and how to apply them to a dataset. I will explore one method for obtaining variable estimates using <code>vimp</code>: you only specify a <em>library</em> of candidate estimators for the conditional means <span class="math inline">\(\mu_{P_0}\)</span> and <span class="math inline">\(\mu_{P_0, s}\)</span>; you allow <code>vimp</code> to obtain the optimal estimates of these quantities using the <code>SuperLearner</code> <span class="citation">(van der Laan, Polley, and Hubbard 2007)</span>, and use these estimates to obtain variable importance estimates. A second method (using precomputed estimates of the regression functions) exists and is described in <a href="precomputed-regressions.html">“Using precomputed regression function estimates in <code>vimp</code>”</a>.</p>
+<div id="a-look-at-the-south-african-heart-disease-study-data" class="section level3">
+<h3>A look at the South African heart disease study data</h3>
+<p>Throughout this document I will use the South African heart disease study data <span class="citation">(Hastie, Tibshirani, and Friedman 2009)</span>, freely available from the <a href="https://web.stanford.edu/~hastie/ElemStatLearn/datasets/SAheart.data">Elements of Statistical Learning website</a>. Information about these data is available <a href="https://web.stanford.edu/~hastie/ElemStatLearn/datasets/SAheart.info.txt">here</a>.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># read in the data from the Elements website</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="kw">library</span>(<span class="st">&quot;RCurl&quot;</span>)</span>
+<span id="cb18-3"><a href="#cb18-3"></a>heart_data &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">text =</span> <span class="kw">getURL</span>(<span class="st">&quot;http://web.stanford.edu/~hastie/ElemStatLearn/datasets/SAheart.data&quot;</span>), <span class="dt">header =</span> <span class="ot">TRUE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb18-4"><a href="#cb18-4"></a><span class="co"># minor data cleaning</span></span>
+<span id="cb18-5"><a href="#cb18-5"></a>heart &lt;-<span class="st"> </span>heart_data[, <span class="dv">2</span><span class="op">:</span><span class="kw">dim</span>(heart_data)[<span class="dv">2</span>]]</span>
+<span id="cb18-6"><a href="#cb18-6"></a>heart<span class="op">$</span>famhist &lt;-<span class="st"> </span><span class="kw">ifelse</span>(heart<span class="op">$</span>famhist <span class="op">==</span><span class="st"> &quot;Present&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb18-7"><a href="#cb18-7"></a><span class="co"># sample-splitting folds for hypothesis testing</span></span>
+<span id="cb18-8"><a href="#cb18-8"></a>heart_folds &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">rep</span>(<span class="kw">seq_len</span>(<span class="dv">2</span>), <span class="dt">length =</span> <span class="kw">dim</span>(heart)[<span class="dv">1</span>]))</span></code></pre></div>
+<p>In addition to the indicator of myocardial infarction <code>chd</code>, the outcome of interest, there are measurements on two groups of variables. First are behavioral features: cumulative tobacco consumption, current alcohol consumption, and type A behavior (a behavioral pattern linked to stress). Second are biological features: systolic blood pressure, low-density lipoprotein (LDL) cholesterol, adiposity (similar to body mass index), family history of heart disease, obesity, and age.</p>
+<p>Since there are nine features and two groups, it is of interest to determine variable importance both for the nine individual features separately and for the two groups of features.</p>
+</div>
+<div id="a-first-approach-linear-regression" class="section level3">
+<h3>A first approach: linear regression</h3>
+<p>Suppose that I believe that a linear model truly describes the relationship between the outcome and the covariates in these data. In that case, I would be justified in only fitting a linear regression to estimate the conditional means; this means that in my importance analysis, I should also use only linear regression. Note that because I chose to fit the regression functions first and then plug them into <code>vimp</code>, I need to explicitly specify the folds used for hypothesis testing. The analysis is achieved by the following:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>X &lt;-<span class="st"> </span>heart[, <span class="op">-</span><span class="kw">dim</span>(heart)[<span class="dv">2</span>]]</span>
+<span id="cb19-2"><a href="#cb19-2"></a>lm_vim_sbp &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">1</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
+<span id="cb19-3"><a href="#cb19-3"></a>lm_vim_tob &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">2</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
+<span id="cb19-4"><a href="#cb19-4"></a>lm_vim_ldl &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">3</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
+<span id="cb19-5"><a href="#cb19-5"></a>lm_vim_adi &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">4</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
+<span id="cb19-6"><a href="#cb19-6"></a>lm_vim_fam &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">5</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
+<span id="cb19-7"><a href="#cb19-7"></a>lm_vim_tpa &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">6</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
+<span id="cb19-8"><a href="#cb19-8"></a>lm_vim_obe &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">7</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
+<span id="cb19-9"><a href="#cb19-9"></a>lm_vim_alc &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">8</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
+<span id="cb19-10"><a href="#cb19-10"></a>lm_vim_age &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">9</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
+<span id="cb19-11"><a href="#cb19-11"></a></span>
+<span id="cb19-12"><a href="#cb19-12"></a><span class="co"># make a table with the estimates using the merge_vim() function</span></span>
+<span id="cb19-13"><a href="#cb19-13"></a><span class="kw">library</span>(<span class="st">&quot;dplyr&quot;</span>)</span></code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>lm_mat &lt;-<span class="st"> </span><span class="kw">merge_vim</span>(lm_vim_sbp, lm_vim_tob, lm_vim_ldl, lm_vim_adi,</span>
+<span id="cb23-2"><a href="#cb23-2"></a>                lm_vim_fam, lm_vim_tpa, lm_vim_obe, lm_vim_alc, lm_vim_age)</span>
+<span id="cb23-3"><a href="#cb23-3"></a><span class="co"># print out the matrix</span></span>
+<span id="cb23-4"><a href="#cb23-4"></a>lm_mat</span></code></pre></div>
+<pre><code>## Variable importance estimates:
+##       Estimate     SE         95% CI                  VIMP &gt; 0 p-value     
+## s = 6 0.2306968687 0.07754543 [0.07871062, 0.3826831]  TRUE    0.0008709805
+## s = 2 0.2297583908 0.07408769 [0.08454918, 0.3749676]  TRUE    0.0014740077
+## s = 1 0.1243845280 0.06401668 [0.00000000, 0.2498549]  TRUE    0.0323404939
+## s = 9 0.0931209210 0.06962164 [0.00000000, 0.2295768] FALSE    0.0935529736
+## s = 7 0.0845631815 0.07720069 [0.00000000, 0.2358737] FALSE    0.1308871251
+## s = 4 0.0754359734 0.07307546 [0.00000000, 0.2186612] FALSE    0.1545292248
+## s = 5 0.0393849670 0.06391775 [0.00000000, 0.1646615] FALSE    0.2698421118
+## s = 8 0.0299019189 0.07034801 [0.00000000, 0.1677815] FALSE    0.3314648344
+## s = 3 0.0003397151 0.06646206 [0.00000000, 0.1306030] FALSE    0.4979267053</code></pre>
+</div>
+<div id="building-a-library-of-learners" class="section level3">
+<h3>Building a library of learners</h3>
+<p>In general, we don’t believe that a linear model truly holds. Thinking about potential model misspecification leads us to consider other algorithms. Suppose that I prefer to use generalized additive models <span class="citation">(Hastie and Tibshirani 1990)</span> to estimate <span class="math inline">\(\mu_{P_0}\)</span> and <span class="math inline">\(\mu_{P_0, s}\)</span>, so I am planning on using the <code>gam</code> package. Suppose that you prefer to use the elastic net <span class="citation">(Zou and Hastie 2005)</span>, and are planning to use the <code>glmnet</code> package.</p>
+<p>The choice of either method is somewhat subjective, and I also will have to use a technique like cross-validation to determine an optimal tuning parameter in each case. It is also possible that neither additive models nor the elastic net will do a good job estimating the true conditional means!</p>
+<p>This motivates using <code>SuperLearner</code> to allow the data to determine the optimal combination of <em>base learners</em> from a <em>library</em> that I define. These base learners are a combination of different methods (e.g., generalized additive models and elastic net) and instances of the same method with different tuning parameter values (e.g., additive models with 3 and 4 degrees of freedom). The Super Learner is an example of model stacking, or model aggregation — these approaches use a data-adaptive combination of base learners to make predictions.</p>
+<p>For instance, my library could include the elastic net, random forests <span class="citation">(Breiman 2001)</span>, and gradient boosted trees <span class="citation">(Friedman 2001)</span> as follows:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="co"># load the library</span></span>
+<span id="cb25-2"><a href="#cb25-2"></a><span class="kw">library</span>(SuperLearner)</span>
+<span id="cb25-3"><a href="#cb25-3"></a></span>
+<span id="cb25-4"><a href="#cb25-4"></a><span class="co"># create a function for boosted stumps</span></span>
+<span id="cb25-5"><a href="#cb25-5"></a>SL.gbm<span class="fl">.1</span> &lt;-<span class="st"> </span><span class="cf">function</span>(..., <span class="dt">interaction.depth =</span> <span class="dv">1</span>) <span class="kw">SL.gbm</span>(..., <span class="dt">interaction.depth =</span> interaction.depth)</span>
+<span id="cb25-6"><a href="#cb25-6"></a></span>
+<span id="cb25-7"><a href="#cb25-7"></a><span class="co"># create GAMs with different degrees of freedom</span></span>
+<span id="cb25-8"><a href="#cb25-8"></a>SL.gam<span class="fl">.3</span> &lt;-<span class="st"> </span><span class="cf">function</span>(..., <span class="dt">deg.gam =</span> <span class="dv">3</span>) <span class="kw">SL.gam</span>(..., <span class="dt">deg.gam =</span> deg.gam)</span>
+<span id="cb25-9"><a href="#cb25-9"></a>SL.gam<span class="fl">.4</span> &lt;-<span class="st"> </span><span class="cf">function</span>(..., <span class="dt">deg.gam =</span> <span class="dv">4</span>) <span class="kw">SL.gam</span>(..., <span class="dt">deg.gam =</span> deg.gam)</span>
+<span id="cb25-10"><a href="#cb25-10"></a>SL.gam<span class="fl">.5</span> &lt;-<span class="st"> </span><span class="cf">function</span>(..., <span class="dt">deg.gam =</span> <span class="dv">5</span>) <span class="kw">SL.gam</span>(..., <span class="dt">deg.gam =</span> deg.gam)</span>
+<span id="cb25-11"><a href="#cb25-11"></a></span>
+<span id="cb25-12"><a href="#cb25-12"></a><span class="co"># add more levels of alpha for glmnet</span></span>
+<span id="cb25-13"><a href="#cb25-13"></a>create.SL.glmnet &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">alpha =</span> <span class="kw">c</span>(<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>)) {</span>
+<span id="cb25-14"><a href="#cb25-14"></a>  <span class="cf">for</span> (mm <span class="cf">in</span> <span class="kw">seq</span>(<span class="kw">length</span>(alpha))) {</span>
+<span id="cb25-15"><a href="#cb25-15"></a>    <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">file =</span> <span class="st">&quot;&quot;</span>, <span class="dt">text =</span> <span class="kw">paste</span>(<span class="st">&#39;SL.glmnet.&#39;</span>, alpha[mm], <span class="st">&#39;&lt;- function(..., alpha = &#39;</span>, alpha[mm], <span class="st">&#39;) SL.glmnet(..., alpha = alpha)&#39;</span>, <span class="dt">sep =</span> <span class="st">&#39;&#39;</span>)), <span class="dt">envir =</span> .GlobalEnv)</span>
+<span id="cb25-16"><a href="#cb25-16"></a>  }</span>
+<span id="cb25-17"><a href="#cb25-17"></a>  <span class="kw">invisible</span>(<span class="ot">TRUE</span>)</span>
+<span id="cb25-18"><a href="#cb25-18"></a>}</span>
+<span id="cb25-19"><a href="#cb25-19"></a><span class="kw">create.SL.glmnet</span>()</span>
+<span id="cb25-20"><a href="#cb25-20"></a></span>
+<span id="cb25-21"><a href="#cb25-21"></a><span class="co"># add tuning parameters for randomForest</span></span>
+<span id="cb25-22"><a href="#cb25-22"></a>create.SL.randomForest &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">tune =</span> <span class="kw">list</span>(<span class="dt">mtry =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">7</span>), <span class="dt">nodesize =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>))) {</span>
+<span id="cb25-23"><a href="#cb25-23"></a>  tuneGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(tune, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb25-24"><a href="#cb25-24"></a>  <span class="cf">for</span> (mm <span class="cf">in</span> <span class="kw">seq</span>(<span class="kw">nrow</span>(tuneGrid))) {</span>
+<span id="cb25-25"><a href="#cb25-25"></a>    <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">file =</span> <span class="st">&quot;&quot;</span>, <span class="dt">text =</span> <span class="kw">paste</span>(<span class="st">&quot;SL.randomForest.&quot;</span>, mm, <span class="st">&quot;&lt;- function(..., mtry = &quot;</span>, tuneGrid[mm, <span class="dv">1</span>], <span class="st">&quot;, nodesize = &quot;</span>, tuneGrid[mm, <span class="dv">2</span>], <span class="st">&quot;) SL.randomForest(..., mtry = mtry, nodesize = nodesize)&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)), <span class="dt">envir =</span> .GlobalEnv)</span>
+<span id="cb25-26"><a href="#cb25-26"></a>  }</span>
+<span id="cb25-27"><a href="#cb25-27"></a>  <span class="kw">invisible</span>(<span class="ot">TRUE</span>)</span>
+<span id="cb25-28"><a href="#cb25-28"></a>}</span>
+<span id="cb25-29"><a href="#cb25-29"></a><span class="kw">create.SL.randomForest</span>()</span>
+<span id="cb25-30"><a href="#cb25-30"></a></span>
+<span id="cb25-31"><a href="#cb25-31"></a><span class="co"># create the library</span></span>
+<span id="cb25-32"><a href="#cb25-32"></a>learners &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;SL.glmnet&quot;</span>, <span class="st">&quot;SL.glmnet.0.25&quot;</span>, <span class="st">&quot;SL.glmnet.0.5&quot;</span>, <span class="st">&quot;SL.glmnet.0.75&quot;</span>,</span>
+<span id="cb25-33"><a href="#cb25-33"></a>              <span class="st">&quot;SL.randomForest&quot;</span>, <span class="st">&quot;SL.randomForest.1&quot;</span>, <span class="st">&quot;SL.randomForest.2&quot;</span>, <span class="st">&quot;SL.randomForest.3&quot;</span>,</span>
+<span id="cb25-34"><a href="#cb25-34"></a>              <span class="st">&quot;SL.randomForest.4&quot;</span>, <span class="st">&quot;SL.randomForest.5&quot;</span>, <span class="st">&quot;SL.randomForest.6&quot;</span>, <span class="st">&quot;SL.randomForest.7&quot;</span>,</span>
+<span id="cb25-35"><a href="#cb25-35"></a>              <span class="st">&quot;SL.randomForest.8&quot;</span>, <span class="st">&quot;SL.randomForest.9&quot;</span>,</span>
+<span id="cb25-36"><a href="#cb25-36"></a>              <span class="st">&quot;SL.gbm.1&quot;</span>)</span></code></pre></div>
+<p>Now that I have created the library of learners, I can move on to estimating variable importance.</p>
+</div>
+<div id="estimating-variable-importance-for-a-single-variable" class="section level3">
+<h3>Estimating variable importance for a single variable</h3>
+<p>The main function for R-squared-based variable importance in the <code>vimp</code> package is the <code>vimp_rsquared()</code> function. There are five main arguments to <code>vimp_rsquared()</code>:</p>
+<ul>
+<li><code>Y</code>, the outcome</li>
+<li><code>X</code>, the covariates</li>
+<li><code>indx</code>, which determines the feature I want to estimate variable importance for</li>
+<li><code>SL.library</code>, the library of candidate learners</li>
+<li><code>V</code>, the number of cross-validation folds to use for computing variable importance</li>
+</ul>
+<p>The main arguments differ if precomputed regression function estimates are used; please see <a href="precomputed-regressions.html">“Using precomputed regression function estimates in <code>vimp</code>”</a> for further discussion of this case.</p>
+<p>Suppose that the first feature that I want to estimate variable importance for is family history of heart disease, <code>fam</code>. Then supplying <code>vimp_rsquared()</code> with</p>
+<ul>
+<li><code>Y = heart$chd</code></li>
+<li><code>X = X</code></li>
+<li><code>indx = 5</code></li>
+<li><code>SL.library = learners</code></li>
+<li><code>V = 5</code></li>
+</ul>
+<p>means that:</p>
+<ul>
+<li>I want to use <code>SuperLearner()</code> to estimate the conditional means <span class="math inline">\(\mu_{P_0}\)</span> and <span class="math inline">\(\mu_{P_0,s}\)</span>, and my candidate library is <code>learners</code></li>
+<li>I want to estimate variable importance for the fifth column of the South African heart disease study covariates, which is <code>fam</code></li>
+<li>I want to use five-fold cross-fitting to estimate importance</li>
+</ul>
+<p>The call to <code>vimp_rsquared()</code> looks like this:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="co"># load the library</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a><span class="kw">library</span>(<span class="st">&quot;vimp&quot;</span>)</span>
+<span id="cb26-3"><a href="#cb26-3"></a></span>
+<span id="cb26-4"><a href="#cb26-4"></a><span class="co"># now estimate variable importance</span></span>
+<span id="cb26-5"><a href="#cb26-5"></a><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X,</span>
+<span id="cb26-6"><a href="#cb26-6"></a>    <span class="dt">indx =</span> <span class="dv">5</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> learners, <span class="dt">V =</span> <span class="dv">5</span>)</span></code></pre></div>
+<p>While this is the preferred method for estimating variable importance, using a large library of learners may cause the function to take time to run. Usually this is okay — in general, you took a long time to collect the data, so letting an algorithm run for a few hours should not be an issue.</p>
+<p>However, for the sake of illustration, I can estimate varibable importance for family history only using only using a small library, a small number of cross-validation folds in the Super Learner, and a small number of cross-fitting folds as follows (again, I suggest using a larger number of folds and a larger library in practice):</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="co"># load the library</span></span>
+<span id="cb27-2"><a href="#cb27-2"></a><span class="kw">library</span>(<span class="st">&quot;vimp&quot;</span>)</span>
+<span id="cb27-3"><a href="#cb27-3"></a></span>
+<span id="cb27-4"><a href="#cb27-4"></a><span class="co"># small learners library</span></span>
+<span id="cb27-5"><a href="#cb27-5"></a>learners<span class="fl">.2</span> &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;SL.ranger&quot;</span>)</span>
+<span id="cb27-6"><a href="#cb27-6"></a><span class="co"># small number of cross-fitting folds</span></span>
+<span id="cb27-7"><a href="#cb27-7"></a>V &lt;-<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb27-8"><a href="#cb27-8"></a><span class="co"># small number of CV folds for Super Learner</span></span>
+<span id="cb27-9"><a href="#cb27-9"></a>sl_cvcontrol &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">V =</span> <span class="dv">2</span>)</span>
+<span id="cb27-10"><a href="#cb27-10"></a></span>
+<span id="cb27-11"><a href="#cb27-11"></a><span class="co"># now estimate variable importance</span></span>
+<span id="cb27-12"><a href="#cb27-12"></a>fam_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> <span class="kw">as.data.frame</span>(heart[, <span class="op">-</span><span class="kw">dim</span>(heart)[<span class="dv">2</span>]]), <span class="dt">indx =</span> <span class="dv">5</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(Y = Y, X = X, f1 = f1, f2 = f2, indx = indx, V = V, type =
+## &quot;r_squared&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
+<p>This code takes approximately 5 seconds to run on a (not very fast) PC. I can display these estimates:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a>fam_vim</span></code></pre></div>
+<pre><code>## Variable importance estimates:
+##       Estimate SE         95% CI        VIMP &gt; 0 p-value  
+## s = 5 0        0.06067205 [0, 0.118915] FALSE    0.9136594</code></pre>
+<p>The object returned by <code>vimp_rsquared()</code> also contains fitted values from using <code>SuperLearner()</code>; I access these using <code>$full_fit</code> and <code>$red_fit</code>. For example,</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="kw">head</span>(fam_vim<span class="op">$</span>full_fit)</span></code></pre></div>
+<pre><code>## [[1]]
+##              [,1]
+##   [1,] 0.58860000
+##   [2,] 0.46750000
+##   [3,] 0.55396667
+##   [4,] 0.16586667
+##   [5,] 0.53133333
+##   [6,] 0.51126667
+##   [7,] 0.47723333
+##   [8,] 0.30333333
+##   [9,] 0.17800000
+##  [10,] 0.47046667
+##  [11,] 0.46123333
+##  [12,] 0.02520000
+##  [13,] 0.08663333
+##  [14,] 0.15913333
+##  [15,] 0.11023333
+##  [16,] 0.09736667
+##  [17,] 0.16700000
+##  [18,] 0.39280000
+##  [19,] 0.54893333
+##  [20,] 0.59936667
+##  [21,] 0.06646667
+##  [22,] 0.23620000
+##  [23,] 0.35260000
+##  [24,] 0.09186667
+##  [25,] 0.58176667
+##  [26,] 0.21020000
+##  [27,] 0.45703333
+##  [28,] 0.16130000
+##  [29,] 0.44070000
+##  [30,] 0.30410000
+##  [31,] 0.75393333
+##  [32,] 0.68286667
+##  [33,] 0.33980000
+##  [34,] 0.08643333
+##  [35,] 0.17996667
+##  [36,] 0.65190000
+##  [37,] 0.54836667
+##  [38,] 0.17126667
+##  [39,] 0.33243333
+##  [40,] 0.39550000
+##  [41,] 0.65530000
+##  [42,] 0.44726667
+##  [43,] 0.23056667
+##  [44,] 0.43996667
+##  [45,] 0.25703333
+##  [46,] 0.50573333
+##  [47,] 0.21950000
+##  [48,] 0.65590000
+##  [49,] 0.33476667
+##  [50,] 0.42123333
+##  [51,] 0.40263333
+##  [52,] 0.22720000
+##  [53,] 0.07206667
+##  [54,] 0.28566667
+##  [55,] 0.15250000
+##  [56,] 0.59216667
+##  [57,] 0.04670000
+##  [58,] 0.47380000
+##  [59,] 0.54116667
+##  [60,] 0.58276667
+##  [61,] 0.53076667
+##  [62,] 0.50150000
+##  [63,] 0.13280000
+##  [64,] 0.31263333
+##  [65,] 0.25990000
+##  [66,] 0.58370000
+##  [67,] 0.51666667
+##  [68,] 0.19746667
+##  [69,] 0.42953333
+##  [70,] 0.30333333
+##  [71,] 0.39396667
+##  [72,] 0.20323333
+##  [73,] 0.42146667
+##  [74,] 0.46886667
+##  [75,] 0.09813333
+##  [76,] 0.24993333
+##  [77,] 0.04420000
+##  [78,] 0.57163333
+##  [79,] 0.22793333
+##  [80,] 0.43110000
+##  [81,] 0.34016667
+##  [82,] 0.44313333
+##  [83,] 0.46963333
+##  [84,] 0.53403333
+##  [85,] 0.46316667
+##  [86,] 0.29736667
+##  [87,] 0.41506667
+##  [88,] 0.16056667
+##  [89,] 0.14333333
+##  [90,] 0.39303333
+##  [91,] 0.67220000
+##  [92,] 0.16536667
+##  [93,] 0.32390000
+##  [94,] 0.55773333
+##  [95,] 0.08520000
+##  [96,] 0.28603333
+##  [97,] 0.08676667
+##  [98,] 0.33370000
+##  [99,] 0.23973333
+## [100,] 0.22266667
+## [101,] 0.24870000
+## [102,] 0.41706667
+## [103,] 0.37433333
+## [104,] 0.55760000
+## [105,] 0.52373333
+## [106,] 0.23700000
+## [107,] 0.49853333
+## [108,] 0.57810000
+## [109,] 0.30933333
+## [110,] 0.58840000
+## [111,] 0.06886667
+## [112,] 0.23843333
+## [113,] 0.23146667
+## [114,] 0.11340000
+## [115,] 0.18396667
+## [116,] 0.19246667
+## 
+## [[2]]
+##              [,1]
+##   [1,] 0.20346667
+##   [2,] 0.05783333
+##   [3,] 0.69640000
+##   [4,] 0.48350000
+##   [5,] 0.45460000
+##   [6,] 0.34390000
+##   [7,] 0.46450000
+##   [8,] 0.58070000
+##   [9,] 0.16296667
+##  [10,] 0.42276667
+##  [11,] 0.36716667
+##  [12,] 0.49880000
+##  [13,] 0.21940000
+##  [14,] 0.79166667
+##  [15,] 0.12316667
+##  [16,] 0.38653333
+##  [17,] 0.17146667
+##  [18,] 0.30490000
+##  [19,] 0.16553333
+##  [20,] 0.13443333
+##  [21,] 0.29426667
+##  [22,] 0.12440000
+##  [23,] 0.18286667
+##  [24,] 0.20953333
+##  [25,] 0.20326667
+##  [26,] 0.45086667
+##  [27,] 0.16363333
+##  [28,] 0.19426667
+##  [29,] 0.12786667
+##  [30,] 0.44326667
+##  [31,] 0.54516667
+##  [32,] 0.29043333
+##  [33,] 0.26800000
+##  [34,] 0.26810000
+##  [35,] 0.20883333
+##  [36,] 0.44626667
+##  [37,] 0.52000000
+##  [38,] 0.13210000
+##  [39,] 0.42776667
+##  [40,] 0.31133333
+##  [41,] 0.19283333
+##  [42,] 0.59506667
+##  [43,] 0.71590000
+##  [44,] 0.59876667
+##  [45,] 0.11986667
+##  [46,] 0.53370000
+##  [47,] 0.18016667
+##  [48,] 0.22516667
+##  [49,] 0.56656667
+##  [50,] 0.69576667
+##  [51,] 0.19866667
+##  [52,] 0.25393333
+##  [53,] 0.50123333
+##  [54,] 0.24620000
+##  [55,] 0.21236667
+##  [56,] 0.70506667
+##  [57,] 0.53060000
+##  [58,] 0.09936667
+##  [59,] 0.39926667
+##  [60,] 0.47340000
+##  [61,] 0.33186667
+##  [62,] 0.13536667
+##  [63,] 0.55360000
+##  [64,] 0.39953333
+##  [65,] 0.13503333
+##  [66,] 0.17533333
+##  [67,] 0.63356667
+##  [68,] 0.12983333
+##  [69,] 0.13980000
+##  [70,] 0.24160000
+##  [71,] 0.37623333
+##  [72,] 0.13806667
+##  [73,] 0.07943333
+##  [74,] 0.34470000
+##  [75,] 0.20730000
+##  [76,] 0.60220000
+##  [77,] 0.59610000
+##  [78,] 0.23920000
+##  [79,] 0.17623333
+##  [80,] 0.63330000
+##  [81,] 0.41706667
+##  [82,] 0.65873333
+##  [83,] 0.29120000
+##  [84,] 0.08093333
+##  [85,] 0.43763333
+##  [86,] 0.72013333
+##  [87,] 0.56246667
+##  [88,] 0.44190000
+##  [89,] 0.18696667
+##  [90,] 0.23393333
+##  [91,] 0.46790000
+##  [92,] 0.40660000
+##  [93,] 0.44043333
+##  [94,] 0.18023333
+##  [95,] 0.17480000
+##  [96,] 0.53920000
+##  [97,] 0.28363333
+##  [98,] 0.59393333
+##  [99,] 0.13090000
+## [100,] 0.64650000
+## [101,] 0.31426667
+## [102,] 0.22980000
+## [103,] 0.18800000
+## [104,] 0.09533333
+## [105,] 0.31186667
+## [106,] 0.51140000
+## [107,] 0.72446667
+## [108,] 0.21386667
+## [109,] 0.21326667
+## [110,] 0.12743333
+## [111,] 0.19116667
+## [112,] 0.36003333
+## [113,] 0.32796667
+## [114,] 0.42933333
+## [115,] 0.45110000</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="kw">head</span>(fam_vim<span class="op">$</span>red_fit)</span></code></pre></div>
+<pre><code>## [[1]]
+##              [,1]
+##   [1,] 0.28380735
+##   [2,] 0.40331392
+##   [3,] 0.07090634
+##   [4,] 0.51798858
+##   [5,] 0.58516301
+##   [6,] 0.32960125
+##   [7,] 0.45714019
+##   [8,] 0.48346931
+##   [9,] 0.43820300
+##  [10,] 0.11125125
+##  [11,] 0.46296540
+##  [12,] 0.58721350
+##  [13,] 0.50220221
+##  [14,] 0.65967085
+##  [15,] 0.25599469
+##  [16,] 0.53141093
+##  [17,] 0.24717160
+##  [18,] 0.08743377
+##  [19,] 0.18183548
+##  [20,] 0.35443256
+##  [21,] 0.64857938
+##  [22,] 0.19713325
+##  [23,] 0.33451562
+##  [24,] 0.29497058
+##  [25,] 0.04477937
+##  [26,] 0.15399466
+##  [27,] 0.49364856
+##  [28,] 0.23225972
+##  [29,] 0.47052194
+##  [30,] 0.51197019
+##  [31,] 0.15773714
+##  [32,] 0.02637028
+##  [33,] 0.67373936
+##  [34,] 0.26617573
+##  [35,] 0.37701313
+##  [36,] 0.31973713
+##  [37,] 0.02550608
+##  [38,] 0.28692110
+##  [39,] 0.23337586
+##  [40,] 0.05714497
+##  [41,] 0.51271565
+##  [42,] 0.31027472
+##  [43,] 0.19370349
+##  [44,] 0.22463344
+##  [45,] 0.36485901
+##  [46,] 0.49243082
+##  [47,] 0.03075477
+##  [48,] 0.41284166
+##  [49,] 0.45002388
+##  [50,] 0.55571851
+##  [51,] 0.03373975
+##  [52,] 0.06308946
+##  [53,] 0.36446220
+##  [54,] 0.14155699
+##  [55,] 0.40746811
+##  [56,] 0.55429256
+##  [57,] 0.08473007
+##  [58,] 0.33726958
+##  [59,] 0.30080094
+##  [60,] 0.30875212
+##  [61,] 0.13840392
+##  [62,] 0.51788770
+##  [63,] 0.07075155
+##  [64,] 0.30815368
+##  [65,] 0.45740437
+##  [66,] 0.58426181
+##  [67,] 0.44580638
+##  [68,] 0.57179039
+##  [69,] 0.33841573
+##  [70,] 0.43816120
+##  [71,] 0.48972476
+##  [72,] 0.04544682
+##  [73,] 0.15694909
+##  [74,] 0.50700450
+##  [75,] 0.06300933
+##  [76,] 0.42285264
+##  [77,] 0.23988274
+##  [78,] 0.48330466
+##  [79,] 0.47225684
+##  [80,] 0.15637678
+##  [81,] 0.33737432
+##  [82,] 0.45285920
+##  [83,] 0.52647765
+##  [84,] 0.55918191
+##  [85,] 0.54191092
+##  [86,] 0.18072404
+##  [87,] 0.46903920
+##  [88,] 0.54208824
+##  [89,] 0.28692777
+##  [90,] 0.55848480
+##  [91,] 0.48031639
+##  [92,] 0.31990909
+##  [93,] 0.62202938
+##  [94,] 0.25395547
+##  [95,] 0.49104686
+##  [96,] 0.36715154
+##  [97,] 0.62564090
+##  [98,] 0.51280398
+##  [99,] 0.55643238
+## [100,] 0.51680172
+## [101,] 0.09039983
+## [102,] 0.53585794
+## [103,] 0.29009759
+## [104,] 0.63967067
+## [105,] 0.28167404
+## [106,] 0.54975427
+## [107,] 0.26158594
+## [108,] 0.23172248
+## [109,] 0.43179719
+## [110,] 0.04986515
+## [111,] 0.07221626
+## [112,] 0.02166060
+## [113,] 0.06644694
+## [114,] 0.10943394
+## [115,] 0.66937865
+## [116,] 0.53364045
+## 
+## [[2]]
+##               [,1]
+##   [1,] 0.643554626
+##   [2,] 0.344801659
+##   [3,] 0.131160181
+##   [4,] 0.290687233
+##   [5,] 0.011270687
+##   [6,] 0.606885376
+##   [7,] 0.542024128
+##   [8,] 0.514418044
+##   [9,] 0.378213099
+##  [10,] 0.089313951
+##  [11,] 0.078929408
+##  [12,] 0.361403254
+##  [13,] 0.147575527
+##  [14,] 0.044508774
+##  [15,] 0.455680589
+##  [16,] 0.008446883
+##  [17,] 0.275838738
+##  [18,] 0.336127501
+##  [19,] 0.315675141
+##  [20,] 0.502014534
+##  [21,] 0.261991959
+##  [22,] 0.405929590
+##  [23,] 0.556957050
+##  [24,] 0.519100061
+##  [25,] 0.147063123
+##  [26,] 0.440406693
+##  [27,] 0.089492127
+##  [28,] 0.387172086
+##  [29,] 0.594881244
+##  [30,] 0.406662487
+##  [31,] 0.118624718
+##  [32,] 0.239283884
+##  [33,] 0.627389421
+##  [34,] 0.176379939
+##  [35,] 0.262892791
+##  [36,] 0.062090879
+##  [37,] 0.031008090
+##  [38,] 0.076088540
+##  [39,] 0.491975773
+##  [40,] 0.005219068
+##  [41,] 0.598302359
+##  [42,] 0.508299527
+##  [43,] 0.574818334
+##  [44,] 0.598671786
+##  [45,] 0.196822532
+##  [46,] 0.292974313
+##  [47,] 0.326512131
+##  [48,] 0.065675477
+##  [49,] 0.160106428
+##  [50,] 0.024961320
+##  [51,] 0.635569879
+##  [52,] 0.073355319
+##  [53,] 0.377143161
+##  [54,] 0.136337583
+##  [55,] 0.378919781
+##  [56,] 0.643531670
+##  [57,] 0.635134821
+##  [58,] 0.610644799
+##  [59,] 0.422421041
+##  [60,] 0.018657063
+##  [61,] 0.542308349
+##  [62,] 0.175449712
+##  [63,] 0.626580606
+##  [64,] 0.438718226
+##  [65,] 0.414370001
+##  [66,] 0.015433653
+##  [67,] 0.577566584
+##  [68,] 0.043054308
+##  [69,] 0.078414066
+##  [70,] 0.590954344
+##  [71,] 0.566867224
+##  [72,] 0.320160988
+##  [73,] 0.170872652
+##  [74,] 0.022306208
+##  [75,] 0.034822017
+##  [76,] 0.200717886
+##  [77,] 0.347206521
+##  [78,] 0.435710266
+##  [79,] 0.126032222
+##  [80,] 0.370027830
+##  [81,] 0.078180598
+##  [82,] 0.227966214
+##  [83,] 0.015247692
+##  [84,] 0.541366253
+##  [85,] 0.521750664
+##  [86,] 0.160398992
+##  [87,] 0.567177950
+##  [88,] 0.286913943
+##  [89,] 0.478049947
+##  [90,] 0.075623133
+##  [91,] 0.559897256
+##  [92,] 0.152850791
+##  [93,] 0.432014747
+##  [94,] 0.420544626
+##  [95,] 0.562514117
+##  [96,] 0.465270031
+##  [97,] 0.625411551
+##  [98,] 0.255236099
+##  [99,] 0.621238120
+## [100,] 0.595599046
+## [101,] 0.147297657
+## [102,] 0.100435888
+## [103,] 0.023604357
+## [104,] 0.032169862
+## [105,] 0.026781933
+## [106,] 0.142296748
+## [107,] 0.257419619
+## [108,] 0.006018821
+## [109,] 0.117231268
+## [110,] 0.099769404
+## [111,] 0.086977207
+## [112,] 0.115717120
+## [113,] 0.368722489
+## [114,] 0.328202510
+## [115,] 0.327776303</code></pre>
+<p>I can obtain estimates for the remaining individual features in the same way (again using only using a small library for illustration):</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a><span class="co"># set up the data, removing the columns for alcohol use and chd</span></span>
+<span id="cb35-2"><a href="#cb35-2"></a>x &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(heart[, <span class="op">-</span><span class="kw">dim</span>(heart)[<span class="dv">2</span>]])</span>
+<span id="cb35-3"><a href="#cb35-3"></a></span>
+<span id="cb35-4"><a href="#cb35-4"></a><span class="co"># estimate variable importance</span></span>
+<span id="cb35-5"><a href="#cb35-5"></a>tpa_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">6</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(Y = Y, X = X, f1 = f1, f2 = f2, indx = indx, V = V, type =
+## &quot;r_squared&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a>alc_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">8</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(Y = Y, X = X, f1 = f1, f2 = f2, indx = indx, V = V, type =
+## &quot;r_squared&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a>sbp_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">1</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(Y = Y, X = X, f1 = f1, f2 = f2, indx = indx, V = V, type =
+## &quot;r_squared&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a>tob_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">2</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span>
+<span id="cb41-2"><a href="#cb41-2"></a>ldl_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">3</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span>
+<span id="cb41-3"><a href="#cb41-3"></a>adi_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">4</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(Y = Y, X = X, f1 = f1, f2 = f2, indx = indx, V = V, type =
+## &quot;r_squared&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a>obe_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">7</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span>
+<span id="cb43-2"><a href="#cb43-2"></a>age_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">9</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<p>Now that I have estimates of each of individual feature’s variable importance, I can view them all simultaneously by plotting:</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a><span class="kw">library</span>(<span class="st">&quot;dplyr&quot;</span>)</span>
+<span id="cb44-2"><a href="#cb44-2"></a><span class="kw">library</span>(<span class="st">&quot;tibble&quot;</span>)</span>
+<span id="cb44-3"><a href="#cb44-3"></a><span class="kw">library</span>(<span class="st">&quot;ggplot2&quot;</span>)</span>
+<span id="cb44-4"><a href="#cb44-4"></a><span class="kw">library</span>(<span class="st">&quot;cowplot&quot;</span>)</span></code></pre></div>
+<pre><code>## 
+## ********************************************************</code></pre>
+<pre><code>## Note: As of version 1.0.0, cowplot does not change the</code></pre>
+<pre><code>##   default ggplot2 theme anymore. To recover the previous</code></pre>
+<pre><code>##   behavior, execute:
+##   theme_set(theme_cowplot())</code></pre>
+<pre><code>## ********************************************************</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a><span class="kw">theme_set</span>(<span class="kw">theme_cowplot</span>())</span>
+<span id="cb50-2"><a href="#cb50-2"></a><span class="co"># combine the objects together</span></span>
+<span id="cb50-3"><a href="#cb50-3"></a>ests &lt;-<span class="st"> </span><span class="kw">merge_vim</span>(sbp_vim, tob_vim, ldl_vim, adi_vim,</span>
+<span id="cb50-4"><a href="#cb50-4"></a>                fam_vim, tpa_vim, obe_vim, alc_vim, age_vim)</span>
+<span id="cb50-5"><a href="#cb50-5"></a>all_vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Sys. blood press.&quot;</span>, <span class="st">&quot;Tobacco consump.&quot;</span>, <span class="st">&quot;LDL cholesterol&quot;</span>,</span>
+<span id="cb50-6"><a href="#cb50-6"></a>              <span class="st">&quot;Adiposity&quot;</span>, <span class="st">&quot;Family history&quot;</span>, <span class="st">&quot;Type A behavior&quot;</span>, <span class="st">&quot;Obesity&quot;</span>,</span>
+<span id="cb50-7"><a href="#cb50-7"></a>              <span class="st">&quot;Alcohol consump.&quot;</span>, <span class="st">&quot;Age&quot;</span>)</span>
+<span id="cb50-8"><a href="#cb50-8"></a></span>
+<span id="cb50-9"><a href="#cb50-9"></a>est_plot_tib &lt;-<span class="st"> </span>ests<span class="op">$</span>mat <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb50-10"><a href="#cb50-10"></a><span class="st">  </span><span class="kw">mutate</span>(</span>
+<span id="cb50-11"><a href="#cb50-11"></a>    <span class="dt">var_fct =</span> <span class="kw">rev</span>(<span class="kw">factor</span>(s, <span class="dt">levels =</span> ests<span class="op">$</span>mat<span class="op">$</span>s,</span>
+<span id="cb50-12"><a href="#cb50-12"></a>                     <span class="dt">labels =</span> all_vars[<span class="kw">as.numeric</span>(ests<span class="op">$</span>mat<span class="op">$</span>s)], </span>
+<span id="cb50-13"><a href="#cb50-13"></a>                     <span class="dt">ordered =</span> <span class="ot">TRUE</span>))</span>
+<span id="cb50-14"><a href="#cb50-14"></a>  )</span>
+<span id="cb50-15"><a href="#cb50-15"></a></span>
+<span id="cb50-16"><a href="#cb50-16"></a><span class="co"># plot</span></span>
+<span id="cb50-17"><a href="#cb50-17"></a>est_plot_tib <span class="op">%&gt;%</span></span>
+<span id="cb50-18"><a href="#cb50-18"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> est, <span class="dt">y =</span> var_fct)) <span class="op">+</span></span>
+<span id="cb50-19"><a href="#cb50-19"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></span>
+<span id="cb50-20"><a href="#cb50-20"></a><span class="st">  </span><span class="kw">geom_errorbarh</span>(<span class="kw">aes</span>(<span class="dt">xmin =</span> cil, <span class="dt">xmax =</span> ciu)) <span class="op">+</span></span>
+<span id="cb50-21"><a href="#cb50-21"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="kw">expression</span>(<span class="kw">paste</span>(<span class="st">&quot;Variable importance estimates: &quot;</span>, R<span class="op">^</span><span class="dv">2</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))) <span class="op">+</span></span>
+<span id="cb50-22"><a href="#cb50-22"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;&quot;</span>) <span class="op">+</span></span>
+<span id="cb50-23"><a href="#cb50-23"></a><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Estimated individual feature importance&quot;</span>) <span class="op">+</span></span>
+<span id="cb50-24"><a href="#cb50-24"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">subtitle =</span> <span class="st">&quot;in the South African heart disease study data&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAzAAAAMACAMAAADMrHKEAAADAFBMVEUAAAABAQECAgIDAwMEBAQFBQUGBgYHBwcICAgJCQkKCgoLCwsMDAwNDQ0ODg4PDw8QEBARERESEhITExMUFBQVFRUWFhYXFxcYGBgZGRkaGhobGxscHBwdHR0eHh4fHx8gICAhISEiIiIjIyMkJCQlJSUmJiYnJycoKCgpKSkqKiorKyssLCwtLS0uLi4vLy8wMDAxMTEyMjIzMzM0NDQ1NTU2NjY3Nzc4ODg5OTk6Ojo7Ozs8PDw9PT0+Pj4/Pz9AQEBBQUFCQkJDQ0NERERFRUVGRkZHR0dISEhJSUlKSkpLS0tMTExNTU1OTk5PT09QUFBRUVFSUlJTU1NUVFRVVVVWVlZXV1dYWFhZWVlaWlpbW1tcXFxdXV1eXl5fX19gYGBhYWFiYmJjY2NkZGRlZWVmZmZnZ2doaGhpaWlqampra2tsbGxtbW1ubm5vb29wcHBxcXFycnJzc3N0dHR1dXV2dnZ3d3d4eHh5eXl6enp7e3t8fHx9fX1+fn5/f3+AgICBgYGCgoKDg4OEhISFhYWGhoaHh4eIiIiJiYmKioqLi4uMjIyNjY2Ojo6Pj4+QkJCRkZGSkpKTk5OUlJSVlZWWlpaXl5eYmJiZmZmampqbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr6/v7/AwMDBwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnKysrLy8vMzMzNzc3Ozs7Pz8/Q0NDR0dHS0tLT09PU1NTV1dXW1tbX19fY2NjZ2dna2trb29vc3Nzd3d3e3t7f39/g4ODh4eHi4uLj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7////isF19AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAgAElEQVR4nO3dCXgUVb738dNJIGQzgUSI2iAgshiUKMgu6HUJShQFhgF3GI2I6KAii4g6KA77MiIGdUSQiywBgQFlADVXHEDBFUYQg0aWV5aALGEJCfm/51R19Z5Qh96qun6f5zFdVX2qTnWoL+nuYMIIAHRjkT4BADNBMAASEAyABAQDIAHBAEhAMAASEAyABAQDIMF8wRQwpwy/A0YwNimA47/H2MPnP5Q6yvd+jy3uh/JjMGP5zpVt/5NSa+QFnbCvAD8DUA0E4y1CwVzDH8+QCzphXwgmdEwZTGJvVX/Pe75g7EbSebk4xvoRmWBOMBbzwfYLOF1/AghGbiILMmUwDf3fI/OHrS+YqukaJRHMfsbqVTM0bNcxgjkP0wezb3DLpEs7v32WnH/Y6nU4qE2b76a3Tr15Ln1zV73MXkVi7I6Hmide3HrCcddYOvtq17QmfVYphzo3oWPqDW/OdrvK1UM936bNJ4uuS7j8gd+9Ryn3D2NsoLijEWOfaRG4D+rM2Ca+aRJjIzzPwS2Ye+L5M7Ja/TzPx/d0PQ7Vl7GCLzte4bmP22n7+Qz8pU2bHyY3Tu4yTR33Wc9mSa3u/V4sagfTPi9uc3s+fJp3e/3UduPLvD95VmH2YHalqS9n/qeccpWFfMflcgtjHZQNT6aIj3b+R78lXh3bxTW2pJ266W/8UGXdlcVrfYLhF5M6/oozXqOU+7cwdjkf+wtjdSsce3gM8rjK3c7BPRj1+L09zsfP6XoHMzaF2T32cT9tP58Bvr96Zn3O8WFP25TlGlPIeTBtIvfT9Hj453qrd1x3mvxMbAGmDCapr4pfPD3434jTn72csTforljGbHGzXJcL63p/qviL+/6bYxibTdSWsRtefPIixlY7x/6V7/7+q8kshr98mMZYXL/H6jB/wbAr83L4x3e9Rqn3N2aM7/6W8oVG3eIxyOMqdzsH76dkmfzG/Xz8nK53MKmxV/6Pxz7up+3nM8D3Z5c/KS7/D4hW8Js/jb2NsdgfnAfTJnI/TY+H/y5jFw0eewVjz5GfiS3AlMFoCojqMfYb0aa0tAFeT8n45XI/0XI+aiVRP8aG0/FY1qSSaChjE7Wxv9dkl/G/Kucwdi+dvZixhUQ/1fIXTCf+FKQ/Y097jVLv56+xpxL1YewTxxbPQe5Xucc5+Abjfj5+TtcnmLrbPPfxOG3fz4DYv2EJ0auMXUN0FWPj+eCBjN3tPJhjIo+53R8+8b+a1pD4otrQ38QWYPZgMhhrMPKLCuUe72CWEh3if73yP/nXlbdsKyrO0b5V1zD2qjb2Y/XlR2ksv1p/ZOwqcZSH/AXzFl+ZLS5Az1Hq/d8wdhtVZrCMCscWz0EeV7n7OfgG434+fk7XJxjxZMhjH/fT9vMZ6Ky+fXYyidlOn7SxNP4ci/YxVt95MG0i97ndH/5R/ukWwyaOGHHaz8QWYMpg3F7DjFbKqd23kHyDWcefZqvfrJmhXC6V7/fIUIY7r8A3XPGdXMZYX3HEyf6C4WnSAnHFeI5yXPJNWPxJXk2etofnII+r3P0cfINxPx8/p+sTzHzy2sf9tP18Bjorz7GUb/r8+C1j7ZTRtZntpHYwbSL3ud0f/ha3N9H8TGwBZg+Glt4ap/yZTT1/MPxJE2tyXy+3K3AMYzFxqh38uP3EAadXG4znKMcl/zxjH01gbK22h+cgj6vc/Rx8g3E/Hz+n6/suGXnt437a/oP5txiQzdgOXnh7ZTQv46h2MG0i97ndH/4Gt2D8TGwBpg+G6PDcXvzFwkWV5wvmK8Yu/UF5xeG8Auepb/UqvmPsanH7aLXBeI5yXPJ845O3sfRybQ/PQfwqFV//nhdzeZyDbzDu5+PndD0OpZ2W+z4ep+0/mMl85XQyiz1bamO1xZvDvzN2CXkF4zG3+8M/6HhK9uOWLeV+JrYAkwfzWZMmj/GbfTXE0wr+h30DVX25vM/YfUTlLbQrkI/9Vv1b9tz7782jU2mMfUj0S1K1wXiO0i75pqxhInvEuYfnoB6MjeWvo5uI68vjHHyDcT8fP6frcSjttNz38Tht/8E0OkI0lrE2RM3Ueh5nrLtHMHwij7ndHz7VVd5C2B7H6lX6mdgCTBmM9rZy329KYpmt/8x/3MdYC6IvGbv426NVXi6f8pe/g8a1VZ+YO8Z241dGwTt3MfYXor8xVuPBwRf7fVvZdcV4jNIu+RfEk8J/u/bwGMS/HsT2G1ifiavc4xz8vK3sdj7+Ttf9UM5r3P0xuJ+2/2BY42fu5h9X8CezjNnum9CdH/I718HUiTzm9nj4/Flm4rPjmzL2jL+JLcCUwTitpJmOpdiPiI6I77blV3m5nGouBta8mbFBzrE/X67u3ukw/4u7q7LYtPpgPEZpl/wPfEuds649PAbtF98KYfE3iqvc4xz8BON2Pv5O1/1Qzmvc/TG4n7b/YLKVsX9xDBO0b1wqB1Mn8pjb4+GX56g7tT/jb2ILMHswtOHeFhclN3vga3HXoubxCbOrvlyK/1y33t1ff52d3faQNpaOP9c2uV7nt8T7q3T2xXYp7d9Ynp39ojaXn2A8Rjkvef7kZYDbHp6H2nFnvbq56+dkZ0/3PAc/wbifj7/TdT+Udo17PAa3k/AfzGfDWqV0maWO++SeZolX3/uDWHQeTJ3IfW7Ph09v3XJJWvvp5X4ntgDzBQMXzvEuG1w4BGMlCCZgCMZKEEzAEIyVIJiAIRgACQgGQAKCAZCAYAAkIBgACQgGQAKCAZCAYAAkIBgACQgGQAKCAZAQJcHYp/nd/P09DZJajjqqe7eubLRy+2ubhN2Bzexfvv/fN3Dh/B4w6LOAi+mCKfX5+d73313VZftNfJd5K8de3K7c351+dtsbk3ylsjDM/sVZ/5P5OF8wYhonfinrOKS+Y2kH9OWx0XcfCITpgjnde4bXlqqDuTtLXPZb2DJ/d/rZbXLcDPaNWBh4i7K+45jPZD6qD2ZHmXcwvuevH4KJPNMFo1yh9g9ebZnaW/1fydszxo7ap4xurG6Y3Tqp5WzH0KbqzzAdtJKoYkyLlHYr+Eot8SNOHs713k1xfW5p4nBSfroDK7bPv5l/4JNVjG6W0vVLomN5l8Y3foU8ZyffmV3j+BEuEdOIcScetdsfn5ahnv/33Wqn99zjbx+fe8i1UTll7fydBxxRn284kzqBPGbRDqjs4zw6BMykwbSZXrYz83Fl/XCvbvsr7Zn3F06Mf4poeo0XVg22vakOzU3KP+XYa2CtcSsHiC812gXnuZuiiH1AvcSPcDry4A37z9mb3z7ntJhsQNobq3Jq/04P1Z2w4lnbAs/ZyXdm1zh+hH1iGjGuS+qUxTclq8Gcyrxxfn5mjp99fO/htI3KKTuD0Q64mW0hWmZTX3M5Z9EOqOzjPCMImEmDEU+ZBnZUNyjPrbL5wr1dqbTOGL6QV1+9Z0cTdlGPGeIXo+yOe51/zM12BeOxm+qV5JO0QPk/rMRTMntrdbKfYgr4i5mkd+ieuXxDq2Fes/vO7BrXmpxPidaJH9hRdrkazBa2gWjxk3728b2HyLlROZZ2/q4DNhhF1K+L1yzOkxD7OFcgYCYN5iW+MFT9Safqlf88XxjSmb5kG0pKShbYHD/IpGLtc9fabPccoxXsAF+dG1PmFYxjN1XWg7yMhKfJEcwodbI5ceI9g5ITYsSeOTWHes3ud2bHuFHkDGZcHfFxqBrMwYQ2i8XzNN99/N6jbfQIxnXAIVl0MmmW1yzOk3DMr65AwEwajHil7RHMVFIu24WOn7/0s7ijvET8VP/f30h+hPJjxPOitew39YJ7KNdzN8UP6q6XVTqCmaJO9qr2s+m/zbk4LafeUK/ZfWd2jZtCzgt2SEvxcarjNUxhR1tMl9X+9vG5R3BsdAXDz991wM/ZzkU1DnvN4jyg2Me5AgGLlmDEBn7Zfsr2ukb+In6VCdf/ClrODvKFebbT6gV3e67nboqRSZ8UFhaOZZ87gpmmTvZOTdHa7t+PJvTdWEltfYLxntlrnCOYieni4/AM7W21A/M7xRX52cf7HgdloysYfv6uA56rN6HnneQ5i+uAfB/3o0OAoiyYgzXFc5NpfZQ7KjPuETcV191KxbEz+VKPLKLE6UTH0vwF00jZ63j8E57BfCteF5zNHL9WXMMnUqsKxjmz1zhHMIXsI34mTdRgCq4+TrSLrfLdx+ceQduoHEs7f9cB6bFWtRwv6J0bXSfB93GtQMCiIJj+WVsqnFf+sJRJa16Om6jes5i1m7LgHx1qbuSvnxMnr84Tv2CoQ4OPC29umuu1G7eJLVJuc+tWeARDPTPeXtfnouJfYgdtWNkhudMO/8E4Z/YaJ6YR47qmzVh+e301mO1xPQoW5qYd8t3H5x7BuVEcy3n+zgPSGpas/YIWbaPrJPg+PztXIGAmDubFQeqGzxqlHHNetpWTshJbzNTGrr+jfq0m927lS+UvNUtuu5wvbO+adPWsd4d57SZuEkqV23fZOs9gzjzTOKXrJqL3myS1//CzNtM8Z/ed2XOcmEaMO/Go/ZK8L7qrOyzJTkzP2exvH597BG2jOJbz/J0HpLMpD2gP2LnReUCxj3MFAma+YMDbr7aPI30K1oFgzK6Cf1Xx+4/lIBQQjNkVsZiVkT4HC0EwZldeuD/Sp2AlCAZAAoIBkIBgACQgGAAJCAZAAoIBkIBgACQgGAAJJgtmX+v1kT4FsDSTBfMLwz8DgUhCMAASEAyABAQDIAHBAEhAMAASEAyABAQDIAHBAEhAMAASoimYgm7hOxGINqOH6xoWTcFMqRG+E4Foc9dtuoYhGAABwQBIQDAAEhAMgAQEAyABwQBIQDAAEhAMgAQEAyABwQBIQDAAEhAMgAQEAyABwQBIQDAAEhAMgAQEAyABwQBIQDAAEhAMgAQEAyABwQBIQDAAEkIRTFc2WrnNyPdzp32a9xa/wwKDYCBEQhDM3pjkK5UFBANRJwTBTI6bwb4RCwgGok4Igrk+tzRR+QG0ooSK0c1Sun7Jb8e0SGm3gm+0TxndOLX3YbctWjC+Qz94taUy9PtutdN77iGqNY9vfTiXqOHcJxo0fmNf94zLP6Bitq1PRvOxle6ngGDOp2LO4y/ti/RJmFHwgyliH1CvhmJJlDAg7Y1VObV/p4G1xq0cwJbxCjLvL5wY/xS5tmjB+A5tM71sZ+bjdCrzxvn5mTnuwTT86NwYW4uvKh5IOF3Mmr19aGnqSPdzQDDn8yfGFUX6LEwo+MG8knySFrBNpJTwU0wBUWnSO7vjXucbcrN5Bfw/urcrubY4gvEz9Ba+MLAjbWEbiBY/6R5Mf6J9bCzRp2xnMcvjW6cmHnXMf3bt2rXvVxtM3FrLmyV6YbmRPg0T6hD0YLIe5Nd9wtNqMHPiyvlCyYkV7AC/nRtTRvbn+cKQzuTa4gjGz9CX+MLQ9nQwoc1iJQdXMOP5kwq2hGgb21HMPuRbd7KNjvmPKNdCdcHYGMCFujXIwfygHvaySiWYVzPVrfkx4jXGWvYb2aeqwbi2OILxM3SaGgwVdrTFdFntCOYhEcwkEcwyRzBf8K1/iHwU53bt2lVY/VOyXZa3VvlDGhDp0zChW4L9FWZk0ieFhYVj2edKMO/UFFf/7t+Xs4P8dp7ttFoBD8a1xRFMFUNFMEQH5neKK1KDud0nmMV861blSaAGr2HO51ney5UHI30WJhT01zCN+oiPx+OfUIL5Vly5ZzPHF8fO5Ft7ZJEzGNcWRzBVDOXBFFx9nGgXW0WJ04mOpfkEI2YclnTM7SQQzHl9Pv69k5E+BzMKdjCb2CLlNrduhVJCz4y31/W5qJjyEievzmNLXcG4tmjvkvkfyoPZHtejYGFu2iHq0ODjwpub+gRTa/CqETEvEM3qe8ZxFggGQiTYwQxJKFVu32XrlBLOPNM4pSt/tlT+UrPktsvJLRjnFi0Y/0NfHES0JDsxPWcz0fauSVfPeneYezDX7OMv+runNX2NP597hJU6zgLBQIiY/x9fFrMtPtsQDIQIggGQgGAAJJg/GH8QDIQIggGQgGAAJCAYAAkIBkACggGQgGAAJCAYAAkIBkACggGQgGAAJCAYAAkIBkACggGQgGAAJCAYAAkIBkACggGQgGAAJCAYAAkIBkACggGQYMFg1j4evhOBaPOGz6+c9CuaggEIOQQDIAHBAEhAMAASEAyABAQDICGagvlqQvhOBCJq8qbzjwmNaAoG37i0jKRxkZoZwYAJIRidEAwICEYnBAMCgtEJwYCAYHRCMCAgGJ0QDAgIRicEAwKC0QnBgIBgdEIwICAYnRAMCAhGJwQDAoLRCcGAgGB0QjAgIBidEAwICEYnBAMCgtEJwYCAYHRCMCAgGJ0QDAgIRicEAwKC0QnBgIBgdEIwICAYnRAMCAhGJwQDAoLRCcGAYLJgejOHV883sisbrS0Wse+877Xr+x02bhAMCCYLZmNBQUH9TvzD9vMM3BuTfKW2LBNMKXvY/x0IBgSTBSO07Ktj0OS4Gewbx7JMMKd7z/DcsKNMvY3aYPYtXHU60udgIiYNZkR9vnAmdUIx29Yno/nYSr42u3VSy9nOQdfnliYOdywXsbU905u+XOE2yD5ldOPU3oeJjuVdGt/4FaJ7ruVbKy8bpKRUMaZFSrsVYtj8m1mxepBoDWYJf37bpDjSZ2EeJg1mM9tCtMy2u5g1e/vQ0tSRRNNrvLBqsO1Nx5gi9gH1auhcyXhq+TO2p90G2TPvL5wY/xTRQ3UnrHjWtoD+l+0m2sA2KMEMrDVu5QC2jA9rfvscx1+/URrMWeUVYe9In4Z5mDQYajCKqF8XKmZ5fGVq4tHSOmP4Ql59x5hXkk/SAub4zQRF7F7+cVh8iWuQPZsv3NuVf2WZyxdaDaNj8W8QPdtIebK2O+51vjGXD7G3Vg5wRLmqqgvGxsAaYk0azJAsOpk0iwfzIV/ZyTZ+yTaUlJQssJ1Rx2Q9yF+/JzytrhSJLxa0ja13DbI/L47RWbl7z5yaQ3kfOUSNRivBrGAH+Oa5MWVkH6WMODNr1qyx1QYTN8ukpipXwRWRPg3zqGXSYD5nOxfVOMyD+YKv/MGWLHT8BfCzMuQHdeWySmWtSPlS4zHIPpXUYL7NuTgtpx4PZnbNY1+zHUow+TFiv7XsN/5SxzlrlD4lo0fFJ2RppM/CPMz6lOxcvQk97yQezGK+spVt+pTtdRsyMumTwsLCsexzZa1I+TK0lW12DVLeJePBHE3ou7GS2vJgjtRY9Hwb9Z7l7CBfmGc77f5mWrQGU/5Gj36fRPokTMSswdBjrWotEMH04cvDko4drDmLL0zrow5ppNwej39CWStSBj2XVuoapAWzViR0IpUHQ7fd10x82eH3FMfO5As9ssgKwYAc0wazhvHX9TyYWoNXjYh5gUeTMmnNy3ETlRGb2CLlNreueCuZB3PJoJXDbOPdBmnB/BI7aMPKDsmd+HOxt+Jjfyf1nrzEyavzxPMUBANeTBvM2ZQHSATzYfe0pq/x1xyVk7ISW8xURwxJKFVu32XrxM3ezj/ekZY1ndwGacHQ+02S2n/4WRu+ejD2NnLcU/5Ss+S2ywnBgA8TBqP61fYxiWC2BOVkzg/BgGDSYCpOPGovJwQD4WbSYIpYjHL9IhgIL5MGU164P1jnoROCAcGkwYQfggEBweiEYEBAMDohGBAQjE4IBgQEoxOCAQHB6IRgQEAwOiEYEBCMTggGBASjE4IBAcHohGBAQDA6IRgQEIxOCAYEBKMTggEBweiEYEBAMDohGBAQjE4IBgQEoxOCAQHB6IRgQEAwOiEYEBCMTggGBASjU7XB/LNp+E4EIiorP1IzR1MwACGHYAAkIBgACQgGQAKCAZCAYAAkRFMwv60L34nA+R1eezLSpxB80RQMvnFpLGvEr/eNNggGQgXBRB6CMREEE3kIxkQQTOQhGBNBMJGHYEwEwUQegjERBBN5CMZEEEzkIRgTQTCRh2BMBMFEHoIxEQQTeQjGRBBM5CEYE0EwkYdgTATBRB6CMREEE3kIxkQQTOQhGBNBMJGHYEwEwUQegjERBBN5CMZEEEzkIRgTQTCRh2BMBMFEHoIxEQQTeQjGRBBM5CEYE0EwVRvCVNX87MkMr9+BY592AfMgGBNBMFUbklKgOOD33lL2cNXBKHdq7r+7+nkQjIkgmKoNyaju3tO9Z1QdjHKnxjuYHWWe68YJ5vSeyjDOZkoIpmrOYI7lXRrf+BW+0HDuEw0av7Gve8blH6hx8GBG1Od3nEmdoIy0TxndOLX3YfXO77vVTu+5h9rzZ3VHK8a0SGm3QoyYfzPr576LcYI59zRjjT4J23TmhGCq5gzmoboTVjxrW8CDafjRuTG2Fl9VPJBwWgtmM9tCtMy2Wxlpz7y/cGL8U0owpzJvnJ+fmUOHe3XbXzmw1riVA9gyfkfz2+esd9/FOMHMFC/YGpSEbT5TQjBVc7zof5XumcvXWg3jwfQn2sfGEn3KdmrBUINRRP26qLvYs/mHe7sqwWxhG4gWP6k8Jdsd9zq/I5ffa29N7rsca926dctqg4lpHS5pysNtErb5TOlKBFMlx4v+7WJ5z5yaQ3kw44kq2BKibfzTpgUzJItOJs1Sd7E/L/brrARzMKHN4qNiIw9mBRPvHMyNKSP7KHLf5WReXl6/aoOJzQuXxkow3cM2nyndgWCq5HxK9m3OxWk59UQwk0QwyzyD+ZztXFTjsDrSPpWcwVBhR1tMl9VKMPkx4tX0WvYbf5VDnrsY5ynZEtHLlaVhm8+U8JSsalowRxP6bqyktlUFc67ehJ53OnZR3iXTgiE6ML9TXJEIZjk7yFfn2dRXPh67GCcYeqtJ7ZwfwzedKSGYqmnBrGV7iU6kVhUMPdaq1gLHLu7BFFx9nGgXWyWCKY6dye/okaWV5LaLgYKB80MwVdOC+SV20IaVHZI77agimDUsWfu9h+7BbI/rUbAwN+0Q9c/aUpGXOHl1HluqBeO2C4IxFQRTNedrmPebJLX/8LM209yCuWafK5izKQ9ou3g8JVuSnZies5nos0Ypx8pfapbcdrk2wn0XBGMqCCZwv9o+DmgXBGMiCCZQFScetZcHtAuCMREEE6giFlPN9a5nFwRjIggmUOWF+wPcBcGYCIKJPARjIggm8hCMiSCYyEMwJoJgIg/BmAiCiTwEYyIIJvIQjIkgmMhDMCaCYCIPwZgIgok8BGMiCCbyEIyJIJjIQzAmgmAiD8GYCIKJPARjIggm8hCMiSCYyEMwJoJgIg/BmAiCiTwEYyIIJvIQjIkgmMhDMCaCYCIPwZgIgok8BGMiCCbyqg3m9JHwnQic39kjFZE+heCLpmAAQg7BAEhAMAASEAyABAQDIAHBAEiIpmDwfZjIu+OOSJ9BiCEYCCYEYywIxuAQjLEgGINDMMaCYAwOwRgLgjE4BGMsCMbgEIyxIBiDQzDGgmAMDsEYC4IxOARjLAjG4BCMsSAYg0MwxoJgDA7BGAuCMTgEYywIxuAQjLEgGINDMMaCYAwOwRgLgjE4BGMsCMbgEIyxIBiDQzDGgmAMDsEYC4IxOARjLAjG4BCMsSAYg0MwxoJgDA7BBE1XNtq1kp9xYQdBMAaHYIJlb0zyla41Hkwpe7ia4cq999/tvRnBGByCCZbJcTPYN841Hszp3jOqGa7ci2BMB8EEy/W5pYnDxcKJR+32x6fxp2T2aVTMtvXJaD62kqhiTIuUdiv43d93q53ec49yb3vG2OP1+bYzqRMcRwl7MP+5tWHud8E/bNRCMEFSxD6gXg3FUpfUKYtvStaCafb2oaWpI4kG1hq3cgBbRqcyb5yfn5mj3Hu4V7f9X7EtRMtsux2HCXcwP/Fm2eV7g37cqIVgguSV5JO0gG0iWicu+bLLtWDy+H1TE4/ujnudL+Rm0xa2gWjxk8q9ylOyBqOI+nURhzg1fPjwgdUGEzs82LqIYNhtQT9u1LoCwQRH1oP8hXzC00Tj6ojVoVowH/KVnWzjCnaAL8yNKTuY0GbxUTFCC2ZIFp1MmiW2HG3cuHGDaoOJaRxsaUowdYJ+3KiViGCC4gflwmOXVdKQlmJ9qhbMF3zlD7YkP4a/jqG17Dcq7GiL6bLaFcznbOeiGoe144T7KdlHyml/GfTjRi08JQuOkUmfFBYWjmWf08R0sT5cC2YxX9nKNi1nB/nCPNtp/vHA/E5xRc5gztWb0PNO53HC/qL/Rd7LlOAfNmohmOBo1Ed8PB7/BBWyj4gqmmjBiO3Dko4Vx87kCz2yqODq40S72CpnMPRYq1oLnMcJ/9vKh7ccDcFRoxaCCYpNbJFym1u3grqmzVh+e30tmFqDV42IeYEoL3Hy6jy2lLbH9ShYmJt2SAmmf9aWClrDkk86D4TvwxgcggmKIQmlyu27bJ34PswleV901170d09r+hp//VL+UrPktsv5kCXZiek5m9XXMJ81SjlGZ1MecB0IwRgcggmpYvFdlvP41faxawXBGByCCanzB1PBvyCVu1YRjMEhmJA6fzBFLMY9EQRjcAgmwsoL97uvIhiDQzDGgmAMDsEYC4IxOARjLAjG4BCMsSAYg0MwxoJgDA7BGAuCMTgEYywIxuAQjLEgGINDMMaCYAwOwRgLgjE4BGMsCMbgEIyxIBiDQzDGgmAMDsEYC4IxOARjLAjG4BCMsSAYg0MwxoJgDA7BGAuCMTgEYywIxuAQjLEgGINDMMaCYAwOwRhLtcH8VBC+EwH/1q+P9BmEWDQFAxByCAZAAoIBkIBgACQgGAAJCAZAQjQFU9AtfCcSVbrh/XjdoikYfOPyAtXAr73VDcEAgpGAYADBSEAwgGAkIBhAMBIQDCAYCQgGEIwEBAMIRgKCAQQjAcEAgpGAYADBSEAwgGAkIBhAMBIQDCAYCQgGEIwEBAMIRgKCAQQjAcEAgpGAYADBSEAwgGAkIBhAMBIQDCAYCQgGEGF1ffIAAB3USURBVIwEBAMIRoJsMN/f0yCp5aijVQ8oYt85ljLyqxyUnyE5rQbBhAKC0U8ymG/iu8xbOfbiduVVjkAw5oNg9JMM5u6ss/zjFrasyhEXHMyOMh3zI5hQQDD6SQbT9F7lZtBKGlGf355JnUDfd6ud3nOPc0QRW9szvenLFWowFWNapLRbQW4LJx612x+fpgZTzLb1yWg+tpLIPv9mVkyzWye1nM23a4f0OjRVH0zRTTHvVMg9HFAgGP0kg8lNyj+lLm1mW4iW2Xafyrxxfn5mjnNEEct4avkztqfVYAbWGrdygPh65Fzokjpl8U3JWjDN3j60NHUkD6b57XNOT6/xwqrBtjdJO6T3oanaYLYy7k9yDwcUCEY/yWB2NGEX9ZhRJBYbjCLq14U/PdtAtPhJ54giJr4IDYsvEcHsjnudr+RmuxbWiSu+7HItmDz+cWriUbK3JiqtM4av5dV3HtLr0GWLFi2aUXUwD4pg2ORFIC0Owegm+y5ZxdrnrrXZ7jlGNCSLTibNooMJbRa7v2lWpLy+2cbWi2BWsAN8ZW5MmXNhXB0xaKgWzIf84062key8vi/ZhpKSkgW2M9ohvQ59RCmiymC6MLhANgSjm1ww5SXiRcLvbyQ/QvQ527moxmGiwo62mC6rnUOK2Cb+8Q+2RASTH8Nfn9Ba9ptzYUhLMWiqFswXjrF2/ke20PHH97PzkJ6HPrdr167CqoMZrOy8fhdIw1My/eSC+YWtUW77X8Gv33oTet6prB2Y3ymuSBtSpHzV2Mo2i2CWs4N8ZZ7ttHNhYroYNFwLZrEydhPZpxF9yvY6J9IO6XFoqvY1zIGmvJcxUg8HVAhGP7lgKjPuETcV193KPz7WqtYCooKrjxPtYqu0IUWsD//4XFqpCKY4diZf6ZHlWihkH/H9m2jBiLHDko4pwRysOYuvTevjPKT3oan6d8lO3R/7tdSjAQcEo5/ka5jFrN2UBf/oUHMjX17Dkk8SbY/rUbAwN+0Qzep7RowoYpcMWjnMNl59lywvcfLqPLbUbaFr2ozlt9fXgqk1eNWImBdICYaGpUxa83LcROchvQ9N+D5MaCAY/WRf9K+/o36tJvduFYtnUx4QN0uyE9NzNhM9wkrF6t7OP96RljWd1GDKX2qW3HY5uS2ceNR+Sd4X3ZWD8Rf93dOavlbpCKZyUlZii5luh/Q6NCGY0EAw+gXwjy9/tX0c4OTF4ns5UhBMKCAY/S44mAr+paLqf1GmD4IxBgSj3wUHU8Riqrl29UEwxoBg9LvgYMoL9wfzPHRCMKGAYPTD/0AGCEYCggEEIwHBAIKRgGAAwUhAMIBgJCAYQDASEAwgGAkIBhCMBAQDCEYCggEEIwHBAIKRgGAAwUhAMIBgJCAYQDASEAwgGAkIBhCMBAQDCEYCggEEIwHBAIKRgGAAwUhAMIBgJERTMOufD9+JRJXn10f6DMwjmoIBCDkEAyABwQBIQDAAEhAMgAQEAyAhmoLB28qSKoZ/GelTMJ1oCgbfuJRUxmZF+hRMB8FYGIKRh2AsDMHIQzAWhmDkIRgLQzDyEIyFIRh5CMbCEIw8BGNhCEYegrEwBCMPwVgYgpGHYCwMwchDMBaGYOQhGAtDMPIQjIUhGHkIxsIQjDwEY2EIRh6CsTAEIw/BWBiCkYdgLAzByEMwFoZg5CEYC0Mw8hCMhSEYeQjGwhCMPARjYQhGHoKxMAQj7/zB9GYOr2pbith3IT2naiCYYEIw8s4fzMaCgoL6nfiH7doWBBMlEIw8fU/JWvZ1XzNoMGV/id1e5Z3gB4KRJxNMxZgWKe1WiGDW9kxv+nIF0bG8S+MbvyLuGt0speuXbreOoQqfjfYPXm2Z2vsw0ffdaqf33ENUax7f+nAuUcO5TzRo/Ma+7hmXf0DFbFufjOZjK91PpJpgDmfxp42TLuiTYFUIRp5MMANrjVs5gC3jwWQ8tfwZ29NED9WdsOJZ2wKiAWlvrMqp/bvzVhuq8NlobzO9bGfm43Qq88b5+Zk57sE0/OjcGFuLryoeSDhdzJq9fWhp6kjtJCqPHDnybdXBDFFeaG07ArrtRzDSJILZHfc6/5ibzYO5ly8Miy+he+byhVbD6KeYAqLSpHe0W+dQwXej/Ra+MLAjbWEbiBY/6R5Mf6J9bCzRp2xnMcvjW6cmHnWcxBGliCqD6cJAGoKRJRHMCnaAf5wbU1akfOnYxpRfVr1nTs2hNCeunC+WnNBunUPFCN+N9pf4wtD2dDChzWIlB1cw4/kzN7ZEHH1HMfuQb93JNjpOomzRokUzqg7mPuUKmLQIdJuPYKRJBJMfI15OrGW/FbFNfOEPfl1/m3NxWk69ofRqpjpOu3UO9b/RPo2UYKiwoy2my2pHMA+JYCaJYJY5gvnCMY1LNa9hvha93FlZ1d3gC69h5EkEs5wd5B/n2U4XKX/1b2Wbjyb03VhJbYfSOzXFhbr7d+3WOVTs7LvRGQzRgfmd4orUYG73CWaxMs0mtxOp7l2yrR1jppXJPn5LQzDyJIIpjp3JP/bI4q9h+vCF59JK17K9RCdSh5LyWvxs5njt1jlU8N2oBVNw9XGiXWwVJU4nOpbmE4yYZljSMbcTwfdhggnByJN5lywvcfLqPLaUB3PJoJXDbOPpl9hBG1Z2SO60g3pmvL2uz0XFzlttqMJnoxbM9rgeBQtz0w5RhwYfF97c1CeYWoNXjYh5gWhW3zOOE0EwwYRg5MkEU/5Ss+S2y4n2dv7xjrQs/kWB3m+S1P7Dz9pMozPPNE7pyp87abfaUIXPRiWYFwcRLclOTM/ZTLS9a9LVs94d5h7MNfv4i/7uaU1f48/nHmGljkMhmGBCMPIM/I8vi9kWn20IJpgQjDwEY2EIRh6CsTAEI8/AwfiDYIIJwchDMBaGYOQhGAtDMPIQjIUhGHkIxsIQjDwEY2EIRh6CsTAEIw/BWBiCkYdgLAzByEMwFoZg5CEYC0Mw8hCMhSEYeQjGwhCMPARjYQhGHoKxMAQjD8FYGIKRh2AsDMHIQzAWhmDkIRgLQzDyEIyFIRh5CMbCEIy8aArmf9uF70SiwtnWSyN9CqYTTcEAhByCAZCAYAAkIBgACQgGQAKCAZAQTcH8ti58J2JOWzdH+gxML5qCwTcuz6dfp0ifgekhGCtBMAFDMFaCYAKGYKwEwQQMwVgJggkYgrESBBMwBGMlCCZgCMZKEEzAEIyVIJiAIRgrQTABQzBWgmAChmCsBMEEDMFYCYIJGIKxEgQTMARjJQgmYAjGShBMwBCMlSCYgCEYK0EwAUMwVoJgAoZgrATBBAzBWAmCCRiCsRIEEzAEYyUIJmAIxkoQTMAQjJUgmIAZLJiubHS19yOYgCCYgBkrmL0xyVdWOwDBBATBBMxYwUyOm8G+qW5AtcGMjSsP9glFGQQTMGMFc31uaeJwsVA25HL7E1Oy+dLs1kktZzsHVBNM+QDGGuHHkVcLwQTMUMEUsQ+oV0Ox1KfOm0s6xvNgptd4YdVg25vaiGqCmcC4+n+E4zxNC8EEzFDBvJJ8khawTURbbbyL46nZVFpnDN+eV1/ce6x169Ytqw7mVhEMu7I1VK1O+7D9WUYrQwWT9SBRacLTRLMSK/lqr2z6km0oKSlZYDvDV0/m5eX1qzqYHkowPfKgak06hO8PM0oZKZgflEueXVZJLzQS64OzaaG6if3sGFLNU7JFYlzLM2E5U7PCU7KAGSmYkUmfFBYWjmWf04wksf7nbPqU7fUYUt27ZP/MZL1+DekJmh6CCZiRgmnUR3w8Hv8Efya2muhUejYdrDmLb5rWRxuC78MEBMEEzEDBbGKLlNvcuhXU/eJ//uumK9oQDUuZtObluInaGAQTEAQTMAMFMyShVLl9l62jk4/Wu3LS+FyiyklZiS1mOscgmIAgmIAZKBg3R5ad4B/7DvK5A8EEBMEEzJjBHE8ZuOvYP2N9f0k2ggkIggmYMYOhwizGLn7bdzuCCQiCCZhBg+FfZPz+IxcEExAEEzDDBuMfggkIggkYgrESBBMwBGMlCCZgCMZKEEzAEIyVIJiAIRgrQTABQzBWgmAChmCsBMEEDMFYCYIJGIKxEgQTMARjJQgmYAjGShBMwBCMlSCYgCEYK0EwAUMwVoJgAoZgrATBBAzBWAmCCRiCsRIEEzAEYyUIJmAIxkoQTMAQjJUgmIBFUzCnj4TvRMyp9Hikz8D0oikYgJBDMAASEAyABAQDIAHBAEhAMAASoikYfB/mgjV7MtJnYBYIBgjB6IdggBCMfggGCMHoh2CAEIx+CAYIweiHYIAQjH4IBgjB6IdggBCMfggGCMHoh2CAEIx+CAYIweiHYIAQjH4IBgjB6IdggBCMfggGCMHoh2CAEIx+CAYIweiHYIAQjH4IBgjB6IdggBCMfggGCMHoh2CAEIx+CAYIweiHYIAQjH4RCaaw75VpN718mqiIfSe3J4IJDQSjVySCGRVzw9i3HkvO+qmaYErZw0T33+29GcGEBoLRKwLBfMhereQ3Oxp3qKw6mNO9ZyCY8EEweoU/mHMNu6gL/2ILitjanulNX67ga7NbJ7WczW+/71Y7veceIvs0as8Ye7w+33YmdYJj5+qCee9S1qc4tOcetRCMXuEP5me2wLHUIK+IZTy1/Bnb00TTa7ywarDtTTqVeeP8/MwcJZjDvbrt/4ptIVpm2+3YpZpgCnherOWZ0D+AaIRg9Ap/MMvY946l224oYvfy22HxJaV1xvCFvPq0hW0gWvykEozylKzBKKJ+ytekk3l5ef2qDuZuEQzrkQcXIB3B6BT+YBayHY6lu1sVsWX8dhtb/yXbUFJSssB25mBCm8VHxZ1aMEOy6GTSLLHlaOPGjRtUHcwtSjCXNIYLkIhgdAp/MFvZcsdS8/uK2CZ++wdbspCpfqbCjraYLqtdwXzOdi6qcVjbuZqnZOPF/g3+CPXpRyc8JdMr/MGU1e6lLnxpm1HEPiSR0OZP2V7ngAPzO8UVOYM5V29Czzud91UTTPlDjDVcE7LTjm4IRq8IvK38FntH3Oy95qqzRawPX3ourfRgTfGsa1ofKrj6ONEutsoZDD3WqtYC577Vvq38StzZ0J559EIwekUgmMpH2O2T33umTqNvqIhdMmjlMNt4/sI/ZdKal+Mm0va4HgULc9MOKcH0z9pSQWtY8knnvvg+TGggGL0i8k9jVt3d6KLOI07wrzKdf7wjLWs631Q5KSuxxUy+sCQ7MT1ns/oa5rNGKcfobMoDrj0RTGggGL2M/48vf7V97FpBMKGBYPQyejAVJx61l7tWEUxoIBi9jB5MEYtxTwTBhAaC0cvowZQX7ndfRTChgWD0MnowXhBMaCAYvRAMEILRD8EAIRj9EAwQgtEPwQAhGP0QDBCC0Q/BACEY/RAMEILRD8EAIRj9EAwQgtEPwQAhGP0QDBCC0Q/BACEY/RAMEILRD8EAIRj9EAwQgtEPwQAhGP0QDBCC0Q/BACEY/RAMEILRD8EAIRj9oimY39aF70SizH92nH8MCNEUDEDIIRgACQgGQAKCAZCAYAAkIBgACdEUzP+2C9+JmNBfRkb6DKJBNAWDb1xWq3PfSJ9BNEAwloFgggHBWAaCCQYEYxkIJhgQjGUgmGBAMJaBYIIBwVgGggkGBGMZCCYYEIxlIJhgQDCWgWCCAcFYBoIJBgRjGQgmGBCMZSCYYEAwloFgggHBWAaCCQYEYxkIJhgQjGUgmGBAMJaBYIIBwVgGggkGBGMZCCYYEIxlIJhgQDCWgWCCAcFYBoIJBgRjGQgmGC44mFs6OxYGM+7y3v/12OjOPs17S0a+3Fyu8QjmwiGYYAhCMGkFBQv+1ix5LQUWzP13VzkXggkGBBMMQQgmU3w83qH5ueAGs6PMz3gEc+EQTDAEKxhay1Z4BVMxullK1y95MFNGN07tfZhvGNMipR0fpQYwu3VSy9n89vtutdN77qH2/IndUedG+/ybWbHneEV1wfzYOWbG2Qt9OBaAYIIhaMGcq/GaVzAD0t5YlVP7d7Jn3l84Mf4pooG1xq0cwJapAUyv8cKqwbY36VTmjfPzM3PocK9u+yu1jWRvfvuc0x7jVdUE8614LdWj8kIfT/RDMMEQtGCo4aOewfwUU0BUmvQO2bP52r1daXfc63whN1sJoLTOGL6SV5+2sA1Ei59UnpI5N5K9NXmO58oWLVo0o+pg7hfBsMmLoAotEEwQBC+YRl7BzIkr5x9LTpD9eX47pDOtYAf4wtyYMhHAl2xDSUnJAtuZgwltFh8V43kwzo1kH0We47kjShFVBtOFQbViEUwQBC2Yypp/9wzmVUdIZJ9KSjD5MeL50lr2mwhgoeNP8Wcq7GiL6bJaCca10T6FPMeLGY4cOfJt1cH8Vdl12xGoQnsEEwRBC+ZT7xf979QU1/vu39V3yXgwy9lBvjDPdloE8Cnb6xx5YH6nuCIRjGuj2MdjvEM1r2EOXcV7mXChD8cC8BomGIIVTGkn77eVlS8GZzPHO4Mpjp3JF3pkKa9JDtacxVem9aGCq48T7WKrRDDOjco+HuMdqnuXrKx/7LYLfTRWgGCC4cKDabFM+C8NTlu2bMlrVyWtcd8o9Mx4e12fi4qdwVBe4uTVeWypGsCwlElrXo6bSNvjehQszE07RP2ztlRoG9V9PMar8H2YC4dgguHCg1FfboxQ/2lMg57bPDYKZ55pnNJ1E7mCKX+pWXLb5aQGUDkpK7GF+BKyJDsxPWcz0WeNUo45Nyr7eIxXIZgLh2CCAf/40jIQTDAgGMtAMMGAYCwDwQQDgrEMBBMMCMYyEEwwIBjLQDDBgGAsA8EEA4KxDAQTDAjGMhBMMCAYy0AwwYBgLAPBBAOCsQwEEwwIxjIQTDAgGMtAMMGAYCwDwQQDgrEMBBMMCMYyEEwwIBjLQDDBgGAsA8EEA4KxDAQTDAjGMhBMMCAYy0AwwYBgLAPBBAOCsQwEEwwIxjIQTDBEUzDrnw/fiZjQm/MjfQbRIJqCAQg5BAMgAcEASEAwABIQDIAEBAMgAcEASEAwABIQDIAEkwWzkTVpXaVrs6u+L7QiN3P2tRac+brwz7lYuwJNFsxPLXrnValDTNX3hdZVdSI186WNIjVz4rURmrg/uzH8kxZqV6DJgqlW5P7x5cCWkZr5pl6RmvnSSP3LvePsvQjNLCCYYEAwYYRgggXBhBOCMb3I/fP+pVMiNfNb70dq5rGrIzTxmeFfR2hmIZqCAQg5BAMgAcEASEAwABIQDIAEswczu3Vq1y98Vjy2hnPmJUx4JHwTEw0Z6m9r+GYOx0P2mLlsbPPEqyac9T2fsDB5MPPYM0vvSfjOa8Vja1hnHl8vnyusftcgTkyVHycN9d0azpnD8JA9Zx5R67XVL8c/FZ7H7MPkwVzTj6ii+aNeKx5bwzrzo7eFdFKfiT9MYWyoz9awzhyGh+wx87kE8e22MTVOh+Ux+zB3MLvZEv5xxCWeKx5bwzoz3TT4yDd/hHJerwf3x7Zt9Yf6bA3nzGF4yJ4z72kunoW9z34Lx2P2Ze5gNrEt/GN+TIXHisfWsM5M9ZvXZKznoXBNLDQZ6m9r2GYOw0P28+hOdWlyLhyP2Ze5g/mI/cw/fsAOeqx4bA3rzGcScrYfX57eI1wTC8plG/aH7Jw5DA/Zd+Zv2qRsCMtj9mXuYDaxb/jHWTFnPVY8toZ1ZvW+aexomCYWHF9hwvyQnTOrQvqQvWc+3D/mnuLwPGZf5g5mN1vOP76Q6bnisTWsM6s+Vv7qC8fEQpOh/raGbWZVSB+y18w7L235ld/zCQtzB0MtHyGqbDXAa8VjazhnXldrHV8bnXouXBOTdtmG/SFrM4fjIXvMXJnV7bT/8wkLkwfzfszkDXkJ3/OvzH3PuFacC+Ge+Vxr+4SPR9WcGbaJSQsm7A9ZmzkcD9lj5i/Y0+8Ip8LymH2YPBh679qLumzgt4+wUteKayHcM+/vf0ly20VhnNj5xCjsD1mbORwP2X3mWUy1PzyP2ZvZgwEIKwQDIAHBAEhAMAASEAyABAQDIAHBAEhAMAASEAyE0Yb2SU3+EemTCAiCgfA5Xnfc0cI6of5nASGFYCB8PqvLPwwK8Q/MCC0EA+FzYjfR2WvfifRpBALBQFj92KV7aaTPIRAIJuRWs8fVhbKUK6ofyZz/R9Yt2aE8o7Bap/7j4trt5lUSnXq27qSQ/p8zIYdgQq68bl315zSsYj6/j8Pu8b/2VhuMXe7/Ap7BimWGV32M6uc9/zTr2A1Dhw59pk8ym0KVt/Y4HPBZRRaCCb3BbJ1y+wjz+aFzTZN1B+M59LyCFkz18+oJZpxyuysxjT5O31lcXGzqZhBM6P2H5Ymbc3Wbem4vWe81MFhPycSBgxZMoEO0YOhWtu9vyrOzgQGfWAQhmNCrbJhRzm/+j40mWtKxTtJVr/GnaLndPk+Ko9zm5LaNDf1X14ta/a3cEczeB65Ibuv8DWNi6N23/JSb3jKfprVKavMfvi1u2se3pl43gb84oG132TNu/jdpB76RX5i3uE93y+4eKRl/2sMHfNO9bt07f/A5vmv11JjmCQ0ePeA4hr95ncd1TOOzK73DhjgO6xaMqb+0OCCYMBjJxJU8hG2llbYWo569jr3Cr+Cr6971mnI1uraxqxMfGn4tu0sNZked2k+Mas1GOg6iXLhX3rB2ey/bTf1++NR+Ce8q7jb7O58OtfUnWl/r4sHDrrS9pR34q0Fszmb36Vpnz/55XkInorXxjZ97Jj3tV+/ju1b72W4blRvT1XEMf/M6j6sO8d2V3kse5jiuFkxx8g3h/ayHBoIJg63sL/xjwxZEfdKO8+dmTTvyK5hNJbUC1zbGVhKV92JrlGByLuZfD87dF7NNPYhy4YpXQbvZVfxLxnjxg43imPh1jy/bvqU2tXcTnchOP+Y4sPpcyX26BXzjINvxiqwr/uBfj2KGeR/fuVoaywOkJ9NK1GP4m9d1XGWIn11d1rGuI0aMGPZA6jW/he0THkIIJhxa1jlLX7OXiQ7yZyt0pgHPITe+jNSr0bWNXS8G/8KfzfBgTrDhYu07Nlk9hnLhZvCFcjaYxA8X5tdwXEdxz2E2Yg9T/kKfx1Y5Dqxeye7TiXdz/872f6v2NHO+1/FdqydjrnK8LnEF4zWv67hiiL9dXRxvKzP2RHh/4l6IIJhweI19RC+w//KlX+eP6JbCxBV8ubhDeQ3j3KZ8ISKq010Es0W70Iarx1Au3IZ8oYKNINGGCKa/ctfFf/6UKa9FvmfTHQd2vBp3Tad8C2gc27+IrVWP53V8t9W/x9o6DC885x6M17yu44oh/nZ1cTwlO/hX8czQ/BBMOPzKHqaslnzhzZppf359Y8dsRyrKR9c2RzBpvUQw37MnVit+VI/hN5gHlbtS7/mEzRML29gkx4HVi917Oh7M++wz9Xhex3df/envNyexNn9UHYzruGKIv11dtNcw5aldQvPJDS8EExYd0rayMUSnEnqL98uudw/GbRu7Tmwr4hcmD+Yke1Ks/VHo+MH4foNpJe75mQ37TX3t/gH7l3swPtPxYDYx5WfuzZridXzX6tFtJ/jqi2xClcG4HVcM8beri/NdsqwWQf6kRgSCCYvX2Q1sB9F29hpf+TbuGrdg3LYxVsCvy16275QX/XekiCdVA2L/n3oIv8GIX5FS0ZttrMxO30dUem3tI65gfvGdjgdzpkFzflHvTXrA+/jO1f9jfyPximSCcgx/87odVxniZ1cXZzDXZITqsxtOCCYsDsQy8cWgvFGdZ2cNzmgW96IrGLdtrH2NB0e1Zk+obyv/N7X2X0e1Zy86DuE3mAY1Hhh1PXuAqDA+85nnm9nytTToLfb4Kp/peDBUENt05AsNkn/yPr5z9fSVNXr/rX9m7V3KMfzN63ZcZYifXeemaW9XO4O5M8bU/+rSAcGERw4bK2623552ac9tu+7o4vYaxrXtln+93zHl+hnk+MZl8Z8bJreZox3BbzBDlrRPyR4vvnH5Q+5l6Tf9m5zB/H5bUm+f6UQwtP6W9Hp3bfU5vmt113314+v33eY4hr95XcdVhvjZ1c83LkeyZ0L12Q0jBGNWpRUiGLl9Kk9UBmVeC0MwZiYbDAQMwZgZggk7BGNmCCbsEAyABAQDIAHBAEhAMAASEAyABAQDIAHBAEhAMAASEAyABAQDIAHBAEhAMAASEAyABAQDIOH/Azhjr5JQNNNrAAAAAElFTkSuQmCC" /><!-- --></p>
+</div>
+</div>
+<div id="estimating-variable-importance-for-a-group-of-variables" class="section level2">
+<h2>Estimating variable importance for a group of variables</h2>
+<p>Now that I have estimated variable importance for each of the individual features, I can estimate variable importance for each of the groups that I mentioned above: biological and behavioral features.</p>
+<p>The only difference between estimating variable importance for a group of features rather than an individual feature is that now I specify a vector for <code>s</code>; I can use any of the options listed in the previous section to compute these estimates.</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1"></a><span class="co"># get the estimates</span></span>
+<span id="cb51-2"><a href="#cb51-2"></a>behav_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">6</span>, <span class="dv">8</span>), <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(Y = Y, X = X, f1 = f1, f2 = f2, indx = indx, V = V, type =
+## &quot;r_squared&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1"></a>bios_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span>), <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span>
+<span id="cb53-2"><a href="#cb53-2"></a></span>
+<span id="cb53-3"><a href="#cb53-3"></a><span class="co"># combine and plot</span></span>
+<span id="cb53-4"><a href="#cb53-4"></a>groups &lt;-<span class="st"> </span><span class="kw">merge_vim</span>(behav_vim, bios_vim)</span>
+<span id="cb53-5"><a href="#cb53-5"></a>all_grp_nms &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Behavioral features&quot;</span>, <span class="st">&quot;Biological features&quot;</span>)</span>
+<span id="cb53-6"><a href="#cb53-6"></a></span>
+<span id="cb53-7"><a href="#cb53-7"></a>grp_plot_tib &lt;-<span class="st"> </span>groups<span class="op">$</span>mat <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb53-8"><a href="#cb53-8"></a><span class="st">  </span><span class="kw">mutate</span>(</span>
+<span id="cb53-9"><a href="#cb53-9"></a>    <span class="dt">grp_fct =</span> <span class="kw">factor</span>(<span class="kw">case_when</span>(</span>
+<span id="cb53-10"><a href="#cb53-10"></a>      s <span class="op">==</span><span class="st"> &quot;2,6,8&quot;</span> <span class="op">~</span><span class="st"> &quot;1&quot;</span>,</span>
+<span id="cb53-11"><a href="#cb53-11"></a>      s <span class="op">==</span><span class="st"> &quot;1,3,4,5,7,9&quot;</span> <span class="op">~</span><span class="st"> &quot;2&quot;</span></span>
+<span id="cb53-12"><a href="#cb53-12"></a>    ), <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>),  <span class="dt">labels =</span> all_grp_nms, <span class="dt">ordered =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb53-13"><a href="#cb53-13"></a>  )</span>
+<span id="cb53-14"><a href="#cb53-14"></a>grp_plot_tib <span class="op">%&gt;%</span></span>
+<span id="cb53-15"><a href="#cb53-15"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> est, <span class="dt">y =</span> grp_fct)) <span class="op">+</span></span>
+<span id="cb53-16"><a href="#cb53-16"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></span>
+<span id="cb53-17"><a href="#cb53-17"></a><span class="st">  </span><span class="kw">geom_errorbarh</span>(<span class="kw">aes</span>(<span class="dt">xmin =</span> cil, <span class="dt">xmax =</span> ciu)) <span class="op">+</span></span>
+<span id="cb53-18"><a href="#cb53-18"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="kw">expression</span>(<span class="kw">paste</span>(<span class="st">&quot;Variable importance estimates: &quot;</span>, R<span class="op">^</span><span class="dv">2</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))) <span class="op">+</span></span>
+<span id="cb53-19"><a href="#cb53-19"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;&quot;</span>) <span class="op">+</span></span>
+<span id="cb53-20"><a href="#cb53-20"></a><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Estimated feature group importance&quot;</span>) <span class="op">+</span></span>
+<span id="cb53-21"><a href="#cb53-21"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">subtitle =</span> <span class="st">&quot;in the South African heart disease study data&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="types-of-population-variable-importance" class="section level2">
+<h2>Types of population variable importance</h2>
+<p>In this document, I have focused on one particular definition of population variable importance that I call <em>conditional</em> variable importance. For a further discussion of what I call <em>marginal</em> variable importance and <em>Shapley population</em> variable importance, please see <a href="types-of-vims.html">“Types of VIMs”</a>.</p>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2 class="unnumbered">References</h2>
+<div id="refs" class="references hanging-indent">
+<div id="ref-breiman2001">
+<p>Breiman, L. 2001. “Random Forests” 45.</p>
+</div>
+<div id="ref-friedman2001">
+<p>Friedman, JH. 2001. “Greedy Function Approximation: A Gradient Boosting Machine.”</p>
+</div>
+<div id="ref-hastie1990">
+<p>Hastie, TJ, and RJ Tibshirani. 1990. <em>Generalized Additive Models</em>. Vol. 43. CRC Press.</p>
+</div>
+<div id="ref-hastie2009">
+<p>Hastie, T, R Tibshirani, and J Friedman. 2009. <em>The Elements of Statistical Learning</em>.</p>
+</div>
+<div id="ref-vanderlaan2007">
+<p>van der Laan, MJ, EC Polley, and AE Hubbard. 2007. “Super Learner” 6.</p>
+</div>
+<div id="ref-williamson2020c">
+<p>Williamson, Brian D, and Jean Feng. 2020. “Efficient Nonparametric Statistical Inference on Population Feature Importance Using Shapley Values.” <a href="https://arxiv.org/abs/2006.09481">https://arxiv.org/abs/2006.09481</a>.</p>
+</div>
+<div id="ref-williamson2020a">
+<p>Williamson, Brian D, Peter B Gilbert, Marco Carone, and Noah Simon. 2020. “Nonparametric Variable Importance Assessment Using Machine Learning Techniques.”</p>
+</div>
+<div id="ref-williamson2020b">
+<p>Williamson, Brian D, Peter B Gilbert, Noah Simon, and Marco Carone. 2020. “A Unified Approach for Inference on Algorithm-Agnostic Variable Importance.” <a href="https://arxiv.org/abs/2004.03683">https://arxiv.org/abs/2004.03683</a>.</p>
+</div>
+<div id="ref-zou2005">
+<p>Zou, H, and TJ Hastie. 2005. “Regularization and Variable Selection via the Elastic Net.”</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

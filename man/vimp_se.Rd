@@ -4,25 +4,14 @@
 \alias{vimp_se}
 \title{Estimate standard errors}
 \usage{
-vimp_se(
-  est,
-  update,
-  denom = NULL,
-  n = length(update),
-  scale = "log",
-  na.rm = FALSE
-)
+vimp_se(est, eif, n = length(eif), na.rm = FALSE)
 }
 \arguments{
 \item{est}{the estimate of variable importance.}
 
-\item{update}{the influence curve-based update.}
-
-\item{denom}{a list of point estimate and influence curve for the denominator (if any) to make the measure of predictiveness interpretable.}
+\item{eif}{the estimated efficient influence curve.}
 
 \item{n}{the sample size.}
-
-\item{scale}{the scale to compute SEs on (either "log", for log-scale, or "identity", for same scale as point estimate).}
 
 \item{na.rm}{logical; should NA's be removed in computation? (defaults to \code{FALSE}).}
 }

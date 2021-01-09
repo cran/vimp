@@ -1,76 +1,86 @@
-## load required functions and packages
+# load required functions and packages
 library("testthat")
 library("SuperLearner")
-library("vimp")
-library("xgboost")
 
-## generate the data
+# generate the data -- note that this is a simple setting, for speed
 set.seed(4747)
 p <- 2
-n <- 10000
-x <- data.frame(replicate(p, stats::runif(n, -5, 5)))
-## apply the function to the x's
-y <- (x[,1]/5)^2*(x[,1]+7)/5 + (x[,2]/3)^2 + rnorm(n, 0, 1)
+n <- 5e4
+x <- as.data.frame(replicate(p, stats::rnorm(n, 0, 1)))
+# apply the function to the x's
+y <- 1 + 0.5 * x[, 1] + 0.75 * x[, 2] + stats::rnorm(n, 0, 1)
+true_var <- mean((y - mean(y)) ^ 2)
+# note that true difference in R-squareds for variable j, under independence, is 
+# beta_j^2 * var(x_j) / var(y)
+r2_one <- 0.5 ^ 2 * 1 / true_var
+r2_two <- 0.75 ^ 2 * 1 / true_var
 folds <- sample(rep(seq_len(2), length = length(y)))
 
-## set up a library for SuperLearner
-SL.xgboost1 <- function(..., max_depth = 1, ntree = 500, shrinkage = 0.1){
-  SL.xgboost(..., objective = 'reg:squarederror', max_depth = max_depth, ntree = ntree, shrinkage = shrinkage)
-}
-learners <- c("SL.glm.interaction", "SL.xgboost1", "SL.mean")
-true_vim <- (500/729)/(1 + 2497/7875 + 500/729)
+# set up a library for SuperLearner
+learners <- c("SL.glm")
+V <- 2
 
+set.seed(1234)
 test_that("General variable importance estimates using internally-computed fitted values work", {
   est <- vim(Y = y, X = x, indx = 2, type = "r_squared", run_regression = TRUE,
-                SL.library = learners, alpha = 0.05, cvControl = list(V = 3),
+                SL.library = learners, alpha = 0.05, cvControl = list(V = V),
              env = environment(), folds = folds)
-  ## check that the estimate is approximately correct
-  expect_equal(est$est, true_vim, tolerance = 0.2, scale = 1)
-  ## check that the SE, CI work
+  # check that the estimate is approximately correct
+  expect_equal(est$est, r2_two, tolerance = 0.1, scale = 1)
+  # check that the SE, CI work
   expect_length(est$ci, 2)
   expect_length(est$se, 1)
-  ## check that the p-value worked
+  # check that the p-value worked
   expect_length(est$p_value, 1)
   expect_true(est$test)
-  ## check that printing, plotting, etc. work
+  # check that printing, plotting, etc. work
   expect_silent(format(est)[1])
   expect_output(print(est), "Estimate", fixed = TRUE)
-  ## check that influence curve worked
-  expect_length(est$update, sum(folds == 1))
+  # check that influence curve worked
+  expect_length(est$eif, sum(folds == 1))
 })
 
-## fit the data with all covariates
-full_fit <- SuperLearner(Y = y[folds == 1], X = x[folds == 1, ], SL.library = learners, cvControl = list(V = 3))
-full_fitted <- predict(full_fit)$pred
-## fit the data with only X1
-reduced_fit <- SuperLearner(Y = full_fitted, X = x[folds == 2, -2, drop = FALSE], SL.library = learners, cvControl = list(V = 3))
-reduced_fitted <- predict(reduced_fit)$pred
-
+# fit the data with all covariates
+set.seed(4747)
+full_fit <- SuperLearner::SuperLearner(Y = y[folds == 1], 
+                                       X = x[folds == 1, ], 
+                                       SL.library = learners, 
+                                       cvControl = list(V = V))
+full_fitted <- SuperLearner::predict.SuperLearner(full_fit)$pred
+# fit the data with only X1
+reduced_fit <- SuperLearner::SuperLearner(Y = full_fitted, 
+                                          X = x[folds == 2, -2, drop = FALSE], 
+                                          SL.library = learners, 
+                                          cvControl = list(V = V))
+reduced_fitted <- SuperLearner::predict.SuperLearner(reduced_fit)$pred
 test_that("General variable importance estimates using externally-computed fitted values work", {
-    ## expect a message with no folds
-    expect_error(est <- vim(Y = y, X = x, f1 = full_fitted, f2 = reduced_fitted, run_regression = FALSE))
-    est <- vim(Y = y, X = x, indx = 2, type = "r_squared", run_regression = FALSE, 
+    # expect a message with no folds
+    expect_error(
+      est <- vim(Y = y, X = x, f1 = full_fitted, 
+                 f2 = reduced_fitted, run_regression = FALSE)
+      )
+    # provide folds
+    est <- vim(Y = y, X = x, indx = 2, type = "r_squared", 
+               run_regression = FALSE,
                f1 = full_fitted, f2 = reduced_fitted,
              folds = folds)
-    ## check that estimate worked
-    expect_equal(est$est, true_vim, tolerance = 0.2, scale = 1)
-    ## check that p-value exists
+    # check that estimate worked
+    expect_equal(est$est, r2_two, tolerance = 0.15, scale = 1)
+    # check that p-value exists
     expect_length(est$p_value, 1)
-    ## check that CIs with other transformations work
-    se_log <- vimp_se(est$est, est$update, scale = "log")
-    se_logit <- vimp_se(est$est, est$update, scale = "logit")
-    ci_log <- vimp_ci(est$est, se_log, scale = "log", level = 0.95)
-    ci_logit <- vimp_ci(est$est, se_logit, scale = "logit", level = 0.95)
+    # check that CIs with other transformations work
+    ci_log <- vimp_ci(est$est, est$se, scale = "log", level = 0.95)
+    ci_logit <- vimp_ci(est$est, est$se, scale = "logit", level = 0.95)
     expect_length(ci_log, 2)
     expect_length(ci_logit, 2)
 })
 
 
 test_that("Measures of predictiveness work", {
-  full_rsquared <- predictiveness_point_est(full_fitted, y[folds == 1], type = "r_squared")
-  expect_equal(full_rsquared, 0.44, tolerance = 0.1)
-  full_update <- predictiveness_update(full_fitted, y[folds == 1], type = "r_squared")
-  expect_length(full_update, sum(folds == 1))
+  full_rsquared <- est_predictiveness(full_fitted, y[folds == 1], 
+                                      type = "r_squared")
+  expect_equal(full_rsquared$point_est, 0.44, tolerance = 0.1)
+  expect_length(full_rsquared$eif, sum(folds == 1))
 })
 
 test_that("Error messages work", {
@@ -80,11 +90,14 @@ test_that("Error messages work", {
     expect_error(vim(Y = y, X = x, run_regression = FALSE))
     expect_error(vim(Y = y, f1 = mean(y)))
     expect_error(vim(Y = y, f1 = rep(mean(y), length(y)), f2 = mean(y)))
-    expect_error(vim(Y = y, X = x, SL.library = learners, type = "nonsense_type"))
+    expect_error(vim(Y = y, X = as.data.frame(x), SL.library = learners,
+                     type = "nonsense_type"))
     expect_error(vim(Y = y, X = X, SL.library = learners, indx = ncol(X) + 1))
 })
 test_that("ANOVA-based R^2 with pre-computed fitted values works", {
-  expect_warning(est <- vim(Y = y, X = x, f1 = full_fitted, f2 = reduced_fitted, run_regression = FALSE, indx = 2, type = "anova", folds = folds))
-  ## check that the estimate is nearly correct
-  expect_equal(est$est, (500/729)/(1 + 2497/7875 + 500/729), tolerance = 0.2, scale = 1)
+  expect_warning(est <- vim(Y = y, X = x, f1 = full_fitted, 
+                            f2 = reduced_fitted, run_regression = FALSE, 
+                            indx = 2, type = "anova", folds = folds))
+  # check that the estimate is nearly correct
+  expect_equal(est$est, r2_two, tolerance = 0.35, scale = 1)
 })

@@ -5,10 +5,9 @@
 \title{Shapley Population Variable Importance Measure (SPVIM) Estimates and Inference}
 \usage{
 sp_vim(
-  Y,
-  X,
+  Y = NULL,
+  X = NULL,
   V = 5,
-  weights = rep(1, length(Y)),
   type = "r_squared",
   SL.library = c("SL.glmnet", "SL.xgboost", "SL.mean"),
   univariate_SL.library = NULL,
@@ -17,6 +16,11 @@ sp_vim(
   delta = 0,
   na.rm = FALSE,
   stratified = FALSE,
+  verbose = FALSE,
+  C = rep(1, length(Y)),
+  Z = NULL,
+  ipc_weights = rep(1, length(Y)),
+  scale = "identity",
   ...
 )
 }
@@ -25,11 +29,9 @@ sp_vim(
 
 \item{X}{the covariates.}
 
-\item{V}{the number of folds for cross-validation, defaults to 10.}
+\item{V}{the number of folds for cross-fitting, defaults to 10.}
 
-\item{weights}{weights for the computed influence curve (e.g., inverse probability weights for coarsened-at-random settings)}
-
-\item{type}{the type of parameter (e.g., R-squared-based is \code{"r_squared"}).}
+\item{type}{the type of parameter (e.g., R-squared-based is \code{"r_squared"}). Note that \code{type = 'anova'} is not allowed for SPVIMs.}
 
 \item{SL.library}{a character vector of learners to pass to \code{SuperLearner}, if \code{f1} and \code{f2} are Y and X, respectively. Defaults to \code{SL.glmnet}, \code{SL.xgboost}, and \code{SL.mean}.}
 
@@ -43,7 +45,17 @@ sp_vim(
 
 \item{na.rm}{should we remove NA's in the outcome and fitted values in computation? (defaults to \code{FALSE})}
 
-\item{stratified}{should the generated folds be stratified based on the outcome (helps to ensure class balance across cross-validation folds)?}
+\item{stratified}{should the generated folds be stratified based on the outcome (helps to ensure class balance across cross-fitting folds)?}
+
+\item{verbose}{should \code{sp_vim} and \code{SuperLearner} print out progress? (defaults to \code{FALSE})}
+
+\item{C}{the indicator of coarsening (1 denotes observed, 0 denotes unobserved).}
+
+\item{Z}{either (i) NULL (the default, in which case the argument \code{C} above must be all ones), or (ii) a character vector specifying the variable(s) among Y and X that are thought to play a role in the coarsening mechanism.}
+
+\item{ipc_weights}{weights for the computed influence curve (i.e., inverse probability weights for coarsened-at-random settings). Assumed to be already inverted (i.e., ipc_weights = 1 / [estimated probability weights]).}
+
+\item{scale}{should CIs be computed on original ("identity") or logit ("logit") scale?}
 
 \item{...}{other arguments to the estimation tool, see "See also".}
 }
@@ -52,16 +64,15 @@ An object of class \code{vim}. See Details for more information.
 }
 \description{
 Compute estimates and confidence intervals for the SPVIMs, using cross-fitting.
-This essentially involves splitting the data into V train/test splits; train the learners on the training data, evaluate importance on the test data; and average over these splits.
 }
 \details{
-We define the SPVIM as the weighted average of the population difference in 
+We define the SPVIM as the weighted average of the population difference in
 predictiveness over all subsets of features not containing feature \eqn{j}.
 
-This is equivalent to finding the solution to a population weighted least squares problem. This 
-key fact allows us to estimate the SPVIM using weighted least squares, where we first 
+This is equivalent to finding the solution to a population weighted least squares problem. This
+key fact allows us to estimate the SPVIM using weighted least squares, where we first
 sample subsets from the power set of all possible features using the Shapley sampling distribution; then
-use cross-fitting to obtain estimators of the predictiveness of each sampled subset; and finally, solve the 
+use cross-fitting to obtain estimators of the predictiveness of each sampled subset; and finally, solve the
 least squares problem given in Williamson and Feng (2020).
 
 See the paper by Williamson and Feng (2020) for more
@@ -71,7 +82,6 @@ The function works by estimating
 In the interest of transparency, we return most of the calculations
 within the \code{vim} object. This results in a list containing:
 \itemize{
- \item{call}{ - the call to \code{cv_vim}}
  \item{SL.library}{ - the library of learners passed to \code{SuperLearner}}
 \item{v}{- the estimated predictiveness measure for each sampled subset}
  \item{preds_lst}{ - the predicted values from the chosen method for each sampled subset}
@@ -84,33 +94,32 @@ within the \code{vim} object. This results in a list containing:
  \item{alpha}{ - the level, for confidence interval calculation}
  \item{delta}{- the \code{delta} value used for hypothesis testing}
  \item{y}{ - the outcome}
- \item{weights}{ - the weights}
+ \item{ipc_weights}{ - the weights}
  \item{mat}{- a tibble with the estimates, SEs, CIs, hypothesis testing decisions, and p-values}
 }
 }
 \examples{
-library(SuperLearner)
-library(ranger)
 n <- 100
 p <- 2
-## generate the data
+# generate the data
 x <- data.frame(replicate(p, stats::runif(n, -5, 5)))
 
-## apply the function to the x's
+# apply the function to the x's
 smooth <- (x[,1]/5)^2*(x[,1]+7)/5 + (x[,2]/3)^2
 
-## generate Y ~ Normal (smooth, 1)
+# generate Y ~ Normal (smooth, 1)
 y <- as.matrix(smooth + stats::rnorm(n, 0, 1))
 
-## set up a library for SuperLearner
-learners <- c("SL.mean", "SL.ranger")
+# set up a library for SuperLearner; note simple library for speed
+library("SuperLearner")
+learners <- c("SL.glm", "SL.mean")
 
-## -----------------------------------------
-## using Super Learner (with a small number of CV folds,
-## for illustration only)
-## -----------------------------------------
+# -----------------------------------------
+# using Super Learner (with a small number of CV folds,
+# for illustration only)
+# -----------------------------------------
 set.seed(4747)
-est <- sp_vim(Y = y, X = x, V = 2, type = "r_squared", 
+est <- sp_vim(Y = y, X = x, V = 2, type = "r_squared",
 SL.library = learners, alpha = 0.05)
 
 }
