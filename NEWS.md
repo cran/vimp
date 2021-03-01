@@ -1,3 +1,34 @@
+# vimp 2.1.9
+
+## Major changes
+None
+
+## Minor changes
+
+* Update sensitivity and specificity to use weak inequalities rather than strict inequalities (better aligns with `cvAUC`)
+* Add a test of CV-AUC estimation against `cvAUC`
+* Borrow information across folds for empirically estimated quantities (e.g., the outcome variance or probability of a certain class); asymptotically equivalent to the prior procedure, but could result in small-sample differences
+* Use fold-specific EIFs for cross-validated SE estimation (again, asymptotically equivalent to the prior procedure, but could result in small-sample differences)
+
+# vimp 2.1.8
+
+## Major changes 
+None
+
+## Minor changes
+
+* Allow the user to specify either an augmented inverse probability of coarsening (AIPW, the default) estimator in coarsened-at-random settings, or specify an IPW estimator, using new argument `ipc_est_type` (available in `vim`, `cv_vim`, and `sp_vim`; also corresponding wrapper functions for each VIM and corresponding internal estimation functions)
+
+# vimp 2.1.7
+
+## Major changes
+None
+
+## Minor changes
+
+* Updated internals so that stratified estimation can be performed in outer regression functions for binary outcomes, but that in the case of two-phase samples the stratification won't be used in any internal regressions with continuous outcomes
+* Updated internals to allow stratification on both the outcome and observed status, so that there are sufficient cases per fold for both the phase 1 and phase 2 regressions (only used with two-phase samples)
+
 # vimp 2.1.6
 
 ## Major changes
