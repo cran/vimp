@@ -1,0 +1,19 @@
+citHeader("To cite vimp in publications use:")
+
+citEntry(entry = "Article",
+  title        = "A unified approach for inference on algorithm-agnostic variable importance",
+  author       = personList(as.person("Brian D. Williamson"),
+                   as.person("Peter B. Gilbert"), as.person("Noah R. Simon"), as.person("Marco Carone")),
+  journal      = "arXiv",
+  year         = "2020",
+  volume       = "",
+  number       = "",
+  pages        = "",
+  url          = "https://arxiv.org/abs/2004.03683",
+
+  textVersion  =
+  paste("Brian D. Williamson, Peter B. Gilbert, Noah R. Simon, and Marco Carone (2020).",
+        "A unified approach for inference on algorithm-agnostic variable importance.",
+        "arXiv.",
+        "URL https://arxiv.org/abs/2004.03683.")
+)

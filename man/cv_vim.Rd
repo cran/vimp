@@ -7,11 +7,15 @@
 cv_vim(
   Y = NULL,
   X = NULL,
+  cross_fitted_f1 = NULL,
+  cross_fitted_f2 = NULL,
   f1 = NULL,
   f2 = NULL,
   indx = 1,
-  V = length(unique(folds)),
-  folds = NULL,
+  V = length(unique(cross_fitting_folds)),
+  sample_splitting = TRUE,
+  sample_splitting_folds = NULL,
+  cross_fitting_folds = NULL,
   stratified = FALSE,
   type = "r_squared",
   run_regression = TRUE,
@@ -24,6 +28,10 @@ cv_vim(
   Z = NULL,
   ipc_weights = rep(1, length(Y)),
   ipc_est_type = "aipw",
+  scale_est = TRUE,
+  cross_fitted_se = TRUE,
+  bootstrap = FALSE,
+  b = 1000,
   ...
 )
 }
@@ -32,68 +40,104 @@ cv_vim(
 
 \item{X}{the covariates.}
 
-\item{f1}{the predicted values on validation data from a flexible estimation 
-technique regressing Y on X in the training data; a list of length V, where
-each object is a set of predictions on the validation data.}
+\item{cross_fitted_f1}{the predicted values on validation data from a
+flexible estimation technique regressing Y on X in the training data;
+a list of length V, where each object is a set of predictions on the
+validation data. If sample-splitting is requested, then these must
+be estimated specially; see Details.}
 
-\item{f2}{the predicted values on validation data from a flexible estimation 
-technique regressing the fitted values in \code{f1} on X withholding the 
-columns in \code{indx}; a list of length V, where each object is a set of 
-predictions on the validation data.}
+\item{cross_fitted_f2}{the predicted values on validation data from a
+flexible estimation technique regressing either (a) the fitted values in
+\code{cross_fitted_f1}, or (b) Y, on X withholding the columns in \code{indx};
+a list of length V, where each object is a set of predictions on the
+validation data. If sample-splitting is requested, then these must
+be estimated specially; see Details.}
 
-\item{indx}{the indices of the covariate(s) to calculate variable importance 
+\item{f1}{the fitted values from a flexible estimation technique
+regressing Y on X. Estimated using the whole dataset. If \code{cross_fitted_se = TRUE},
+then this argument is not used.}
+
+\item{f2}{the fitted values from a flexible estimation technique
+regressing either (a) \code{f1} or (b) Y on X withholding the columns in
+\code{indx}. Estimated using the whole dataset. If \code{cross_fitted_se = TRUE},
+then this argument is not used.}
+
+\item{indx}{the indices of the covariate(s) to calculate variable importance
 for; defaults to 1.}
 
-\item{V}{the number of folds for cross-fitting, defaults to 10.}
+\item{V}{the number of folds for cross-fitting, defaults to 5. If
+\code{sample_splitting = TRUE}, then a special type of \code{V}-fold cross-fitting
+is done. See Details for a more detailed explanation.}
 
-\item{folds}{the folds to use, if f1 and f2 are supplied. A list of length 
-two; the first element provides the outer folds (for hypothesis testing), 
-while the second element is a list providing the inner folds 
-(for cross-fitting).}
+\item{sample_splitting}{should we use sample-splitting to estimate the full and
+reduced predictiveness? Defaults to \code{TRUE}, since inferences made using
+\code{sample_splitting = FALSE} will be invalid for variable with truly zero
+importance.}
 
-\item{stratified}{if run_regression = TRUE, then should the generated folds 
-be stratified based on the outcome (helps to ensure class balance across 
+\item{sample_splitting_folds}{the folds to use for sample-splitting; if entered,
+these should result in balance within the cross-fitting folds. Only used
+if \code{run_regression = FALSE} and \code{sample_splitting = TRUE}. A vector
+of length \eqn{2 * V}.}
+
+\item{cross_fitting_folds}{the folds for cross-fitting. Only used if
+\code{run_regression = FALSE}.}
+
+\item{stratified}{if run_regression = TRUE, then should the generated folds
+be stratified based on the outcome (helps to ensure class balance across
 cross-fitting folds)}
 
 \item{type}{the type of parameter (e.g., ANOVA-based is \code{"anova"}).}
 
-\item{run_regression}{if outcome Y and covariates X are passed to 
-\code{cv_vim}, and \code{run_regression} is \code{TRUE}, then Super Learner 
-will be used; otherwise, variable importance will be computed using the 
+\item{run_regression}{if outcome Y and covariates X are passed to
+\code{cv_vim}, and \code{run_regression} is \code{TRUE}, then Super Learner
+will be used; otherwise, variable importance will be computed using the
 inputted fitted values.}
 
-\item{SL.library}{a character vector of learners to pass to 
-\code{SuperLearner}, if \code{f1} and \code{f2} are Y and X, respectively. 
+\item{SL.library}{a character vector of learners to pass to
+\code{SuperLearner}, if \code{f1} and \code{f2} are Y and X, respectively.
 Defaults to \code{SL.glmnet}, \code{SL.xgboost}, and \code{SL.mean}.}
 
-\item{alpha}{the level to compute the confidence interval at. Defaults to 
+\item{alpha}{the level to compute the confidence interval at. Defaults to
 0.05, corresponding to a 95\% confidence interval.}
 
-\item{delta}{the value of the \eqn{\delta}-null (i.e., testing if 
+\item{delta}{the value of the \eqn{\delta}-null (i.e., testing if
 importance < \eqn{\delta}); defaults to 0.}
 
-\item{scale}{should CIs be computed on original ("identity") or 
+\item{scale}{should CIs be computed on original ("identity", default) or
 logit ("logit") scale?}
 
-\item{na.rm}{should we remove NA's in the outcome and fitted values in 
+\item{na.rm}{should we remove NA's in the outcome and fitted values in
 computation? (defaults to \code{FALSE})}
 
-\item{C}{the indicator of coarsening (1 denotes observed, 0 denotes 
+\item{C}{the indicator of coarsening (1 denotes observed, 0 denotes
 unobserved).}
 
-\item{Z}{either (i) NULL (the default, in which case the argument 
-\code{C} above must be all ones), or (ii) a character vector specifying 
-the variable(s) among Y and X that are thought to play a role in the 
+\item{Z}{either (i) NULL (the default, in which case the argument
+\code{C} above must be all ones), or (ii) a character vector specifying
+the variable(s) among Y and X that are thought to play a role in the
 coarsening mechanism.}
 
-\item{ipc_weights}{weights for the computed influence curve (i.e., inverse 
-probability weights for coarsened-at-random settings). Assumed to be 
+\item{ipc_weights}{weights for the computed influence curve (i.e., inverse
+probability weights for coarsened-at-random settings). Assumed to be
 already inverted (i.e., ipc_weights = 1 / [estimated probability weights]).}
 
-\item{ipc_est_type}{the type of procedure used for coarsened-at-random 
-settings; options are "ipw" (for inverse probability weighting) or 
-"aipw" (for augmented inverse probability weighting). 
+\item{ipc_est_type}{the type of procedure used for coarsened-at-random
+settings; options are "ipw" (for inverse probability weighting) or
+"aipw" (for augmented inverse probability weighting).
 Only used if \code{C} is not all equal to 1.}
+
+\item{scale_est}{should the point estimate be scaled to be greater than 0?
+Defaults to \code{TRUE}.}
+
+\item{cross_fitted_se}{should we use cross-fitting to estimate the standard
+errors (\code{TRUE}, the default) or not (\code{FALSE})?}
+
+\item{bootstrap}{should bootstrap-based standard error estimates be computed?
+Defaults to \code{FALSE} (and currently may only be used if
+\code{sample_splitting = FALSE} and \code{cross_fitted_se = FALSE}).}
+
+\item{b}{the number of bootstrap replicates (only used if \code{bootstrap = TRUE}
+and \code{sample_splitting = FALSE}).}
 
 \item{...}{other arguments to the estimation tool, see "See also".}
 }
@@ -101,49 +145,83 @@ Only used if \code{C} is not all equal to 1.}
 An object of class \code{vim}. See Details for more information.
 }
 \description{
-Compute estimates and confidence intervals using cross-fitting for 
-nonparametric intrinsic variable importance based on the 
-population-level contrast between the oracle predictiveness using the 
+Compute estimates and confidence intervals using cross-fitting for
+nonparametric intrinsic variable importance based on the
+population-level contrast between the oracle predictiveness using the
 feature(s) of interest versus not.
 }
 \details{
-We define the population variable importance measure (VIM) for the group
-of features (or single feature) \eqn{s} with respect to the predictiveness measure
-\eqn{V} by \deqn{\psi_{0,s} := V(f_0, P_0) - V(f_{0,s}, P_0),} where \eqn{f_0} is
-the population predictiveness maximizing function, \eqn{f_{0,s}} is the population
-predictiveness maximizing function that is only allowed to access the features with
-index not in \eqn{s}, and \eqn{P_0} is the true data-generating distribution. Cross-fitted
-VIM estimates are obtained by first splitting the data into \eqn{K} folds; then using each
-fold in turn as a hold-out set, constructing estimators \eqn{f_{n,k}} and \eqn{f_{n,k,s}} of
-\eqn{f_0} and \eqn{f_{0,s}}, respectively on the training data and estimator \eqn{P_{n,k}} of
-\eqn{P_0} using the test data; and finally, computing \deqn{\psi_{n,s} := K^{(-1)}\sum_{k=1}^K \{V(f_{n,k},P_{n,k}) - V(f_{n,k,s}, P_{n,k})\}}
+We define the population variable importance measure (VIM) for the
+group of features (or single feature) \eqn{s} with respect to the
+predictiveness measure \eqn{V} by
+\deqn{\psi_{0,s} := V(f_0, P_0) - V(f_{0,s}, P_0),} where \eqn{f_0} is
+the population predictiveness maximizing function, \eqn{f_{0,s}} is the
+population predictiveness maximizing function that is only allowed to access
+the features with index not in \eqn{s}, and \eqn{P_0} is the true
+data-generating distribution.
+
+Cross-fitted VIM estimates are computed differently if sample-splitting
+is requested versus if it is not. We recommend using sample-splitting
+in most cases, since only in this case will inferences be valid if
+the variable(s) of interest have truly zero population importance.
+The purpose of cross-fitting is to estimate \eqn{f_0} and \eqn{f_{0,s}}
+on independent data from estimating \eqn{P_0}; this can result in improved
+performance, especially when using flexible learning algorithms. The purpose
+of sample-splitting is to estimate \eqn{f_0} and \eqn{f_{0,s}} on independent
+data; this allows valid inference under the null hypothesis of zero importance.
+
+Without sample-splitting, cross-fitted VIM estimates are obtained by first
+splitting the data into \eqn{K} folds; then using each fold in turn as a
+hold-out set, constructing estimators \eqn{f_{n,k}} and \eqn{f_{n,k,s}} of
+\eqn{f_0} and \eqn{f_{0,s}}, respectively on the training data and estimator
+\eqn{P_{n,k}} of \eqn{P_0} using the test data; and finally, computing
+\deqn{\psi_{n,s} := K^{(-1)}\sum_{k=1}^K \{V(f_{n,k},P_{n,k}) - V(f_{n,k,s}, P_{n,k})\}.}
+
+With sample-splitting, cross-fitted VIM estimates are obtained by first
+splitting the data into \eqn{2K} folds. These folds are further divided
+into 2 groups of folds. Then, for each fold \eqn{k} in the first group,
+estimator \eqn{f_{n,k}} of \eqn{f_0} is constructed using all data besides
+the kth fold in the group (i.e., \eqn{(2K - 1)/(2K)} of the data) and
+estimator \eqn{P_{n,k}} of \eqn{P_0} is constructed using the held-out data
+(i.e., \eqn{1/2K} of the data); then, computing
+\deqn{v_{n,k} = V(f_{n,k},P_{n,k}).}
+Similarly, for each fold \eqn{k} in the second group,
+estimator \eqn{f_{n,k,s}} of \eqn{f_{0,s}} is constructed using all data
+besides the kth fold in the group (i.e., \eqn{(2K - 1)/(2K)} of the data)
+and estimator \eqn{P_{n,k}} of \eqn{P_0} is constructed using the held-out
+data (i.e., \eqn{1/2K} of the data); then, computing
+\deqn{v_{n,k,s} = V(f_{n,k,s},P_{n,k}).}
+Finally,
+\deqn{\psi_{n,s} := K^{(-1)}\sum_{k=1}^K \{v_{n,k} - v_{n,k,s}\}.}
+
 See the paper by Williamson, Gilbert, Simon, and Carone for more
-details on the mathematics behind the \code{cv_vim} function, and the validity
-of the confidence intervals.
+details on the mathematics behind the \code{cv_vim} function, and the
+validity of the confidence intervals.
 
 In the interest of transparency, we return most of the calculations
 within the \code{vim} object. This results in a list including:
-\itemize{
- \item{s}{ - the column(s) to calculate variable importance for}
- \item{SL.library}{ - the library of learners passed to \code{SuperLearner}}
- \item{full_fit}{ - the fitted values of the chosen method fit to the full data (a list, for train and test data)}
- \item{red_fit}{ - the fitted values of the chosen method fit to the reduced data (a list, for train and test data)}
- \item{est}{ - the estimated variable importance}
- \item{naive}{ - the naive estimator of variable importance}
- \item{naives}{ - the naive estimator on each fold}
- \item{eif}{- the estimated influence function}
- \item{all_eifs}{ - the estimated influence curve for each fold}
- \item{se}{ - the standard error for the estimated variable importance}
- \item{ci}{ - the \eqn{(1-\alpha) \times 100}\% confidence interval for the variable importance estimate}
- \item{test}{ - a decision to either reject (TRUE) or not reject (FALSE) the null hypothesis, based on a conservative test}
- \item{p_value}{ - a p-value based on the same test as \code{test}}
- \item{full_mod}{ - the object returned by the estimation procedure for the full data regression (if applicable)}
- \item{red_mod}{ - the object returned by the estimation procedure for the reduced data regression (if applicable)}
- \item{alpha}{ - the level, for confidence interval calculation}
- \item{folds}{ - the folds used for hypothesis testing and cross-fitting}
- \item{y}{ - the outcome}
- \item{ipc_weights}{ - the weights}
- \item{mat}{- a tibble with the estimate, SE, CI, hypothesis testing decision, and p-value}
+\describe{
+ \item{s}{the column(s) to calculate variable importance for}
+ \item{SL.library}{the library of learners passed to \code{SuperLearner}}
+ \item{full_fit}{the fitted values of the chosen method fit to the full data (a list, for train and test data)}
+ \item{red_fit}{the fitted values of the chosen method fit to the reduced data (a list, for train and test data)}
+ \item{est}{the estimated variable importance}
+ \item{naive}{the naive estimator of variable importance}
+ \item{eif}{the estimated efficient influence function}
+ \item{eif_full}{the estimated efficient influence function for the full regression}
+ \item{eif_reduced}{the estimated efficient influence function for the reduced regression}
+ \item{se}{the standard error for the estimated variable importance}
+ \item{ci}{the \eqn{(1-\alpha) \times 100}\% confidence interval for the variable importance estimate}
+ \item{test}{a decision to either reject (TRUE) or not reject (FALSE) the null hypothesis, based on a conservative test}
+ \item{p_value}{a p-value based on the same test as \code{test}}
+ \item{full_mod}{the object returned by the estimation procedure for the full data regression (if applicable)}
+ \item{red_mod}{the object returned by the estimation procedure for the reduced data regression (if applicable)}
+ \item{alpha}{the level, for confidence interval calculation}
+ \item{sample_splitting_folds}{the folds used for hypothesis testing}
+ \item{cross_fitting_folds}{the folds used for cross-fitting}
+ \item{y}{the outcome}
+ \item{ipc_weights}{the weights}
+ \item{mat}{a tibble with the estimate, SE, CI, hypothesis testing decision, and p-value}
 }
 }
 \examples{
@@ -160,7 +238,7 @@ y <- as.matrix(smooth + stats::rnorm(n, 0, 1))
 
 # set up a library for SuperLearner; note simple library for speed
 library("SuperLearner")
-learners <- c("SL.glm", "SL.mean")
+learners <- c("SL.glm")
 
 # -----------------------------------------
 # using Super Learner (with a small number of folds, for illustration only)
@@ -171,46 +249,60 @@ type = "r_squared", run_regression = TRUE,
 SL.library = learners, cvControl = list(V = 2), alpha = 0.05)
 
 # ------------------------------------------
-# doing things by hand, and plugging them in 
+# doing things by hand, and plugging them in
 # (with a small number of folds, for illustration only)
 # ------------------------------------------
 # set up the folds
 indx <- 2
 V <- 2
+Y <- matrix(y)
 set.seed(4747)
-outer_folds <- sample(rep(seq_len(2), length = n))
-inner_folds_1 <- sample(rep(seq_len(V), length = sum(outer_folds == 1)))
-inner_folds_2 <- sample(rep(seq_len(V), length = sum(outer_folds == 2)))
-y_1 <- y[outer_folds == 1, , drop = FALSE]
-x_1 <- x[outer_folds == 1, , drop = FALSE]
-y_2 <- y[outer_folds == 2, , drop = FALSE]
-x_2 <- x[outer_folds == 2, , drop = FALSE]
-# get the fitted values by fitting the super learner on each pair
-fhat_ful <- list()
-fhat_red <- list()
-for (v in 1:V) {
-    # fit super learner
-    fit <- SuperLearner::SuperLearner(Y = y_1[inner_folds_1 != v, , drop = FALSE],
-     X = x_1[inner_folds_1 != v, , drop = FALSE],
-     SL.library = learners, cvControl = list(V = V))
-    fitted_v <- SuperLearner::predict.SuperLearner(fit)$pred
-    # get predictions on the validation fold
-    fhat_ful[[v]] <- SuperLearner::predict.SuperLearner(fit,
-     newdata = x_1[inner_folds_1 == v, , drop = FALSE])$pred
-    # fit the super learner on the reduced covariates
-    red <- SuperLearner::SuperLearner(Y = y_2[inner_folds_2 != v, , drop = FALSE],
-     X = x_2[inner_folds_2 != v, -indx, drop = FALSE],
-     SL.library = learners, cvControl = list(V = V))
-    # get predictions on the validation fold
-    fhat_red[[v]] <- SuperLearner::predict.SuperLearner(red,
-     newdata = x_2[inner_folds_2 == v, -indx, drop = FALSE])$pred
-}
-est <- cv_vim(Y = y, f1 = fhat_ful, f2 = fhat_red, indx = 2,
-V = V, folds = list(outer_folds = outer_folds,
-inner_folds = list(inner_folds_1, inner_folds_2)),
-type = "r_squared", run_regression = FALSE, alpha = 0.05)
+# Note that the CV.SuperLearner should be run with an outer layer
+# of 2*V folds (for V-fold cross-fitted importance)
+full_cv_fit <- suppressWarnings(SuperLearner::CV.SuperLearner(
+Y = Y, X = x, SL.library = learners, cvControl = list(V = 2 * V),
+innerCvControl = list(list(V = V))
+))
+# use the same cross-fitting folds for reduced
+reduced_cv_fit <- suppressWarnings(SuperLearner::CV.SuperLearner(
+    Y = Y, X = x[, -indx, drop = FALSE], SL.library = learners,
+    cvControl = SuperLearner::SuperLearner.CV.control(
+        V = 2 * V, validRows = full_cv_fit$folds
+    ),
+    innerCvControl = list(list(V = V))
+))
+# extract the predictions on split portions of the data,
+# for hypothesis testing
+cross_fitting_folds <- get_cv_sl_folds(full_cv_fit$folds)
+set.seed(1234)
+sample_splitting_folds <- make_folds(unique(cross_fitting_folds), V = 2)
+full_cv_preds <- extract_sampled_split_predictions(
+    full_cv_fit, sample_splitting_folds = sample_splitting_folds, full = TRUE
+)
+reduced_cv_preds <- extract_sampled_split_predictions(
+    reduced_cv_fit, sample_splitting_folds = sample_splitting_folds, full = FALSE
+)
+set.seed(5678)
+# refit on the whole dataset
+# (for estimating the efficient influence function)
+full_fit <- SuperLearner::SuperLearner(
+    Y = Y, X = x, SL.library = learners, cvControl = list(V = V)
+)
+fhat_ful <- SuperLearner::predict.SuperLearner(full_fit, onlySL = TRUE)$pred
+reduced_fit <- SuperLearner::SuperLearner(
+    Y = Y, X = x[, -indx, drop = FALSE], SL.library = learners,
+    cvControl = list(V = V)
+)
+fhat_red <- SuperLearner::predict.SuperLearner(reduced_fit, onlySL = TRUE)$pred
+est <- cv_vim(Y = y, cross_fitted_f1 = full_cv_preds,
+cross_fitted_f2 = reduced_cv_preds, f1 = fhat_ful,
+f2 = fhat_red, indx = 2, delta = 0, V = V, type = "r_squared",
+cross_fitting_folds = cross_fitting_folds,
+sample_splitting_folds = sample_splitting_folds,
+run_regression = FALSE, alpha = 0.05, na.rm = TRUE)
 
 }
 \seealso{
-\code{\link[SuperLearner]{SuperLearner}} for specific usage of the \code{SuperLearner} function and package.
+\code{\link[SuperLearner]{SuperLearner}} for specific usage of the
+  \code{SuperLearner} function and package.
 }

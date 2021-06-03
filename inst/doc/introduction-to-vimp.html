@@ -12,7 +12,7 @@
 
 <meta name="author" content="Brian D. Williamson" />
 
-<meta name="date" content="2021-03-01" />
+<meta name="date" content="2021-06-03" />
 
 <title>Introduction to vimp</title>
 
@@ -402,7 +402,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Introduction to <code>vimp</code></h1>
 <h4 class="author">Brian D. Williamson</h4>
-<h4 class="date">2021-03-01</h4>
+<h4 class="date">2021-06-03</h4>
 
 
 
@@ -428,21 +428,19 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>This section should serve as a quick guide to using the <code>vimp</code> package — we will cover the main functions for estimating <span class="math inline">\(R^2\)</span>-based variable importance using a simulated data example. More details are given in the next section.</p>
 <p>First, load the <code>vimp</code> package:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">library</span>(<span class="st">&quot;vimp&quot;</span>)</span></code></pre></div>
-<pre><code>## vimp version 2.1.9: Perform Inference on Algorithm-Agnostic Variable Importance</code></pre>
-<pre><code>## Package created on 2021-03-01</code></pre>
 <p>Next, create some data:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># -------------------------------------------------------------</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="co"># problem setup</span></span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="co"># -------------------------------------------------------------</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a><span class="co"># set up the data</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="kw">set.seed</span>(<span class="dv">5678910</span>)</span>
-<span id="cb6-6"><a href="#cb6-6"></a>n &lt;-<span class="st"> </span><span class="dv">1000</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a>p &lt;-<span class="st"> </span><span class="dv">2</span></span>
-<span id="cb6-8"><a href="#cb6-8"></a>s &lt;-<span class="st"> </span><span class="dv">1</span> <span class="co"># desire importance for X_1</span></span>
-<span id="cb6-9"><a href="#cb6-9"></a>x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">replicate</span>(p, <span class="kw">runif</span>(n, <span class="dv">-1</span>, <span class="dv">1</span>)))</span>
-<span id="cb6-10"><a href="#cb6-10"></a>y &lt;-<span class="st"> </span>(x[,<span class="dv">1</span>])<span class="op">^</span><span class="dv">2</span><span class="op">*</span>(x[,<span class="dv">1</span>]<span class="op">+</span><span class="dv">7</span><span class="op">/</span><span class="dv">5</span>) <span class="op">+</span><span class="st"> </span>(<span class="dv">25</span><span class="op">/</span><span class="dv">9</span>)<span class="op">*</span>(x[,<span class="dv">2</span>])<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb6-11"><a href="#cb6-11"></a><span class="co"># set up folds for hypothesis testing</span></span>
-<span id="cb6-12"><a href="#cb6-12"></a>folds &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">rep</span>(<span class="kw">seq_len</span>(<span class="dv">2</span>), <span class="dt">length =</span> <span class="kw">length</span>(y)))</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># -------------------------------------------------------------</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="co"># problem setup</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co"># -------------------------------------------------------------</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co"># set up the data</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="kw">set.seed</span>(<span class="dv">5678910</span>)</span>
+<span id="cb4-6"><a href="#cb4-6"></a>n &lt;-<span class="st"> </span><span class="dv">1000</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a>p &lt;-<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a>s &lt;-<span class="st"> </span><span class="dv">1</span> <span class="co"># desire importance for X_1</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a>x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">replicate</span>(p, <span class="kw">runif</span>(n, <span class="dv">-1</span>, <span class="dv">1</span>)))</span>
+<span id="cb4-10"><a href="#cb4-10"></a>y &lt;-<span class="st"> </span>(x[,<span class="dv">1</span>])<span class="op">^</span><span class="dv">2</span><span class="op">*</span>(x[,<span class="dv">1</span>]<span class="op">+</span><span class="dv">7</span><span class="op">/</span><span class="dv">5</span>) <span class="op">+</span><span class="st"> </span>(<span class="dv">25</span><span class="op">/</span><span class="dv">9</span>)<span class="op">*</span>(x[,<span class="dv">2</span>])<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co"># set up folds for hypothesis testing</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a>folds &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">rep</span>(<span class="kw">seq_len</span>(<span class="dv">2</span>), <span class="dt">length =</span> <span class="kw">length</span>(y)))</span></code></pre></div>
 <p>This creates a matrix of covariates <code>x</code> with two columns, a vector <code>y</code> of normally-distributed outcome values, and a set of folds for a sample of <code>n = 100</code> study participants.</p>
 <p>The workhorse function of <code>vimp</code>, for <span class="math inline">\(R^2\)</span>-based variable importance, is <code>vimp_rsquared</code>. There are two ways to compute variable importance: in the first method, you allow <code>vimp</code> to run regressions for you and return variable importance; in the second method (discussed in <a href="precomputed-regressions.html">“Using precomputed regression function estimates in <code>vimp</code>”</a>), you run the regressions yourself and plug these into <code>vimp</code>. I will focus on the first method here. The basic arguments are</p>
 <ul>
@@ -454,26 +452,22 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>V: the number of folds to use for cross-fitted variable importance</li>
 </ul>
 <p>This second-to-last argument, <code>SL.library</code>, determines the estimators you want to use for the conditional mean of Y given X. Estimates of variable importance rely on good estimators of the conditional mean, so we suggest using flexible estimators and model stacking to do so. One option for this is the <code>SuperLearner</code> package; load that package using</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">library</span>(<span class="st">&quot;SuperLearner&quot;</span>)</span></code></pre></div>
-<pre><code>## Loading required package: nnls</code></pre>
-<pre><code>## Super Learner</code></pre>
-<pre><code>## Version: 2.0-27-9000</code></pre>
-<pre><code>## Package created on 2019-08-12</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># load specific algorithms</span></span>
-<span id="cb12-2"><a href="#cb12-2"></a><span class="kw">library</span>(<span class="st">&quot;ranger&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">library</span>(<span class="st">&quot;SuperLearner&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co"># load specific algorithms</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="kw">library</span>(<span class="st">&quot;ranger&quot;</span>)</span></code></pre></div>
 <p>The code</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>est_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> y, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">1</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb13-2"><a href="#cb13-2"></a><span class="dt">SL.library =</span> <span class="kw">c</span>(<span class="st">&quot;SL.ranger&quot;</span>, <span class="st">&quot;SL.mean&quot;</span>), <span class="dt">V =</span> <span class="dv">2</span>, <span class="dt">env =</span> <span class="kw">environment</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>est_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> y, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">1</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="dt">SL.library =</span> <span class="kw">c</span>(<span class="st">&quot;SL.ranger&quot;</span>, <span class="st">&quot;SL.mean&quot;</span>), <span class="dt">V =</span> <span class="dv">2</span>, <span class="dt">env =</span> <span class="kw">environment</span>())</span></code></pre></div>
 <p>uses the Super Learner to fit the required regression functions, and computes an estimate of variable importance for the importance of <span class="math inline">\(X_1\)</span>. We can visualize the estimate, standard error, and confidence interval by printing or typing the object name:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>est_<span class="dv">1</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>est_<span class="dv">1</span></span></code></pre></div>
 <pre><code>## Variable importance estimates:
-##       Estimate  SE         95% CI                  VIMP &gt; 0 p-value     
-## s = 1 0.1319242 0.03988206 [0.05375681, 0.2100916] TRUE     0.0006784031</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">print</span>(est_<span class="dv">1</span>)</span></code></pre></div>
+##       Estimate   SE         95% CI         VIMP &gt; 0 p-value  
+## s = 1 0.01985866 0.04777691 [0, 0.1134997] FALSE    0.3388317</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">print</span>(est_<span class="dv">1</span>)</span></code></pre></div>
 <pre><code>## Variable importance estimates:
-##       Estimate  SE         95% CI                  VIMP &gt; 0 p-value     
-## s = 1 0.1319242 0.03988206 [0.05375681, 0.2100916] TRUE     0.0006784031</code></pre>
-<p>This output shows that we have estimated the importance of <span class="math inline">\(X_1\)</span> to be 0.132, with a 95% confidence interval of [0.054, 0.21].</p>
+##       Estimate   SE         95% CI         VIMP &gt; 0 p-value  
+## s = 1 0.01985866 0.04777691 [0, 0.1134997] FALSE    0.3388317</code></pre>
+<p>This output shows that we have estimated the importance of <span class="math inline">\(X_1\)</span> to be 0.02, with a 95% confidence interval of [0, 0.113].</p>
 </div>
 <div id="detailed-guide" class="section level2">
 <h2>Detailed guide</h2>
@@ -490,33 +484,43 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="a-look-at-the-south-african-heart-disease-study-data" class="section level3">
 <h3>A look at the South African heart disease study data</h3>
 <p>Throughout this document I will use the South African heart disease study data <span class="citation">(Hastie, Tibshirani, and Friedman 2009)</span>, freely available from the <a href="https://web.stanford.edu/~hastie/ElemStatLearn/datasets/SAheart.data">Elements of Statistical Learning website</a>. Information about these data is available <a href="https://web.stanford.edu/~hastie/ElemStatLearn/datasets/SAheart.info.txt">here</a>.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># read in the data from the Elements website</span></span>
-<span id="cb18-2"><a href="#cb18-2"></a><span class="kw">library</span>(<span class="st">&quot;RCurl&quot;</span>)</span>
-<span id="cb18-3"><a href="#cb18-3"></a>heart_data &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">text =</span> <span class="kw">getURL</span>(<span class="st">&quot;http://web.stanford.edu/~hastie/ElemStatLearn/datasets/SAheart.data&quot;</span>), <span class="dt">header =</span> <span class="ot">TRUE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb18-4"><a href="#cb18-4"></a><span class="co"># minor data cleaning</span></span>
-<span id="cb18-5"><a href="#cb18-5"></a>heart &lt;-<span class="st"> </span>heart_data[, <span class="dv">2</span><span class="op">:</span><span class="kw">dim</span>(heart_data)[<span class="dv">2</span>]]</span>
-<span id="cb18-6"><a href="#cb18-6"></a>heart<span class="op">$</span>famhist &lt;-<span class="st"> </span><span class="kw">ifelse</span>(heart<span class="op">$</span>famhist <span class="op">==</span><span class="st"> &quot;Present&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
-<span id="cb18-7"><a href="#cb18-7"></a><span class="co"># sample-splitting folds for hypothesis testing</span></span>
-<span id="cb18-8"><a href="#cb18-8"></a>heart_folds &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">rep</span>(<span class="kw">seq_len</span>(<span class="dv">2</span>), <span class="dt">length =</span> <span class="kw">dim</span>(heart)[<span class="dv">1</span>]))</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># read in the data from the Elements website</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="kw">library</span>(<span class="st">&quot;RCurl&quot;</span>)</span>
+<span id="cb11-3"><a href="#cb11-3"></a>heart_data &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="dt">text =</span> <span class="kw">getURL</span>(<span class="st">&quot;http://web.stanford.edu/~hastie/ElemStatLearn/datasets/SAheart.data&quot;</span>), <span class="dt">header =</span> <span class="ot">TRUE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="co"># minor data cleaning</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a>heart &lt;-<span class="st"> </span>heart_data[, <span class="dv">2</span><span class="op">:</span><span class="kw">dim</span>(heart_data)[<span class="dv">2</span>]]</span>
+<span id="cb11-6"><a href="#cb11-6"></a>heart<span class="op">$</span>famhist &lt;-<span class="st"> </span><span class="kw">ifelse</span>(heart<span class="op">$</span>famhist <span class="op">==</span><span class="st"> &quot;Present&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="co"># sample-splitting folds for hypothesis testing</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a>heart_folds &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">rep</span>(<span class="kw">seq_len</span>(<span class="dv">2</span>), <span class="dt">length =</span> <span class="kw">dim</span>(heart)[<span class="dv">1</span>]))</span></code></pre></div>
 <p>In addition to the indicator of myocardial infarction <code>chd</code>, the outcome of interest, there are measurements on two groups of variables. First are behavioral features: cumulative tobacco consumption, current alcohol consumption, and type A behavior (a behavioral pattern linked to stress). Second are biological features: systolic blood pressure, low-density lipoprotein (LDL) cholesterol, adiposity (similar to body mass index), family history of heart disease, obesity, and age.</p>
 <p>Since there are nine features and two groups, it is of interest to determine variable importance both for the nine individual features separately and for the two groups of features.</p>
 </div>
 <div id="a-first-approach-linear-regression" class="section level3">
 <h3>A first approach: linear regression</h3>
 <p>Suppose that I believe that a linear model truly describes the relationship between the outcome and the covariates in these data. In that case, I would be justified in only fitting a linear regression to estimate the conditional means; this means that in my importance analysis, I should also use only linear regression. Note that because I chose to fit the regression functions first and then plug them into <code>vimp</code>, I need to explicitly specify the folds used for hypothesis testing. The analysis is achieved by the following:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>X &lt;-<span class="st"> </span>heart[, <span class="op">-</span><span class="kw">dim</span>(heart)[<span class="dv">2</span>]]</span>
-<span id="cb19-2"><a href="#cb19-2"></a>lm_vim_sbp &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">1</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
-<span id="cb19-3"><a href="#cb19-3"></a>lm_vim_tob &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">2</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
-<span id="cb19-4"><a href="#cb19-4"></a>lm_vim_ldl &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">3</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
-<span id="cb19-5"><a href="#cb19-5"></a>lm_vim_adi &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">4</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
-<span id="cb19-6"><a href="#cb19-6"></a>lm_vim_fam &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">5</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
-<span id="cb19-7"><a href="#cb19-7"></a>lm_vim_tpa &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">6</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
-<span id="cb19-8"><a href="#cb19-8"></a>lm_vim_obe &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">7</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
-<span id="cb19-9"><a href="#cb19-9"></a>lm_vim_alc &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">8</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
-<span id="cb19-10"><a href="#cb19-10"></a>lm_vim_age &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">9</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
-<span id="cb19-11"><a href="#cb19-11"></a></span>
-<span id="cb19-12"><a href="#cb19-12"></a><span class="co"># make a table with the estimates using the merge_vim() function</span></span>
-<span id="cb19-13"><a href="#cb19-13"></a><span class="kw">library</span>(<span class="st">&quot;dplyr&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>X &lt;-<span class="st"> </span>heart[, <span class="op">-</span><span class="kw">ncol</span>(heart)]</span>
+<span id="cb12-2"><a href="#cb12-2"></a>lm_vim_sbp &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">1</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
+<span id="cb12-3"><a href="#cb12-3"></a>lm_vim_tob &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">2</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span></code></pre></div>
+<pre><code>## Warning in vim(Y = heart$chd, X = X, indx = 2, run_regression = TRUE, SL.library
+## = &quot;SL.lm&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>lm_vim_ldl &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">3</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span></code></pre></div>
+<pre><code>## Warning in vim(Y = heart$chd, X = X, indx = 3, run_regression = TRUE, SL.library
+## = &quot;SL.lm&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>lm_vim_adi &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">4</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span></code></pre></div>
+<pre><code>## Warning in vim(Y = heart$chd, X = X, indx = 4, run_regression = TRUE, SL.library
+## = &quot;SL.lm&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>lm_vim_fam &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">5</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
+<span id="cb18-2"><a href="#cb18-2"></a>lm_vim_tpa &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">6</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
+<span id="cb18-3"><a href="#cb18-3"></a>lm_vim_obe &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">7</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span></code></pre></div>
+<pre><code>## Warning in vim(Y = heart$chd, X = X, indx = 7, run_regression = TRUE, SL.library
+## = &quot;SL.lm&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>lm_vim_alc &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">8</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span></code></pre></div>
+<pre><code>## Warning in vim(Y = heart$chd, X = X, indx = 8, run_regression = TRUE, SL.library
+## = &quot;SL.lm&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>lm_vim_age &lt;-<span class="st"> </span><span class="kw">vim</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">9</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> <span class="st">&quot;SL.lm&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;r_squared&quot;</span>)</span>
+<span id="cb22-2"><a href="#cb22-2"></a></span>
+<span id="cb22-3"><a href="#cb22-3"></a><span class="co"># make a table with the estimates using the merge_vim() function</span></span>
+<span id="cb22-4"><a href="#cb22-4"></a><span class="kw">library</span>(<span class="st">&quot;dplyr&quot;</span>)</span></code></pre></div>
 <pre><code>## 
 ## Attaching package: &#39;dplyr&#39;</code></pre>
 <pre><code>## The following objects are masked from &#39;package:stats&#39;:
@@ -525,21 +529,21 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <pre><code>## The following objects are masked from &#39;package:base&#39;:
 ## 
 ##     intersect, setdiff, setequal, union</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>lm_mat &lt;-<span class="st"> </span><span class="kw">merge_vim</span>(lm_vim_sbp, lm_vim_tob, lm_vim_ldl, lm_vim_adi,</span>
-<span id="cb23-2"><a href="#cb23-2"></a>                lm_vim_fam, lm_vim_tpa, lm_vim_obe, lm_vim_alc, lm_vim_age)</span>
-<span id="cb23-3"><a href="#cb23-3"></a><span class="co"># print out the matrix</span></span>
-<span id="cb23-4"><a href="#cb23-4"></a>lm_mat</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>lm_mat &lt;-<span class="st"> </span><span class="kw">merge_vim</span>(lm_vim_sbp, lm_vim_tob, lm_vim_ldl, lm_vim_adi,</span>
+<span id="cb26-2"><a href="#cb26-2"></a>                lm_vim_fam, lm_vim_tpa, lm_vim_obe, lm_vim_alc, lm_vim_age)</span>
+<span id="cb26-3"><a href="#cb26-3"></a><span class="co"># print out the matrix</span></span>
+<span id="cb26-4"><a href="#cb26-4"></a>lm_mat</span></code></pre></div>
 <pre><code>## Variable importance estimates:
-##       Estimate     SE         95% CI                  VIMP &gt; 0 p-value     
-## s = 6 0.2306770059 0.07748125 [0.07881654, 0.3825375]  TRUE    0.0008655745
-## s = 2 0.2291866363 0.07297854 [0.08615132, 0.3722220]  TRUE    0.0013260752
-## s = 1 0.1243122222 0.06376809 [0.00000000, 0.2492954]  TRUE    0.0320306085
-## s = 9 0.0931139793 0.06960993 [0.00000000, 0.2295469] FALSE    0.0936743935
-## s = 7 0.0834326317 0.07484857 [0.00000000, 0.2301331] FALSE    0.1259555768
-## s = 4 0.0752877199 0.07240828 [0.00000000, 0.2172053] FALSE    0.1520951529
-## s = 5 0.0393767790 0.06347288 [0.00000000, 0.1637813] FALSE    0.2684451728
-## s = 8 0.0297456450 0.06942128 [0.00000000, 0.1658089] FALSE    0.3311879771
-## s = 3 0.0003335377 0.06636275 [0.00000000, 0.1304021] FALSE    0.4979592436</code></pre>
+##       Estimate   SE         95% CI                   VIMP &gt; 0 p-value   
+## s = 9 0.13103142 0.06487123 [0.003886152, 0.2581767]  TRUE    0.02169846
+## s = 6 0.06811560 0.06509051 [0.000000000, 0.1956907] FALSE    0.14767086
+## s = 1 0.05216276 0.06436184 [0.000000000, 0.1783096] FALSE    0.20883764
+## s = 5 0.04812513 0.06276984 [0.000000000, 0.1711517] FALSE    0.22163233
+## s = 2 0.00000000 0.06322478 [0.000000000, 0.1239183] FALSE    0.58737127
+## s = 3 0.00000000 0.06355300 [0.000000000, 0.1245616] FALSE    0.58097486
+## s = 4 0.00000000 0.06460803 [0.000000000, 0.1266294] FALSE    0.61381924
+## s = 7 0.00000000 0.06458195 [0.000000000, 0.1265783] FALSE    0.60874835
+## s = 8 0.00000000 0.06447907 [0.000000000, 0.1263767] FALSE    0.66773221</code></pre>
 </div>
 <div id="building-a-library-of-learners" class="section level3">
 <h3>Building a library of learners</h3>
@@ -547,42 +551,39 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>The choice of either method is somewhat subjective, and I also will have to use a technique like cross-validation to determine an optimal tuning parameter in each case. It is also possible that neither additive models nor the elastic net will do a good job estimating the true conditional means!</p>
 <p>This motivates using <code>SuperLearner</code> to allow the data to determine the optimal combination of <em>base learners</em> from a <em>library</em> that I define. These base learners are a combination of different methods (e.g., generalized additive models and elastic net) and instances of the same method with different tuning parameter values (e.g., additive models with 3 and 4 degrees of freedom). The Super Learner is an example of model stacking, or model aggregation — these approaches use a data-adaptive combination of base learners to make predictions.</p>
 <p>For instance, my library could include the elastic net, random forests <span class="citation">(Breiman 2001)</span>, and gradient boosted trees <span class="citation">(Friedman 2001)</span> as follows:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="co"># load the library</span></span>
-<span id="cb25-2"><a href="#cb25-2"></a><span class="kw">library</span>(SuperLearner)</span>
-<span id="cb25-3"><a href="#cb25-3"></a></span>
-<span id="cb25-4"><a href="#cb25-4"></a><span class="co"># create a function for boosted stumps</span></span>
-<span id="cb25-5"><a href="#cb25-5"></a>SL.gbm<span class="fl">.1</span> &lt;-<span class="st"> </span><span class="cf">function</span>(..., <span class="dt">interaction.depth =</span> <span class="dv">1</span>) <span class="kw">SL.gbm</span>(..., <span class="dt">interaction.depth =</span> interaction.depth)</span>
-<span id="cb25-6"><a href="#cb25-6"></a></span>
-<span id="cb25-7"><a href="#cb25-7"></a><span class="co"># create GAMs with different degrees of freedom</span></span>
-<span id="cb25-8"><a href="#cb25-8"></a>SL.gam<span class="fl">.3</span> &lt;-<span class="st"> </span><span class="cf">function</span>(..., <span class="dt">deg.gam =</span> <span class="dv">3</span>) <span class="kw">SL.gam</span>(..., <span class="dt">deg.gam =</span> deg.gam)</span>
-<span id="cb25-9"><a href="#cb25-9"></a>SL.gam<span class="fl">.4</span> &lt;-<span class="st"> </span><span class="cf">function</span>(..., <span class="dt">deg.gam =</span> <span class="dv">4</span>) <span class="kw">SL.gam</span>(..., <span class="dt">deg.gam =</span> deg.gam)</span>
-<span id="cb25-10"><a href="#cb25-10"></a>SL.gam<span class="fl">.5</span> &lt;-<span class="st"> </span><span class="cf">function</span>(..., <span class="dt">deg.gam =</span> <span class="dv">5</span>) <span class="kw">SL.gam</span>(..., <span class="dt">deg.gam =</span> deg.gam)</span>
-<span id="cb25-11"><a href="#cb25-11"></a></span>
-<span id="cb25-12"><a href="#cb25-12"></a><span class="co"># add more levels of alpha for glmnet</span></span>
-<span id="cb25-13"><a href="#cb25-13"></a>create.SL.glmnet &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">alpha =</span> <span class="kw">c</span>(<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>)) {</span>
-<span id="cb25-14"><a href="#cb25-14"></a>  <span class="cf">for</span> (mm <span class="cf">in</span> <span class="kw">seq</span>(<span class="kw">length</span>(alpha))) {</span>
-<span id="cb25-15"><a href="#cb25-15"></a>    <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">file =</span> <span class="st">&quot;&quot;</span>, <span class="dt">text =</span> <span class="kw">paste</span>(<span class="st">&#39;SL.glmnet.&#39;</span>, alpha[mm], <span class="st">&#39;&lt;- function(..., alpha = &#39;</span>, alpha[mm], <span class="st">&#39;) SL.glmnet(..., alpha = alpha)&#39;</span>, <span class="dt">sep =</span> <span class="st">&#39;&#39;</span>)), <span class="dt">envir =</span> .GlobalEnv)</span>
-<span id="cb25-16"><a href="#cb25-16"></a>  }</span>
-<span id="cb25-17"><a href="#cb25-17"></a>  <span class="kw">invisible</span>(<span class="ot">TRUE</span>)</span>
-<span id="cb25-18"><a href="#cb25-18"></a>}</span>
-<span id="cb25-19"><a href="#cb25-19"></a><span class="kw">create.SL.glmnet</span>()</span>
-<span id="cb25-20"><a href="#cb25-20"></a></span>
-<span id="cb25-21"><a href="#cb25-21"></a><span class="co"># add tuning parameters for randomForest</span></span>
-<span id="cb25-22"><a href="#cb25-22"></a>create.SL.randomForest &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">tune =</span> <span class="kw">list</span>(<span class="dt">mtry =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">7</span>), <span class="dt">nodesize =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>))) {</span>
-<span id="cb25-23"><a href="#cb25-23"></a>  tuneGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(tune, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</span>
-<span id="cb25-24"><a href="#cb25-24"></a>  <span class="cf">for</span> (mm <span class="cf">in</span> <span class="kw">seq</span>(<span class="kw">nrow</span>(tuneGrid))) {</span>
-<span id="cb25-25"><a href="#cb25-25"></a>    <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">file =</span> <span class="st">&quot;&quot;</span>, <span class="dt">text =</span> <span class="kw">paste</span>(<span class="st">&quot;SL.randomForest.&quot;</span>, mm, <span class="st">&quot;&lt;- function(..., mtry = &quot;</span>, tuneGrid[mm, <span class="dv">1</span>], <span class="st">&quot;, nodesize = &quot;</span>, tuneGrid[mm, <span class="dv">2</span>], <span class="st">&quot;) SL.randomForest(..., mtry = mtry, nodesize = nodesize)&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)), <span class="dt">envir =</span> .GlobalEnv)</span>
-<span id="cb25-26"><a href="#cb25-26"></a>  }</span>
-<span id="cb25-27"><a href="#cb25-27"></a>  <span class="kw">invisible</span>(<span class="ot">TRUE</span>)</span>
-<span id="cb25-28"><a href="#cb25-28"></a>}</span>
-<span id="cb25-29"><a href="#cb25-29"></a><span class="kw">create.SL.randomForest</span>()</span>
-<span id="cb25-30"><a href="#cb25-30"></a></span>
-<span id="cb25-31"><a href="#cb25-31"></a><span class="co"># create the library</span></span>
-<span id="cb25-32"><a href="#cb25-32"></a>learners &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;SL.glmnet&quot;</span>, <span class="st">&quot;SL.glmnet.0.25&quot;</span>, <span class="st">&quot;SL.glmnet.0.5&quot;</span>, <span class="st">&quot;SL.glmnet.0.75&quot;</span>,</span>
-<span id="cb25-33"><a href="#cb25-33"></a>              <span class="st">&quot;SL.randomForest&quot;</span>, <span class="st">&quot;SL.randomForest.1&quot;</span>, <span class="st">&quot;SL.randomForest.2&quot;</span>, <span class="st">&quot;SL.randomForest.3&quot;</span>,</span>
-<span id="cb25-34"><a href="#cb25-34"></a>              <span class="st">&quot;SL.randomForest.4&quot;</span>, <span class="st">&quot;SL.randomForest.5&quot;</span>, <span class="st">&quot;SL.randomForest.6&quot;</span>, <span class="st">&quot;SL.randomForest.7&quot;</span>,</span>
-<span id="cb25-35"><a href="#cb25-35"></a>              <span class="st">&quot;SL.randomForest.8&quot;</span>, <span class="st">&quot;SL.randomForest.9&quot;</span>,</span>
-<span id="cb25-36"><a href="#cb25-36"></a>              <span class="st">&quot;SL.gbm.1&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="co"># create a function for boosted stumps</span></span>
+<span id="cb28-2"><a href="#cb28-2"></a>SL.gbm<span class="fl">.1</span> &lt;-<span class="st"> </span><span class="cf">function</span>(..., <span class="dt">interaction.depth =</span> <span class="dv">1</span>) <span class="kw">SL.gbm</span>(..., <span class="dt">interaction.depth =</span> interaction.depth)</span>
+<span id="cb28-3"><a href="#cb28-3"></a></span>
+<span id="cb28-4"><a href="#cb28-4"></a><span class="co"># create GAMs with different degrees of freedom</span></span>
+<span id="cb28-5"><a href="#cb28-5"></a>SL.gam<span class="fl">.3</span> &lt;-<span class="st"> </span><span class="cf">function</span>(..., <span class="dt">deg.gam =</span> <span class="dv">3</span>) <span class="kw">SL.gam</span>(..., <span class="dt">deg.gam =</span> deg.gam)</span>
+<span id="cb28-6"><a href="#cb28-6"></a>SL.gam<span class="fl">.4</span> &lt;-<span class="st"> </span><span class="cf">function</span>(..., <span class="dt">deg.gam =</span> <span class="dv">4</span>) <span class="kw">SL.gam</span>(..., <span class="dt">deg.gam =</span> deg.gam)</span>
+<span id="cb28-7"><a href="#cb28-7"></a>SL.gam<span class="fl">.5</span> &lt;-<span class="st"> </span><span class="cf">function</span>(..., <span class="dt">deg.gam =</span> <span class="dv">5</span>) <span class="kw">SL.gam</span>(..., <span class="dt">deg.gam =</span> deg.gam)</span>
+<span id="cb28-8"><a href="#cb28-8"></a></span>
+<span id="cb28-9"><a href="#cb28-9"></a><span class="co"># add more levels of alpha for glmnet</span></span>
+<span id="cb28-10"><a href="#cb28-10"></a>create.SL.glmnet &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">alpha =</span> <span class="kw">c</span>(<span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>)) {</span>
+<span id="cb28-11"><a href="#cb28-11"></a>  <span class="cf">for</span> (mm <span class="cf">in</span> <span class="kw">seq</span>(<span class="kw">length</span>(alpha))) {</span>
+<span id="cb28-12"><a href="#cb28-12"></a>    <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">file =</span> <span class="st">&quot;&quot;</span>, <span class="dt">text =</span> <span class="kw">paste</span>(<span class="st">&#39;SL.glmnet.&#39;</span>, alpha[mm], <span class="st">&#39;&lt;- function(..., alpha = &#39;</span>, alpha[mm], <span class="st">&#39;) SL.glmnet(..., alpha = alpha)&#39;</span>, <span class="dt">sep =</span> <span class="st">&#39;&#39;</span>)), <span class="dt">envir =</span> .GlobalEnv)</span>
+<span id="cb28-13"><a href="#cb28-13"></a>  }</span>
+<span id="cb28-14"><a href="#cb28-14"></a>  <span class="kw">invisible</span>(<span class="ot">TRUE</span>)</span>
+<span id="cb28-15"><a href="#cb28-15"></a>}</span>
+<span id="cb28-16"><a href="#cb28-16"></a><span class="kw">create.SL.glmnet</span>()</span>
+<span id="cb28-17"><a href="#cb28-17"></a></span>
+<span id="cb28-18"><a href="#cb28-18"></a><span class="co"># add tuning parameters for randomForest</span></span>
+<span id="cb28-19"><a href="#cb28-19"></a>create.SL.randomForest &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">tune =</span> <span class="kw">list</span>(<span class="dt">mtry =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">7</span>), <span class="dt">nodesize =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">10</span>))) {</span>
+<span id="cb28-20"><a href="#cb28-20"></a>  tuneGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(tune, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb28-21"><a href="#cb28-21"></a>  <span class="cf">for</span> (mm <span class="cf">in</span> <span class="kw">seq</span>(<span class="kw">nrow</span>(tuneGrid))) {</span>
+<span id="cb28-22"><a href="#cb28-22"></a>    <span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">file =</span> <span class="st">&quot;&quot;</span>, <span class="dt">text =</span> <span class="kw">paste</span>(<span class="st">&quot;SL.randomForest.&quot;</span>, mm, <span class="st">&quot;&lt;- function(..., mtry = &quot;</span>, tuneGrid[mm, <span class="dv">1</span>], <span class="st">&quot;, nodesize = &quot;</span>, tuneGrid[mm, <span class="dv">2</span>], <span class="st">&quot;) SL.randomForest(..., mtry = mtry, nodesize = nodesize)&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)), <span class="dt">envir =</span> .GlobalEnv)</span>
+<span id="cb28-23"><a href="#cb28-23"></a>  }</span>
+<span id="cb28-24"><a href="#cb28-24"></a>  <span class="kw">invisible</span>(<span class="ot">TRUE</span>)</span>
+<span id="cb28-25"><a href="#cb28-25"></a>}</span>
+<span id="cb28-26"><a href="#cb28-26"></a><span class="kw">create.SL.randomForest</span>()</span>
+<span id="cb28-27"><a href="#cb28-27"></a></span>
+<span id="cb28-28"><a href="#cb28-28"></a><span class="co"># create the library</span></span>
+<span id="cb28-29"><a href="#cb28-29"></a>learners &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;SL.glmnet&quot;</span>, <span class="st">&quot;SL.glmnet.0.25&quot;</span>, <span class="st">&quot;SL.glmnet.0.5&quot;</span>, <span class="st">&quot;SL.glmnet.0.75&quot;</span>,</span>
+<span id="cb28-30"><a href="#cb28-30"></a>              <span class="st">&quot;SL.randomForest&quot;</span>, <span class="st">&quot;SL.randomForest.1&quot;</span>, <span class="st">&quot;SL.randomForest.2&quot;</span>, <span class="st">&quot;SL.randomForest.3&quot;</span>,</span>
+<span id="cb28-31"><a href="#cb28-31"></a>              <span class="st">&quot;SL.randomForest.4&quot;</span>, <span class="st">&quot;SL.randomForest.5&quot;</span>, <span class="st">&quot;SL.randomForest.6&quot;</span>, <span class="st">&quot;SL.randomForest.7&quot;</span>,</span>
+<span id="cb28-32"><a href="#cb28-32"></a>              <span class="st">&quot;SL.randomForest.8&quot;</span>, <span class="st">&quot;SL.randomForest.9&quot;</span>,</span>
+<span id="cb28-33"><a href="#cb28-33"></a>              <span class="st">&quot;SL.gbm.1&quot;</span>)</span></code></pre></div>
 <p>Now that I have created the library of learners, I can move on to estimating variable importance.</p>
 </div>
 <div id="estimating-variable-importance-for-a-single-variable" class="section level3">
@@ -611,598 +612,271 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li>I want to use five-fold cross-fitting to estimate importance</li>
 </ul>
 <p>The call to <code>vimp_rsquared()</code> looks like this:</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="co"># load the library</span></span>
-<span id="cb26-2"><a href="#cb26-2"></a><span class="kw">library</span>(<span class="st">&quot;vimp&quot;</span>)</span>
-<span id="cb26-3"><a href="#cb26-3"></a></span>
-<span id="cb26-4"><a href="#cb26-4"></a><span class="co"># now estimate variable importance</span></span>
-<span id="cb26-5"><a href="#cb26-5"></a><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X,</span>
-<span id="cb26-6"><a href="#cb26-6"></a>    <span class="dt">indx =</span> <span class="dv">5</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> learners, <span class="dt">V =</span> <span class="dv">5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X,</span>
+<span id="cb29-2"><a href="#cb29-2"></a>    <span class="dt">indx =</span> <span class="dv">5</span>, <span class="dt">run_regression =</span> <span class="ot">TRUE</span>, <span class="dt">SL.library =</span> learners, <span class="dt">V =</span> <span class="dv">5</span>)</span></code></pre></div>
 <p>While this is the preferred method for estimating variable importance, using a large library of learners may cause the function to take time to run. Usually this is okay — in general, you took a long time to collect the data, so letting an algorithm run for a few hours should not be an issue.</p>
 <p>However, for the sake of illustration, I can estimate varibable importance for family history only using only using a small library, a small number of cross-validation folds in the Super Learner, and a small number of cross-fitting folds as follows (again, I suggest using a larger number of folds and a larger library in practice):</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="co"># load the library</span></span>
-<span id="cb27-2"><a href="#cb27-2"></a><span class="kw">library</span>(<span class="st">&quot;vimp&quot;</span>)</span>
-<span id="cb27-3"><a href="#cb27-3"></a></span>
-<span id="cb27-4"><a href="#cb27-4"></a><span class="co"># small learners library</span></span>
-<span id="cb27-5"><a href="#cb27-5"></a>learners<span class="fl">.2</span> &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;SL.ranger&quot;</span>)</span>
-<span id="cb27-6"><a href="#cb27-6"></a><span class="co"># small number of cross-fitting folds</span></span>
-<span id="cb27-7"><a href="#cb27-7"></a>V &lt;-<span class="st"> </span><span class="dv">2</span></span>
-<span id="cb27-8"><a href="#cb27-8"></a><span class="co"># small number of CV folds for Super Learner</span></span>
-<span id="cb27-9"><a href="#cb27-9"></a>sl_cvcontrol &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">V =</span> <span class="dv">2</span>)</span>
-<span id="cb27-10"><a href="#cb27-10"></a></span>
-<span id="cb27-11"><a href="#cb27-11"></a><span class="co"># now estimate variable importance</span></span>
-<span id="cb27-12"><a href="#cb27-12"></a>fam_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> <span class="kw">as.data.frame</span>(heart[, <span class="op">-</span><span class="kw">dim</span>(heart)[<span class="dv">2</span>]]), <span class="dt">indx =</span> <span class="dv">5</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
-<pre><code>## Warning in cv_vim(Y = Y, X = X, f1 = f1, f2 = f2, indx = indx, V = V, type =
-## &quot;r_squared&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
-<p>This code takes approximately 5 seconds to run on a (not very fast) PC. I can display these estimates:</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a>fam_vim</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a><span class="co"># small learners library</span></span>
+<span id="cb30-2"><a href="#cb30-2"></a>learners<span class="fl">.2</span> &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;SL.ranger&quot;</span>)</span>
+<span id="cb30-3"><a href="#cb30-3"></a><span class="co"># small number of cross-fitting folds</span></span>
+<span id="cb30-4"><a href="#cb30-4"></a>V &lt;-<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb30-5"><a href="#cb30-5"></a><span class="co"># small number of CV folds for Super Learner</span></span>
+<span id="cb30-6"><a href="#cb30-6"></a>sl_cvcontrol &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">V =</span> <span class="dv">2</span>)</span>
+<span id="cb30-7"><a href="#cb30-7"></a></span>
+<span id="cb30-8"><a href="#cb30-8"></a><span class="co"># now estimate variable importance</span></span>
+<span id="cb30-9"><a href="#cb30-9"></a>start_time &lt;-<span class="st"> </span><span class="kw">Sys.time</span>()</span>
+<span id="cb30-10"><a href="#cb30-10"></a>fam_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">5</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =
+## cross_fitted_f1, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a>end_time &lt;-<span class="st"> </span><span class="kw">Sys.time</span>()</span></code></pre></div>
+<p>This code takes approximately 2.162 seconds to run on a (not very fast) PC. I can display these estimates:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a>fam_vim</span></code></pre></div>
 <pre><code>## Variable importance estimates:
 ##       Estimate SE         95% CI         VIMP &gt; 0 p-value  
-## s = 5 0        0.06149265 [0, 0.1205234] FALSE    0.9152885</code></pre>
+## s = 5 0        0.05859551 [0, 0.1148451] FALSE    0.9894053</code></pre>
 <p>The object returned by <code>vimp_rsquared()</code> also contains fitted values from using <code>SuperLearner()</code>; I access these using <code>$full_fit</code> and <code>$red_fit</code>. For example,</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="kw">head</span>(fam_vim<span class="op">$</span>full_fit)</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a><span class="kw">head</span>(fam_vim<span class="op">$</span>full_fit)</span></code></pre></div>
 <pre><code>## [[1]]
-##              [,1]
-##   [1,] 0.58860000
-##   [2,] 0.46750000
-##   [3,] 0.55396667
-##   [4,] 0.16586667
-##   [5,] 0.53133333
-##   [6,] 0.51126667
-##   [7,] 0.47723333
-##   [8,] 0.30333333
-##   [9,] 0.17800000
-##  [10,] 0.47046667
-##  [11,] 0.46123333
-##  [12,] 0.02520000
-##  [13,] 0.08663333
-##  [14,] 0.15913333
-##  [15,] 0.11023333
-##  [16,] 0.09736667
-##  [17,] 0.16700000
-##  [18,] 0.39280000
-##  [19,] 0.54893333
-##  [20,] 0.59936667
-##  [21,] 0.06646667
-##  [22,] 0.23620000
-##  [23,] 0.35260000
-##  [24,] 0.09186667
-##  [25,] 0.58176667
-##  [26,] 0.21020000
-##  [27,] 0.45703333
-##  [28,] 0.16130000
-##  [29,] 0.44070000
-##  [30,] 0.30410000
-##  [31,] 0.75393333
-##  [32,] 0.68286667
-##  [33,] 0.33980000
-##  [34,] 0.08643333
-##  [35,] 0.17996667
-##  [36,] 0.65190000
-##  [37,] 0.54836667
-##  [38,] 0.17126667
-##  [39,] 0.33243333
-##  [40,] 0.39550000
-##  [41,] 0.65530000
-##  [42,] 0.44726667
-##  [43,] 0.23056667
-##  [44,] 0.43996667
-##  [45,] 0.25703333
-##  [46,] 0.50573333
-##  [47,] 0.21950000
-##  [48,] 0.65590000
-##  [49,] 0.33476667
-##  [50,] 0.42123333
-##  [51,] 0.40263333
-##  [52,] 0.22720000
-##  [53,] 0.07206667
-##  [54,] 0.28566667
-##  [55,] 0.15250000
-##  [56,] 0.59216667
-##  [57,] 0.04670000
-##  [58,] 0.47380000
-##  [59,] 0.54116667
-##  [60,] 0.58276667
-##  [61,] 0.53076667
-##  [62,] 0.50150000
-##  [63,] 0.13280000
-##  [64,] 0.31263333
-##  [65,] 0.25990000
-##  [66,] 0.58370000
-##  [67,] 0.51666667
-##  [68,] 0.19746667
-##  [69,] 0.42953333
-##  [70,] 0.30333333
-##  [71,] 0.39396667
-##  [72,] 0.20323333
-##  [73,] 0.42146667
-##  [74,] 0.46886667
-##  [75,] 0.09813333
-##  [76,] 0.24993333
-##  [77,] 0.04420000
-##  [78,] 0.57163333
-##  [79,] 0.22793333
-##  [80,] 0.43110000
-##  [81,] 0.34016667
-##  [82,] 0.44313333
-##  [83,] 0.46963333
-##  [84,] 0.53403333
-##  [85,] 0.46316667
-##  [86,] 0.29736667
-##  [87,] 0.41506667
-##  [88,] 0.16056667
-##  [89,] 0.14333333
-##  [90,] 0.39303333
-##  [91,] 0.67220000
-##  [92,] 0.16536667
-##  [93,] 0.32390000
-##  [94,] 0.55773333
-##  [95,] 0.08520000
-##  [96,] 0.28603333
-##  [97,] 0.08676667
-##  [98,] 0.33370000
-##  [99,] 0.23973333
-## [100,] 0.22266667
-## [101,] 0.24870000
-## [102,] 0.41706667
-## [103,] 0.37433333
-## [104,] 0.55760000
-## [105,] 0.52373333
-## [106,] 0.23700000
-## [107,] 0.49853333
-## [108,] 0.57810000
-## [109,] 0.30933333
-## [110,] 0.58840000
-## [111,] 0.06886667
-## [112,] 0.23843333
-## [113,] 0.23146667
-## [114,] 0.11340000
-## [115,] 0.18396667
-## [116,] 0.19246667
+##   [1] 0.6500000 0.4880000 0.2380000 0.6960000 0.4080000 0.7860000 0.3680000
+##   [8] 0.8540000 0.1960000 0.3960000 0.2460000 0.1920000 0.1500000 0.5080000
+##  [15] 0.1120000 0.1220000 0.2160000 0.6080000 0.0460000 0.2600000 0.5780000
+##  [22] 0.2480000 0.0040000 0.5360000 0.4360000 0.5140000 0.0800000 0.2920000
+##  [29] 0.5300000 0.6300000 0.5460000 0.1380000 0.2760000 0.4340000 0.0020000
+##  [36] 0.7120000 0.1180000 0.0060000 0.5780000 0.4920000 0.7980000 0.2140000
+##  [43] 0.2660000 0.1660000 0.4980000 0.1840000 0.3380000 0.0360000 0.6440000
+##  [50] 0.1980000 0.7460000 0.3820000 0.6100000 0.4840000 0.1640000 0.0560000
+##  [57] 0.5220000 0.0380000 0.6200000 0.3820000 0.4400000 0.0100000 0.3960000
+##  [64] 0.3600000 0.2000000 0.2880000 0.1660000 0.6000000 0.0060000 0.0100000
+##  [71] 0.0080000 0.1580000 0.2240000 0.2540000 0.1520000 0.2840000 0.1840000
+##  [78] 0.3900000 0.2280000 0.4060000 0.2580000 0.3100000 0.3300000 0.1840000
+##  [85] 0.3260000 0.2980000 0.3540000 0.4400000 0.5780000 0.2860000 0.2280000
+##  [92] 0.3900000 0.7520000 0.5753333 0.6300000 0.2300000 0.0880000 0.6640000
+##  [99] 0.5940000 0.6740000 0.0700000 0.2220000 0.1660000 0.3840000 0.0600000
+## [106] 0.0920000 0.0460000 0.2240000 0.3260000 0.4380000 0.3140000 0.3260000
+## [113] 0.5640000 0.3800000 0.3160000 0.3160000
 ## 
 ## [[2]]
-##              [,1]
-##   [1,] 0.20346667
-##   [2,] 0.05783333
-##   [3,] 0.69640000
-##   [4,] 0.48350000
-##   [5,] 0.45460000
-##   [6,] 0.34390000
-##   [7,] 0.46450000
-##   [8,] 0.58070000
-##   [9,] 0.16296667
-##  [10,] 0.42276667
-##  [11,] 0.36716667
-##  [12,] 0.49880000
-##  [13,] 0.21940000
-##  [14,] 0.79166667
-##  [15,] 0.12316667
-##  [16,] 0.38653333
-##  [17,] 0.17146667
-##  [18,] 0.30490000
-##  [19,] 0.16553333
-##  [20,] 0.13443333
-##  [21,] 0.29426667
-##  [22,] 0.12440000
-##  [23,] 0.18286667
-##  [24,] 0.20953333
-##  [25,] 0.20326667
-##  [26,] 0.45086667
-##  [27,] 0.16363333
-##  [28,] 0.19426667
-##  [29,] 0.12786667
-##  [30,] 0.44326667
-##  [31,] 0.54516667
-##  [32,] 0.29043333
-##  [33,] 0.26800000
-##  [34,] 0.26810000
-##  [35,] 0.20883333
-##  [36,] 0.44626667
-##  [37,] 0.52000000
-##  [38,] 0.13210000
-##  [39,] 0.42776667
-##  [40,] 0.31133333
-##  [41,] 0.19283333
-##  [42,] 0.59506667
-##  [43,] 0.71590000
-##  [44,] 0.59876667
-##  [45,] 0.11986667
-##  [46,] 0.53370000
-##  [47,] 0.18016667
-##  [48,] 0.22516667
-##  [49,] 0.56656667
-##  [50,] 0.69576667
-##  [51,] 0.19866667
-##  [52,] 0.25393333
-##  [53,] 0.50123333
-##  [54,] 0.24620000
-##  [55,] 0.21236667
-##  [56,] 0.70506667
-##  [57,] 0.53060000
-##  [58,] 0.09936667
-##  [59,] 0.39926667
-##  [60,] 0.47340000
-##  [61,] 0.33186667
-##  [62,] 0.13536667
-##  [63,] 0.55360000
-##  [64,] 0.39953333
-##  [65,] 0.13503333
-##  [66,] 0.17533333
-##  [67,] 0.63356667
-##  [68,] 0.12983333
-##  [69,] 0.13980000
-##  [70,] 0.24160000
-##  [71,] 0.37623333
-##  [72,] 0.13806667
-##  [73,] 0.07943333
-##  [74,] 0.34470000
-##  [75,] 0.20730000
-##  [76,] 0.60220000
-##  [77,] 0.59610000
-##  [78,] 0.23920000
-##  [79,] 0.17623333
-##  [80,] 0.63330000
-##  [81,] 0.41706667
-##  [82,] 0.65873333
-##  [83,] 0.29120000
-##  [84,] 0.08093333
-##  [85,] 0.43763333
-##  [86,] 0.72013333
-##  [87,] 0.56246667
-##  [88,] 0.44190000
-##  [89,] 0.18696667
-##  [90,] 0.23393333
-##  [91,] 0.46790000
-##  [92,] 0.40660000
-##  [93,] 0.44043333
-##  [94,] 0.18023333
-##  [95,] 0.17480000
-##  [96,] 0.53920000
-##  [97,] 0.28363333
-##  [98,] 0.59393333
-##  [99,] 0.13090000
-## [100,] 0.64650000
-## [101,] 0.31426667
-## [102,] 0.22980000
-## [103,] 0.18800000
-## [104,] 0.09533333
-## [105,] 0.31186667
-## [106,] 0.51140000
-## [107,] 0.72446667
-## [108,] 0.21386667
-## [109,] 0.21326667
-## [110,] 0.12743333
-## [111,] 0.19116667
-## [112,] 0.36003333
-## [113,] 0.32796667
-## [114,] 0.42933333
-## [115,] 0.45110000</code></pre>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="kw">head</span>(fam_vim<span class="op">$</span>red_fit)</span></code></pre></div>
+##   [1] 0.2180000 0.6960000 0.0960000 0.4640000 0.2480000 0.3960000 0.2640000
+##   [8] 0.6960000 0.2740000 0.1260000 0.2040000 0.3120000 0.2940000 0.2660000
+##  [15] 0.0160000 0.1880000 0.4280000 0.1300000 0.4760000 0.4400000 0.2840000
+##  [22] 0.2180000 0.0820000 0.3640000 0.3640000 0.0440000 0.3100000 0.1580000
+##  [29] 0.8380000 0.2260000 0.2400000 0.6080000 0.3120000 0.3900000 0.6500000
+##  [36] 0.1700000 0.0120000 0.4460000 0.5220000 0.1200000 0.3260000 0.2560000
+##  [43] 0.0060000 0.6480000 0.6620000 0.4000000 0.0340000 0.0280000 0.4060000
+##  [50] 0.0760000 0.8220000 0.2980000 0.5480000 0.4320000 0.4540000 0.1580000
+##  [57] 0.4120000 0.8100000 0.4720000 0.5440000 0.1340000 0.4660000 0.4540000
+##  [64] 0.0900000 0.2540000 0.4440000 0.7100000 0.2680000 0.3060000 0.3720000
+##  [71] 0.2380000 0.5300000 0.4180000 0.2820000 0.0960000 0.4420000 0.3140000
+##  [78] 0.0860000 0.7680000 0.3840000 0.3740000 0.5460000 0.2800000 0.6320000
+##  [85] 0.3040000 0.3860000 0.6740000 0.5120000 0.0220000 0.3300000 0.5540000
+##  [92] 0.5540000 0.4280000 0.0820000 0.4720000 0.3800000 0.6240000 0.3242857
+##  [99] 0.1980000 0.1200000 0.4160000 0.3600000 0.1060000 0.3100000 0.2680000
+## [106] 0.4020000 0.4140000 0.5300000 0.1200000 0.0940000 0.2220000 0.0780000
+## [113] 0.2440000 0.1360000 0.7020000 0.3540000
+## 
+## [[3]]
+##   [1] 0.6680 0.4520 0.4660 0.4360 0.0600 0.8020 0.2040 0.4640 0.3520 0.3660
+##  [11] 0.1160 0.1840 0.1140 0.6840 0.3860 0.1840 0.2300 0.4860 0.4120 0.6440
+##  [21] 0.2100 0.4800 0.1780 0.3920 0.1000 0.1380 0.3560 0.7040 0.4460 0.1040
+##  [31] 0.6980 0.4680 0.6360 0.4420 0.2640 0.1280 0.5580 0.5680 0.1920 0.7180
+##  [41] 0.1200 0.4520 0.0360 0.7620 0.5500 0.1172 0.7060 0.4440 0.0160 0.2660
+##  [51] 0.2560 0.4960 0.1520 0.6480 0.2280 0.3300 0.1680 0.6960 0.4580 0.4040
+##  [61] 0.4420 0.6840 0.4320 0.5940 0.0140 0.2880 0.4980 0.6440 0.1500 0.1100
+##  [71] 0.6900 0.7340 0.0440 0.2960 0.0100 0.1420 0.0600 0.4700 0.2880 0.5500
+##  [81] 0.4040 0.2600 0.6240 0.5200 0.5300 0.0300 0.2420 0.4840 0.1640 0.4220
+##  [91] 0.1500 0.2140 0.3020 0.0880 0.6500 0.7800 0.2940 0.5520 0.5380 0.5820
+## [101] 0.0720 0.2160 0.4160 0.2620 0.5680 0.6320 0.5480 0.2480 0.1220 0.0620
+## [111] 0.0300 0.1580 0.2040 0.3340 0.5580
+## 
+## [[4]]
+##   [1] 0.1920 0.3040 0.0380 0.5300 0.4340 0.7640 0.5540 0.4420 0.6700 0.2500
+##  [11] 0.3280 0.3020 0.3140 0.3140 0.2340 0.0925 0.0585 0.1980 0.1285 0.6560
+##  [21] 0.3880 0.5700 0.3560 0.4860 0.4280 0.1420 0.1280 0.4960 0.2800 0.4920
+##  [31] 0.7200 0.1980 0.1700 0.1240 0.5200 0.1380 0.2000 0.8740 0.1500 0.3580
+##  [41] 0.0160 0.2260 0.3480 0.4480 0.2180 0.3140 0.0260 0.1135 0.6100 0.1440
+##  [51] 0.2360 0.2500 0.2920 0.2280 0.4720 0.5320 0.6440 0.0640 0.0800 0.2800
+##  [61] 0.4460 0.4480 0.2880 0.0160 0.6780 0.3000 0.5800 0.4340 0.3080 0.3880
+##  [71] 0.6940 0.7080 0.0765 0.2920 0.5200 0.3485 0.2320 0.0280 0.4920 0.0650
+##  [81] 0.1160 0.3880 0.6120 0.5740 0.1340 0.4460 0.6580 0.4560 0.3080 0.5000
+##  [91] 0.2800 0.4320 0.5080 0.4880 0.4580 0.3540 0.3420 0.6060 0.6760 0.5520
+## [101] 0.4620 0.5760 0.4960 0.5360 0.4940 0.5620 0.1900 0.4360 0.2405 0.0340
+## [111] 0.0260 0.0280 0.0260 0.1540 0.1340</code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a><span class="kw">head</span>(fam_vim<span class="op">$</span>red_fit)</span></code></pre></div>
 <pre><code>## [[1]]
-##              [,1]
-##   [1,] 0.28380735
-##   [2,] 0.40331392
-##   [3,] 0.07090634
-##   [4,] 0.51798858
-##   [5,] 0.58516301
-##   [6,] 0.32960125
-##   [7,] 0.45714019
-##   [8,] 0.48346931
-##   [9,] 0.43820300
-##  [10,] 0.11125125
-##  [11,] 0.46296540
-##  [12,] 0.58721350
-##  [13,] 0.50220221
-##  [14,] 0.65967085
-##  [15,] 0.25599469
-##  [16,] 0.53141093
-##  [17,] 0.24717160
-##  [18,] 0.08743377
-##  [19,] 0.18183548
-##  [20,] 0.35443256
-##  [21,] 0.64857938
-##  [22,] 0.19713325
-##  [23,] 0.33451562
-##  [24,] 0.29497058
-##  [25,] 0.04477937
-##  [26,] 0.15399466
-##  [27,] 0.49364856
-##  [28,] 0.23225972
-##  [29,] 0.47052194
-##  [30,] 0.51197019
-##  [31,] 0.15773714
-##  [32,] 0.02637028
-##  [33,] 0.67373936
-##  [34,] 0.26617573
-##  [35,] 0.37701313
-##  [36,] 0.31973713
-##  [37,] 0.02550608
-##  [38,] 0.28692110
-##  [39,] 0.23337586
-##  [40,] 0.05714497
-##  [41,] 0.51271565
-##  [42,] 0.31027472
-##  [43,] 0.19370349
-##  [44,] 0.22463344
-##  [45,] 0.36485901
-##  [46,] 0.49243082
-##  [47,] 0.03075477
-##  [48,] 0.41284166
-##  [49,] 0.45002388
-##  [50,] 0.55571851
-##  [51,] 0.03373975
-##  [52,] 0.06308946
-##  [53,] 0.36446220
-##  [54,] 0.14155699
-##  [55,] 0.40746811
-##  [56,] 0.55429256
-##  [57,] 0.08473007
-##  [58,] 0.33726958
-##  [59,] 0.30080094
-##  [60,] 0.30875212
-##  [61,] 0.13840392
-##  [62,] 0.51788770
-##  [63,] 0.07075155
-##  [64,] 0.30815368
-##  [65,] 0.45740437
-##  [66,] 0.58426181
-##  [67,] 0.44580638
-##  [68,] 0.57179039
-##  [69,] 0.33841573
-##  [70,] 0.43816120
-##  [71,] 0.48972476
-##  [72,] 0.04544682
-##  [73,] 0.15694909
-##  [74,] 0.50700450
-##  [75,] 0.06300933
-##  [76,] 0.42285264
-##  [77,] 0.23988274
-##  [78,] 0.48330466
-##  [79,] 0.47225684
-##  [80,] 0.15637678
-##  [81,] 0.33737432
-##  [82,] 0.45285920
-##  [83,] 0.52647765
-##  [84,] 0.55918191
-##  [85,] 0.54191092
-##  [86,] 0.18072404
-##  [87,] 0.46903920
-##  [88,] 0.54208824
-##  [89,] 0.28692777
-##  [90,] 0.55848480
-##  [91,] 0.48031639
-##  [92,] 0.31990909
-##  [93,] 0.62202938
-##  [94,] 0.25395547
-##  [95,] 0.49104686
-##  [96,] 0.36715154
-##  [97,] 0.62564090
-##  [98,] 0.51280398
-##  [99,] 0.55643238
-## [100,] 0.51680172
-## [101,] 0.09039983
-## [102,] 0.53585794
-## [103,] 0.29009759
-## [104,] 0.63967067
-## [105,] 0.28167404
-## [106,] 0.54975427
-## [107,] 0.26158594
-## [108,] 0.23172248
-## [109,] 0.43179719
-## [110,] 0.04986515
-## [111,] 0.07221626
-## [112,] 0.02166060
-## [113,] 0.06644694
-## [114,] 0.10943394
-## [115,] 0.66937865
-## [116,] 0.53364045
+##   [1] 0.60330973 0.43751573 0.27145889 0.45316608 0.48293878 0.54442920
+##   [7] 0.43720725 0.59464975 0.31213881 0.42809690 0.35664473 0.25326986
+##  [13] 0.14032718 0.42222073 0.15371601 0.17191766 0.25320961 0.56254273
+##  [19] 0.13203266 0.22741957 0.58414740 0.35785656 0.04634136 0.50408532
+##  [25] 0.36434641 0.52636593 0.20288595 0.32883113 0.51962167 0.63835113
+##  [31] 0.55999084 0.17067117 0.42430050 0.52292780 0.04509573 0.56713693
+##  [37] 0.18702838 0.05183927 0.42591517 0.46276960 0.48536039 0.36263132
+##  [43] 0.21988527 0.25043230 0.55279700 0.25081339 0.20088510 0.07670994
+##  [49] 0.47575660 0.32232616 0.51383800 0.44866140 0.53789616 0.48331356
+##  [55] 0.16787089 0.15518653 0.36922739 0.12215087 0.41959839 0.42107719
+##  [61] 0.43424455 0.17958293 0.29973146 0.45001751 0.40176863 0.36224273
+##  [67] 0.38606462 0.55365940 0.06525293 0.08536250 0.06263378 0.19904312
+##  [73] 0.29843855 0.31992817 0.13222397 0.25845303 0.21001090 0.51298249
+##  [79] 0.21052614 0.45226727 0.29384499 0.39705597 0.31175077 0.27981094
+##  [85] 0.49830580 0.25001053 0.25431068 0.47720238 0.51069573 0.24152024
+##  [91] 0.17933615 0.36246213 0.55819933 0.50031907 0.58242507 0.27215634
+##  [97] 0.15809045 0.49646500 0.46498158 0.57513913 0.12021481 0.26285500
+## [103] 0.26184816 0.33617577 0.14993953 0.17807090 0.07421892 0.30898874
+## [109] 0.31735051 0.54329600 0.24986394 0.31125044 0.50716727 0.51580536
+## [115] 0.36757592 0.33324880
 ## 
 ## [[2]]
-##               [,1]
-##   [1,] 0.643554626
-##   [2,] 0.344801659
-##   [3,] 0.131160181
-##   [4,] 0.290687233
-##   [5,] 0.011270687
-##   [6,] 0.606885376
-##   [7,] 0.542024128
-##   [8,] 0.514418044
-##   [9,] 0.378213099
-##  [10,] 0.089313951
-##  [11,] 0.078929408
-##  [12,] 0.361403254
-##  [13,] 0.147575527
-##  [14,] 0.044508774
-##  [15,] 0.455680589
-##  [16,] 0.008446883
-##  [17,] 0.275838738
-##  [18,] 0.336127501
-##  [19,] 0.315675141
-##  [20,] 0.502014534
-##  [21,] 0.261991959
-##  [22,] 0.405929590
-##  [23,] 0.556957050
-##  [24,] 0.519100061
-##  [25,] 0.147063123
-##  [26,] 0.440406693
-##  [27,] 0.089492127
-##  [28,] 0.387172086
-##  [29,] 0.594881244
-##  [30,] 0.406662487
-##  [31,] 0.118624718
-##  [32,] 0.239283884
-##  [33,] 0.627389421
-##  [34,] 0.176379939
-##  [35,] 0.262892791
-##  [36,] 0.062090879
-##  [37,] 0.031008090
-##  [38,] 0.076088540
-##  [39,] 0.491975773
-##  [40,] 0.005219068
-##  [41,] 0.598302359
-##  [42,] 0.508299527
-##  [43,] 0.574818334
-##  [44,] 0.598671786
-##  [45,] 0.196822532
-##  [46,] 0.292974313
-##  [47,] 0.326512131
-##  [48,] 0.065675477
-##  [49,] 0.160106428
-##  [50,] 0.024961320
-##  [51,] 0.635569879
-##  [52,] 0.073355319
-##  [53,] 0.377143161
-##  [54,] 0.136337583
-##  [55,] 0.378919781
-##  [56,] 0.643531670
-##  [57,] 0.635134821
-##  [58,] 0.610644799
-##  [59,] 0.422421041
-##  [60,] 0.018657063
-##  [61,] 0.542308349
-##  [62,] 0.175449712
-##  [63,] 0.626580606
-##  [64,] 0.438718226
-##  [65,] 0.414370001
-##  [66,] 0.015433653
-##  [67,] 0.577566584
-##  [68,] 0.043054308
-##  [69,] 0.078414066
-##  [70,] 0.590954344
-##  [71,] 0.566867224
-##  [72,] 0.320160988
-##  [73,] 0.170872652
-##  [74,] 0.022306208
-##  [75,] 0.034822017
-##  [76,] 0.200717886
-##  [77,] 0.347206521
-##  [78,] 0.435710266
-##  [79,] 0.126032222
-##  [80,] 0.370027830
-##  [81,] 0.078180598
-##  [82,] 0.227966214
-##  [83,] 0.015247692
-##  [84,] 0.541366253
-##  [85,] 0.521750664
-##  [86,] 0.160398992
-##  [87,] 0.567177950
-##  [88,] 0.286913943
-##  [89,] 0.478049947
-##  [90,] 0.075623133
-##  [91,] 0.559897256
-##  [92,] 0.152850791
-##  [93,] 0.432014747
-##  [94,] 0.420544626
-##  [95,] 0.562514117
-##  [96,] 0.465270031
-##  [97,] 0.625411551
-##  [98,] 0.255236099
-##  [99,] 0.621238120
-## [100,] 0.595599046
-## [101,] 0.147297657
-## [102,] 0.100435888
-## [103,] 0.023604357
-## [104,] 0.032169862
-## [105,] 0.026781933
-## [106,] 0.142296748
-## [107,] 0.257419619
-## [108,] 0.006018821
-## [109,] 0.117231268
-## [110,] 0.099769404
-## [111,] 0.086977207
-## [112,] 0.115717120
-## [113,] 0.368722489
-## [114,] 0.328202510
-## [115,] 0.327776303</code></pre>
+##   [1] 0.42437191 0.42166087 0.11034915 0.53628817 0.26664338 0.56019193
+##   [7] 0.47742424 0.57393773 0.14084728 0.14362862 0.31236129 0.31721526
+##  [13] 0.38596440 0.18880493 0.04812138 0.45638473 0.41078058 0.05256078
+##  [19] 0.46492843 0.52171893 0.46108704 0.21290513 0.22310043 0.45409643
+##  [25] 0.45930327 0.18577457 0.36158588 0.24971898 0.58879898 0.41575047
+##  [31] 0.18554941 0.39445373 0.28522318 0.58346389 0.32451036 0.18008878
+##  [37] 0.04132313 0.59830758 0.41320793 0.14514696 0.29721112 0.22637895
+##  [43] 0.04849278 0.40651673 0.40851120 0.66014540 0.13879684 0.06363653
+##  [49] 0.52363313 0.13815280 0.51922242 0.37840873 0.54789402 0.57943600
+##  [55] 0.56132071 0.38889393 0.52519133 0.58779907 0.28938997 0.61631587
+##  [61] 0.13184617 0.34006403 0.57948064 0.14434030 0.25303662 0.45252013
+##  [67] 0.57257067 0.29465880 0.43297707 0.36033907 0.37258560 0.46463744
+##  [73] 0.50987457 0.37172193 0.18361503 0.42113694 0.27689800 0.14365438
+##  [79] 0.55354278 0.54706793 0.42226267 0.47061693 0.36409860 0.48147536
+##  [85] 0.33758893 0.41467864 0.55986707 0.38533223 0.13734775 0.44497587
+##  [91] 0.39932320 0.62210273 0.29616191 0.20060165 0.27928239 0.33310813
+##  [97] 0.32835193 0.33672433 0.25222402 0.24816602 0.44472647 0.47488773
+## [103] 0.22254282 0.31701187 0.29165748 0.40074613 0.58059227 0.30186144
+## [109] 0.15521216 0.25418054 0.20895696 0.05475050 0.28761327 0.24282338
+## [115] 0.44208013 0.43015740
+## 
+## [[3]]
+##   [1] 0.51886213 0.42269027 0.44311863 0.42097641 0.08775118 0.68640580
+##   [7] 0.38567227 0.35998449 0.42384362 0.53274313 0.06131857 0.34763320
+##  [13] 0.13748328 0.54042713 0.33666000 0.25974166 0.08628498 0.41911114
+##  [19] 0.33101043 0.54331782 0.05772015 0.21888174 0.30547037 0.26009764
+##  [25] 0.18179839 0.38878107 0.23727769 0.53649911 0.38548718 0.21766214
+##  [31] 0.60574720 0.46111682 0.44998460 0.33639220 0.33745086 0.19814248
+##  [37] 0.58312175 0.56342873 0.41387230 0.51587540 0.18108673 0.50461171
+##  [43] 0.05742022 0.54832385 0.39993243 0.26222228 0.46996698 0.39748883
+##  [49] 0.05128998 0.32957914 0.28134991 0.38633118 0.17907480 0.48894244
+##  [55] 0.27214778 0.38215857 0.16875248 0.57504793 0.43138046 0.40680677
+##  [61] 0.38195078 0.62946244 0.48569321 0.45541271 0.08121655 0.29280507
+##  [67] 0.48125267 0.50030933 0.11051915 0.13026557 0.59390120 0.49857053
+##  [73] 0.05569837 0.33661873 0.06947750 0.27254522 0.08370582 0.47734205
+##  [79] 0.25854425 0.52549333 0.36830842 0.31619340 0.56383251 0.43537553
+##  [85] 0.54850904 0.09762280 0.39710900 0.54611167 0.19688535 0.38312842
+##  [91] 0.26104218 0.26134510 0.19782715 0.12904413 0.43233847 0.54829153
+##  [97] 0.25843992 0.46684123 0.46931578 0.44456338 0.09883917 0.41934371
+## [103] 0.48932050 0.25744409 0.36440272 0.51494833 0.34001164 0.30144678
+## [109] 0.10116837 0.16362342 0.04455765 0.21164136 0.15217418 0.20862540
+## [115] 0.48968624
+## 
+## [[4]]
+##   [1] 0.24318525 0.27168888 0.06791553 0.41096761 0.41596643 0.58930087
+##   [7] 0.41769771 0.46090447 0.49960951 0.32958534 0.28412914 0.33479565
+##  [13] 0.36729217 0.35418922 0.35689552 0.10278960 0.08794669 0.22925602
+##  [19] 0.14529536 0.34744209 0.24985377 0.41863983 0.58322111 0.62031029
+##  [25] 0.57121680 0.25373312 0.21557363 0.32174822 0.39187201 0.53394426
+##  [31] 0.51542553 0.26847875 0.26356160 0.18582352 0.45294571 0.19105650
+##  [37] 0.43787822 0.62515087 0.31439221 0.22131296 0.08579988 0.31440747
+##  [43] 0.32640030 0.22369113 0.31179650 0.43604764 0.11352461 0.07149760
+##  [49] 0.49464436 0.27355690 0.31410435 0.34157473 0.39964022 0.30217861
+##  [55] 0.39890980 0.63995049 0.50031623 0.14610220 0.14853607 0.26198229
+##  [61] 0.56244909 0.37178915 0.28645553 0.06631427 0.39800367 0.36144240
+##  [67] 0.45469685 0.52593675 0.34153796 0.33798933 0.43995311 0.41494533
+##  [73] 0.09274013 0.47213131 0.38566597 0.07528619 0.19508148 0.04278647
+##  [79] 0.48228020 0.13411580 0.25901665 0.34908591 0.37152620 0.56274387
+##  [85] 0.18740821 0.52141060 0.44128652 0.46919588 0.27361018 0.42742451
+##  [91] 0.38143163 0.29662040 0.48132690 0.33626072 0.51412002 0.45460133
+##  [97] 0.54358228 0.55396576 0.53727964 0.57786145 0.52649933 0.58069430
+## [103] 0.61365660 0.64033193 0.40337173 0.55142553 0.29193827 0.25789120
+## [109] 0.13084704 0.07202955 0.04114760 0.06072500 0.09584507 0.36074252
+## [115] 0.08962574</code></pre>
 <p>I can obtain estimates for the remaining individual features in the same way (again using only using a small library for illustration):</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a><span class="co"># set up the data, removing the columns for alcohol use and chd</span></span>
-<span id="cb35-2"><a href="#cb35-2"></a>x &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(heart[, <span class="op">-</span><span class="kw">dim</span>(heart)[<span class="dv">2</span>]])</span>
-<span id="cb35-3"><a href="#cb35-3"></a></span>
-<span id="cb35-4"><a href="#cb35-4"></a><span class="co"># estimate variable importance</span></span>
-<span id="cb35-5"><a href="#cb35-5"></a>tpa_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">6</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
-<pre><code>## Warning in cv_vim(Y = Y, X = X, f1 = f1, f2 = f2, indx = indx, V = V, type =
-## &quot;r_squared&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a>alc_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">8</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
-<pre><code>## Warning in cv_vim(Y = Y, X = X, f1 = f1, f2 = f2, indx = indx, V = V, type =
-## &quot;r_squared&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a>sbp_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">1</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
-<pre><code>## Warning in cv_vim(Y = Y, X = X, f1 = f1, f2 = f2, indx = indx, V = V, type =
-## &quot;r_squared&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a>tob_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">2</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span>
-<span id="cb41-2"><a href="#cb41-2"></a>ldl_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">3</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span>
-<span id="cb41-3"><a href="#cb41-3"></a>adi_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">4</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
-<pre><code>## Warning in cv_vim(Y = Y, X = X, f1 = f1, f2 = f2, indx = indx, V = V, type =
-## &quot;r_squared&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a>obe_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">7</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span>
-<span id="cb43-2"><a href="#cb43-2"></a>age_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">9</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a><span class="co"># estimate variable importance</span></span>
+<span id="cb39-2"><a href="#cb39-2"></a>tpa_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">6</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =
+## cross_fitted_f1, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a>alc_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">8</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =
+## cross_fitted_f1, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a>sbp_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">1</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =
+## cross_fitted_f1, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a>tob_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">2</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =
+## cross_fitted_f1, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1"></a>ldl_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">3</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =
+## cross_fitted_f1, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1"></a>adi_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">4</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =
+## cross_fitted_f1, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1"></a>obe_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">7</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =
+## cross_fitted_f1, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1"></a>age_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">9</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =
+## cross_fitted_f1, : Original estimate &lt; 0; returning zero.</code></pre>
 <p>Now that I have estimates of each of individual feature’s variable importance, I can view them all simultaneously by plotting:</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a><span class="kw">library</span>(<span class="st">&quot;dplyr&quot;</span>)</span>
-<span id="cb44-2"><a href="#cb44-2"></a><span class="kw">library</span>(<span class="st">&quot;tibble&quot;</span>)</span>
-<span id="cb44-3"><a href="#cb44-3"></a><span class="kw">library</span>(<span class="st">&quot;ggplot2&quot;</span>)</span>
-<span id="cb44-4"><a href="#cb44-4"></a><span class="kw">library</span>(<span class="st">&quot;cowplot&quot;</span>)</span></code></pre></div>
-<pre><code>## 
-## ********************************************************</code></pre>
-<pre><code>## Note: As of version 1.0.0, cowplot does not change the</code></pre>
-<pre><code>##   default ggplot2 theme anymore. To recover the previous</code></pre>
-<pre><code>##   behavior, execute:
-##   theme_set(theme_cowplot())</code></pre>
-<pre><code>## ********************************************************</code></pre>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a><span class="kw">theme_set</span>(<span class="kw">theme_cowplot</span>())</span>
-<span id="cb50-2"><a href="#cb50-2"></a><span class="co"># combine the objects together</span></span>
-<span id="cb50-3"><a href="#cb50-3"></a>ests &lt;-<span class="st"> </span><span class="kw">merge_vim</span>(sbp_vim, tob_vim, ldl_vim, adi_vim,</span>
-<span id="cb50-4"><a href="#cb50-4"></a>                fam_vim, tpa_vim, obe_vim, alc_vim, age_vim)</span>
-<span id="cb50-5"><a href="#cb50-5"></a>all_vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Sys. blood press.&quot;</span>, <span class="st">&quot;Tobacco consump.&quot;</span>, <span class="st">&quot;LDL cholesterol&quot;</span>,</span>
-<span id="cb50-6"><a href="#cb50-6"></a>              <span class="st">&quot;Adiposity&quot;</span>, <span class="st">&quot;Family history&quot;</span>, <span class="st">&quot;Type A behavior&quot;</span>, <span class="st">&quot;Obesity&quot;</span>,</span>
-<span id="cb50-7"><a href="#cb50-7"></a>              <span class="st">&quot;Alcohol consump.&quot;</span>, <span class="st">&quot;Age&quot;</span>)</span>
-<span id="cb50-8"><a href="#cb50-8"></a></span>
-<span id="cb50-9"><a href="#cb50-9"></a>est_plot_tib &lt;-<span class="st"> </span>ests<span class="op">$</span>mat <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb50-10"><a href="#cb50-10"></a><span class="st">  </span><span class="kw">mutate</span>(</span>
-<span id="cb50-11"><a href="#cb50-11"></a>    <span class="dt">var_fct =</span> <span class="kw">rev</span>(<span class="kw">factor</span>(s, <span class="dt">levels =</span> ests<span class="op">$</span>mat<span class="op">$</span>s,</span>
-<span id="cb50-12"><a href="#cb50-12"></a>                     <span class="dt">labels =</span> all_vars[<span class="kw">as.numeric</span>(ests<span class="op">$</span>mat<span class="op">$</span>s)], </span>
-<span id="cb50-13"><a href="#cb50-13"></a>                     <span class="dt">ordered =</span> <span class="ot">TRUE</span>))</span>
-<span id="cb50-14"><a href="#cb50-14"></a>  )</span>
-<span id="cb50-15"><a href="#cb50-15"></a></span>
-<span id="cb50-16"><a href="#cb50-16"></a><span class="co"># plot</span></span>
-<span id="cb50-17"><a href="#cb50-17"></a>est_plot_tib <span class="op">%&gt;%</span></span>
-<span id="cb50-18"><a href="#cb50-18"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> est, <span class="dt">y =</span> var_fct)) <span class="op">+</span></span>
-<span id="cb50-19"><a href="#cb50-19"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></span>
-<span id="cb50-20"><a href="#cb50-20"></a><span class="st">  </span><span class="kw">geom_errorbarh</span>(<span class="kw">aes</span>(<span class="dt">xmin =</span> cil, <span class="dt">xmax =</span> ciu)) <span class="op">+</span></span>
-<span id="cb50-21"><a href="#cb50-21"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="kw">expression</span>(<span class="kw">paste</span>(<span class="st">&quot;Variable importance estimates: &quot;</span>, R<span class="op">^</span><span class="dv">2</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))) <span class="op">+</span></span>
-<span id="cb50-22"><a href="#cb50-22"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;&quot;</span>) <span class="op">+</span></span>
-<span id="cb50-23"><a href="#cb50-23"></a><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Estimated individual feature importance&quot;</span>) <span class="op">+</span></span>
-<span id="cb50-24"><a href="#cb50-24"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">subtitle =</span> <span class="st">&quot;in the South African heart disease study data&quot;</span>)</span></code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1"></a><span class="kw">library</span>(<span class="st">&quot;dplyr&quot;</span>)</span>
+<span id="cb55-2"><a href="#cb55-2"></a><span class="kw">library</span>(<span class="st">&quot;tibble&quot;</span>)</span>
+<span id="cb55-3"><a href="#cb55-3"></a><span class="kw">library</span>(<span class="st">&quot;ggplot2&quot;</span>)</span>
+<span id="cb55-4"><a href="#cb55-4"></a><span class="kw">library</span>(<span class="st">&quot;cowplot&quot;</span>)</span>
+<span id="cb55-5"><a href="#cb55-5"></a><span class="kw">theme_set</span>(<span class="kw">theme_cowplot</span>())</span>
+<span id="cb55-6"><a href="#cb55-6"></a><span class="co"># combine the objects together</span></span>
+<span id="cb55-7"><a href="#cb55-7"></a>ests &lt;-<span class="st"> </span><span class="kw">merge_vim</span>(sbp_vim, tob_vim, ldl_vim, adi_vim,</span>
+<span id="cb55-8"><a href="#cb55-8"></a>                fam_vim, tpa_vim, obe_vim, alc_vim, age_vim)</span>
+<span id="cb55-9"><a href="#cb55-9"></a>all_vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Sys. blood press.&quot;</span>, <span class="st">&quot;Tobacco consump.&quot;</span>, <span class="st">&quot;LDL cholesterol&quot;</span>,</span>
+<span id="cb55-10"><a href="#cb55-10"></a>              <span class="st">&quot;Adiposity&quot;</span>, <span class="st">&quot;Family history&quot;</span>, <span class="st">&quot;Type A behavior&quot;</span>, <span class="st">&quot;Obesity&quot;</span>,</span>
+<span id="cb55-11"><a href="#cb55-11"></a>              <span class="st">&quot;Alcohol consump.&quot;</span>, <span class="st">&quot;Age&quot;</span>)</span>
+<span id="cb55-12"><a href="#cb55-12"></a></span>
+<span id="cb55-13"><a href="#cb55-13"></a>est_plot_tib &lt;-<span class="st"> </span>ests<span class="op">$</span>mat <span class="op">%&gt;%</span></span>
+<span id="cb55-14"><a href="#cb55-14"></a><span class="st">  </span><span class="kw">mutate</span>(</span>
+<span id="cb55-15"><a href="#cb55-15"></a>    <span class="dt">var_fct =</span> <span class="kw">rev</span>(<span class="kw">factor</span>(s, <span class="dt">levels =</span> ests<span class="op">$</span>mat<span class="op">$</span>s,</span>
+<span id="cb55-16"><a href="#cb55-16"></a>                     <span class="dt">labels =</span> all_vars[<span class="kw">as.numeric</span>(ests<span class="op">$</span>mat<span class="op">$</span>s)],</span>
+<span id="cb55-17"><a href="#cb55-17"></a>                     <span class="dt">ordered =</span> <span class="ot">TRUE</span>))</span>
+<span id="cb55-18"><a href="#cb55-18"></a>  )</span>
+<span id="cb55-19"><a href="#cb55-19"></a></span>
+<span id="cb55-20"><a href="#cb55-20"></a><span class="co"># plot</span></span>
+<span id="cb55-21"><a href="#cb55-21"></a>est_plot_tib <span class="op">%&gt;%</span></span>
+<span id="cb55-22"><a href="#cb55-22"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> est, <span class="dt">y =</span> var_fct)) <span class="op">+</span></span>
+<span id="cb55-23"><a href="#cb55-23"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></span>
+<span id="cb55-24"><a href="#cb55-24"></a><span class="st">  </span><span class="kw">geom_errorbarh</span>(<span class="kw">aes</span>(<span class="dt">xmin =</span> cil, <span class="dt">xmax =</span> ciu)) <span class="op">+</span></span>
+<span id="cb55-25"><a href="#cb55-25"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="kw">expression</span>(<span class="kw">paste</span>(<span class="st">&quot;Variable importance estimates: &quot;</span>, R<span class="op">^</span><span class="dv">2</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))) <span class="op">+</span></span>
+<span id="cb55-26"><a href="#cb55-26"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;&quot;</span>) <span class="op">+</span></span>
+<span id="cb55-27"><a href="#cb55-27"></a><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Estimated individual feature importance&quot;</span>) <span class="op">+</span></span>
+<span id="cb55-28"><a href="#cb55-28"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">subtitle =</span> <span class="st">&quot;in the South African heart disease study data&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 </div>
 </div>
 <div id="estimating-variable-importance-for-a-group-of-variables" class="section level2">
 <h2>Estimating variable importance for a group of variables</h2>
 <p>Now that I have estimated variable importance for each of the individual features, I can estimate variable importance for each of the groups that I mentioned above: biological and behavioral features.</p>
 <p>The only difference between estimating variable importance for a group of features rather than an individual feature is that now I specify a vector for <code>s</code>; I can use any of the options listed in the previous section to compute these estimates.</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1"></a><span class="co"># get the estimates</span></span>
-<span id="cb51-2"><a href="#cb51-2"></a>behav_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">6</span>, <span class="dv">8</span>), <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
-<pre><code>## Warning in cv_vim(Y = Y, X = X, f1 = f1, f2 = f2, indx = indx, V = V, type =
-## &quot;r_squared&quot;, : Original estimate &lt; 0; returning zero.</code></pre>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1"></a>bios_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span>), <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span>
-<span id="cb53-2"><a href="#cb53-2"></a></span>
-<span id="cb53-3"><a href="#cb53-3"></a><span class="co"># combine and plot</span></span>
-<span id="cb53-4"><a href="#cb53-4"></a>groups &lt;-<span class="st"> </span><span class="kw">merge_vim</span>(behav_vim, bios_vim)</span>
-<span id="cb53-5"><a href="#cb53-5"></a>all_grp_nms &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Behavioral features&quot;</span>, <span class="st">&quot;Biological features&quot;</span>)</span>
-<span id="cb53-6"><a href="#cb53-6"></a></span>
-<span id="cb53-7"><a href="#cb53-7"></a>grp_plot_tib &lt;-<span class="st"> </span>groups<span class="op">$</span>mat <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb53-8"><a href="#cb53-8"></a><span class="st">  </span><span class="kw">mutate</span>(</span>
-<span id="cb53-9"><a href="#cb53-9"></a>    <span class="dt">grp_fct =</span> <span class="kw">factor</span>(<span class="kw">case_when</span>(</span>
-<span id="cb53-10"><a href="#cb53-10"></a>      s <span class="op">==</span><span class="st"> &quot;2,6,8&quot;</span> <span class="op">~</span><span class="st"> &quot;1&quot;</span>,</span>
-<span id="cb53-11"><a href="#cb53-11"></a>      s <span class="op">==</span><span class="st"> &quot;1,3,4,5,7,9&quot;</span> <span class="op">~</span><span class="st"> &quot;2&quot;</span></span>
-<span id="cb53-12"><a href="#cb53-12"></a>    ), <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>),  <span class="dt">labels =</span> all_grp_nms, <span class="dt">ordered =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb53-13"><a href="#cb53-13"></a>  )</span>
-<span id="cb53-14"><a href="#cb53-14"></a>grp_plot_tib <span class="op">%&gt;%</span></span>
-<span id="cb53-15"><a href="#cb53-15"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> est, <span class="dt">y =</span> grp_fct)) <span class="op">+</span></span>
-<span id="cb53-16"><a href="#cb53-16"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></span>
-<span id="cb53-17"><a href="#cb53-17"></a><span class="st">  </span><span class="kw">geom_errorbarh</span>(<span class="kw">aes</span>(<span class="dt">xmin =</span> cil, <span class="dt">xmax =</span> ciu)) <span class="op">+</span></span>
-<span id="cb53-18"><a href="#cb53-18"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="kw">expression</span>(<span class="kw">paste</span>(<span class="st">&quot;Variable importance estimates: &quot;</span>, R<span class="op">^</span><span class="dv">2</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))) <span class="op">+</span></span>
-<span id="cb53-19"><a href="#cb53-19"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;&quot;</span>) <span class="op">+</span></span>
-<span id="cb53-20"><a href="#cb53-20"></a><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Estimated feature group importance&quot;</span>) <span class="op">+</span></span>
-<span id="cb53-21"><a href="#cb53-21"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">subtitle =</span> <span class="st">&quot;in the South African heart disease study data&quot;</span>)</span></code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1"></a><span class="co"># get the estimates</span></span>
+<span id="cb56-2"><a href="#cb56-2"></a>behav_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">6</span>, <span class="dv">8</span>), <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
+<pre><code>## Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =
+## cross_fitted_f1, : Original estimate &lt; 0; returning zero.</code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1"></a>bios_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span>), <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span>
+<span id="cb58-2"><a href="#cb58-2"></a></span>
+<span id="cb58-3"><a href="#cb58-3"></a><span class="co"># combine and plot</span></span>
+<span id="cb58-4"><a href="#cb58-4"></a>groups &lt;-<span class="st"> </span><span class="kw">merge_vim</span>(behav_vim, bios_vim)</span>
+<span id="cb58-5"><a href="#cb58-5"></a>all_grp_nms &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Behavioral features&quot;</span>, <span class="st">&quot;Biological features&quot;</span>)</span>
+<span id="cb58-6"><a href="#cb58-6"></a></span>
+<span id="cb58-7"><a href="#cb58-7"></a>grp_plot_tib &lt;-<span class="st"> </span>groups<span class="op">$</span>mat <span class="op">%&gt;%</span></span>
+<span id="cb58-8"><a href="#cb58-8"></a><span class="st">  </span><span class="kw">mutate</span>(</span>
+<span id="cb58-9"><a href="#cb58-9"></a>    <span class="dt">grp_fct =</span> <span class="kw">factor</span>(<span class="kw">case_when</span>(</span>
+<span id="cb58-10"><a href="#cb58-10"></a>      s <span class="op">==</span><span class="st"> &quot;2,6,8&quot;</span> <span class="op">~</span><span class="st"> &quot;1&quot;</span>,</span>
+<span id="cb58-11"><a href="#cb58-11"></a>      s <span class="op">==</span><span class="st"> &quot;1,3,4,5,7,9&quot;</span> <span class="op">~</span><span class="st"> &quot;2&quot;</span></span>
+<span id="cb58-12"><a href="#cb58-12"></a>    ), <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>),  <span class="dt">labels =</span> all_grp_nms, <span class="dt">ordered =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb58-13"><a href="#cb58-13"></a>  )</span>
+<span id="cb58-14"><a href="#cb58-14"></a>grp_plot_tib <span class="op">%&gt;%</span></span>
+<span id="cb58-15"><a href="#cb58-15"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> est, <span class="dt">y =</span> grp_fct)) <span class="op">+</span></span>
+<span id="cb58-16"><a href="#cb58-16"></a><span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span></span>
+<span id="cb58-17"><a href="#cb58-17"></a><span class="st">  </span><span class="kw">geom_errorbarh</span>(<span class="kw">aes</span>(<span class="dt">xmin =</span> cil, <span class="dt">xmax =</span> ciu)) <span class="op">+</span></span>
+<span id="cb58-18"><a href="#cb58-18"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="kw">expression</span>(<span class="kw">paste</span>(<span class="st">&quot;Variable importance estimates: &quot;</span>, R<span class="op">^</span><span class="dv">2</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))) <span class="op">+</span></span>
+<span id="cb58-19"><a href="#cb58-19"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;&quot;</span>) <span class="op">+</span></span>
+<span id="cb58-20"><a href="#cb58-20"></a><span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&quot;Estimated feature group importance&quot;</span>) <span class="op">+</span></span>
+<span id="cb58-21"><a href="#cb58-21"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">subtitle =</span> <span class="st">&quot;in the South African heart disease study data&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 </div>
 <div id="types-of-population-variable-importance" class="section level2">
 <h2>Types of population variable importance</h2>

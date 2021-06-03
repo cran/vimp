@@ -1,40 +1,184 @@
-# -------------------------------------
-# Checkers
-# -------------------------------------
-check_inputs <- function(Y, X, f1, f2, indx, folds) {
-    if (is.null(f1) && is.null(Y)) stop("You must enter either Y or fitted values for the full regression.")
-    if (is.null(f2) && is.null(X)) stop("You must enter either X or fitted values for the reduced regression.")
-    # if indx is outside the range of X, stop and throw an error
-    if (!is.null(X)) {
-        if (any(indx > dim(X)[2])) stop("One of the feature indices in 'indx' is larger than the total number of features in X. Please specify a new index subgroup in 'indx'.")
+# Checkers ---------------------------------------------------------------------
+
+#' Check inputs to a call to vim, cv_vim, or sp_vim
+#'
+#' @details Ensure that inputs to \code{vim}, \code{cv_vim}, and \code{sp_vim}
+#'   follow the correct formats.
+#'
+#' @param Y the outcome
+#' @param X the covariates
+#' @param f1 estimator of the population-optimal prediction function
+#'   using all covariates
+#' @param f2 estimator of the population-optimal prediction function
+#'   using the reduced set of covariates
+#' @param indx the index or indices of the covariate(s) of interest
+#'
+#' @return None. Called for the side effect of stopping the algorithm if
+#'   any inputs are in an unexpected format.
+#' @export
+check_inputs <- function(Y, X, f1, f2, indx) {
+  if (is.null(f1) && is.null(Y)) {
+    stop("You must enter either Y or fitted values for the full regression.")
+  }
+  if (is.null(f2) && is.null(X)) {
+    stop("You must enter either X or fitted values for the reduced regression.")
+  }
+  # if indx is outside the range of X, stop and throw an error
+  if (!is.null(X)) {
+    if (any(indx > dim(X)[2])) {
+      stop(paste0("One of the feature indices in 'indx' is larger than the ",
+                  "total number of features in X. Please specify a new index ",
+                  "subgroup in 'indx'."))
     }
+  }
 }
-check_fitted_values <- function(Y, f1, f2, folds, V = NULL, cv = FALSE) {
-    if (is.null(Y)) stop("Y must be entered.")
-    if (!cv) {
-        if (length(f1) == 0 || length(f2) == 0) stop("Fitted values must be entered if run_regression = FALSE.")
-        if (length(f1) != length(Y[folds == 1])) stop("Fitted values from the full regression must be the same length as the number of observations in the first fold.")
-        if (length(f2) != length(Y[folds == 2])) stop("Fitted values from the reduced regression must be the same length as the number of observations in the second fold.")
+#' Check pre-computed fitted values for call to vim, cv_vim, or sp_vim
+#'
+#' @details Ensure that inputs to \code{vim}, \code{cv_vim}, and \code{sp_vim}
+#'   follow the correct formats.
+#'
+#' @param Y the outcome
+#' @param f1 estimator of the population-optimal prediction function
+#'   using all covariates
+#' @param f2 estimator of the population-optimal prediction function
+#'   using the reduced set of covariates
+#' @param cross_fitted_f1 cross-fitted estimator of the population-optimal
+#'   prediction function using all covariates
+#' @param cross_fitted_f2 cross-fitted estimator of the population-optimal
+#'   prediction function using the reduced set of covariates
+#' @param sample_splitting_folds the folds for sample-splitting (used for
+#'   hypothesis testing)
+#' @param cross_fitting_folds the folds for cross-fitting (used for point
+#'   estimates of variable importance in \code{cv_vim} and \code{sp_vim})
+#' @param V the number of cross-fitting folds
+#' @param ss_V the number of folds for CV (if sample_splitting is TRUE)
+#' @param cv a logical flag indicating whether or not to use cross-fitting
+#'
+#' @return None. Called for the side effect of stopping the algorithm if
+#'   any inputs are in an unexpected format.
+#' @export
+check_fitted_values <- function(Y = NULL, f1 = NULL, f2 = NULL,
+                                cross_fitted_f1 = NULL, cross_fitted_f2 = NULL,
+                                sample_splitting_folds = NULL,
+                                cross_fitting_folds = NULL, V = NULL, ss_V = NULL,
+                                cv = FALSE) {
+  if (is.null(Y)) stop("Y must be entered.")
+  if (!cv) {
+    if (length(f1) == 0 || length(f2) == 0) {
+      stop("Fitted values must be entered if run_regression = FALSE.")
+    }
+    if (length(sample_splitting_folds) != length(Y)) {
+      stop("The entered folds must be the same length as the outcome of interest.")
+    }
+  } else {
+    if (is.null(cross_fitted_f1)) {
+      stop(paste0("You must specify a list of predicted values from a ",
+                  "regression of Y on X."))
+    }
+    if (is.null(cross_fitted_f2)) {
+      stop(paste0("You must specify a list of predicted values from either ",
+                  "(a) a regression of the fitted values from the Y on X ",
+                  "regression on the reduced set of covariates, or (b)",
+                  "a regression of Y on the reduced set of covariates."))
+    }
+    if (is.null(f1)) {
+      stop(paste0("You must enter an estimator of the population-optimal predictor",
+                  " using all covariates."))
+    }
+    if (is.null(f2)) {
+      stop(paste0("You must enter an estimator of the population-optimal predictor",
+                  " using the reduced set of covariates."))
+    }
+    if (length(sample_splitting_folds) != ss_V) {
+      stop("The sample splitting folds must be the same length as the number of cross-fitting folds.")
+    }
+    if (is.null(cross_fitting_folds)) {
+      stop("You must specify the folds that were used for cross-fitting.")
+    }
+    if (length(cross_fitted_f1) != V) {
+      stop(paste0("The number of folds from the full regression must be the ",
+                  "same length as the number of folds."))
+    }
+    if (length(cross_fitted_f2) != V) {
+      stop(paste0("The number of folds from the reduced regression must be ",
+                  "the same length as the number of folds."))
+    }
+  }
+}
+
+#' Create complete-case outcome, weights, and Z
+#'
+#' @param Y the outcome
+#' @param C indicator of missing or observed
+#' @param Z the covariates observed in phase 1 and 2 data
+#' @param X all covariates
+#' @param ipc_weights the weights
+#'
+#' @return a list, with the complete-case outcome, weights, and Z matrix
+#' @export
+create_z <- function(Y, C, Z, X, ipc_weights) {
+  # set up internal data -- based on complete cases only
+  Y_cc <- subset(Y, C == 1, drop = FALSE)
+  weights_cc <- ipc_weights[C == 1]
+  if (!all(C == 1) || !all(ipc_weights == 1)) {
+    if (is.character(Z)) {
+      tmp_Z <- Z[Z != "Y"]
+      minus_X <- as.numeric(gsub("X", "", tmp_Z))
+      # check to see if it is only part of X matrix
+      if (any(sapply(seq_along(minus_X), function(j) length(minus_X[j]) > 0))) {
+        if (any(grepl("Y", Z))) {
+          Z_in <- as.data.frame(mget("Y"))
+        } else {
+          Z_in <- NULL
+        }
+        Z_in <- cbind.data.frame(Z_in, X[, minus_X])
+      } else {
+        Z_in <- as.data.frame(mget(Z))
+      }
     } else {
-        if (is.null(f1)) stop("You must specify a list of predicted values from a regression of Y on X.")
-        if (is.null(f2)) stop("You must specify a list of predicted values from a regression of the fitted values from the Y on X regression on the reduced set of covariates.")
-        if (is.null(folds)) stop("You must specify a list of folds.")
-        if (length(f1) != V) stop("The number of folds from the full regression must be the same length as the number of folds.")
-        if (length(f2) != V) stop("The number of folds from the reduced regression must be the same length as the number of folds.")
+      stop("Please enter a character vector corresponding to the names of the fully observed data.")
     }
+  } else {
+    Z_in <- NULL
+  }
+  list(Y = Y_cc, weights = weights_cc, Z = Z_in)
 }
 
-# -----------------------------
-# Match the type
-# -----------------------------
+# ------------------------------------------------------------------------------
+
+#' Obtain the type of VIM to estimate using partial matching
+#'
+#' @param type the partial string indicating the type of VIM
+#'
+#' @return the full string indicating the type of VIM
+#' @export
 get_full_type <- function(type) {
-    types <- c("accuracy", "auc", "deviance", "r_squared", "anova")
-    full_type <- types[pmatch(type, types)]
-    if (is.na(full_type)) stop("We currently do not support the entered variable importance parameter.")
-    if (full_type == "anova" ) warning("Hypothesis testing is not available for type = 'anova'. If you want an R-squared-based hypothesis test, please enter type = 'r_squared'.")
-    full_type
+  types <- c("accuracy", "auc", "deviance", "r_squared", "anova")
+  full_type <- types[pmatch(type, types)]
+  if (is.na(full_type)) {
+    stop("We currently do not support the entered variable importance parameter.")
+  }
+  if (full_type == "anova" ) {
+    warning(paste0("Hypothesis testing is not available for type = 'anova'. ",
+                   "If you want an R-squared-based hypothesis test, please enter ",
+                   "type = 'r_squared'."))
+  }
+  full_type
 }
 
+#' Return an estimator on a different scale
+#'
+#' @details It may be of interest to return an estimate (or confidence interval)
+#'   on a different scale than originally measured. For example, computing a
+#'   confidence interval (CI) for a VIM value that lies in (0,1) on the logit scale
+#'   ensures that the CI also lies in (0, 1).
+#'
+#' @param obs_est the observed VIM estimate
+#' @param grad the estimated efficient influence function
+#' @param scale the scale to compute on
+#'
+#' @return the scaled estimate
+#' @export
 scale_est <- function(obs_est = NULL, grad = NULL, scale = "identity") {
   if (scale == "logit") {
     this_grad <- 1 / (obs_est - obs_est ^ 2)
@@ -47,21 +191,22 @@ scale_est <- function(obs_est = NULL, grad = NULL, scale = "identity") {
   }
   est
 }
-# -------------------------------------
-# Create Folds for Cross-Fitting
-# -------------------------------------
-#
-# @param y the outcome
-# @param V the number of folds
-# @param stratified should the folds be stratified based on the outcome?
-# @param C a vector indicating whether or not the observation is fully observed;
-#    1 denotes yes, 0 denotes no
-# @param probs vector of proportions for each fold number
-# @return a vector of folds
-# @keywords internal
-.make_folds <- function(y, V = 2, stratified = FALSE, 
-                        C = NULL,
-                        probs = rep(1/V, V)) {
+
+# ------------------------------------------------------------------------------
+
+#' Create Folds for Cross-Fitting
+#'
+#' @param y the outcome
+#' @param V the number of folds
+#' @param stratified should the folds be stratified based on the outcome?
+#' @param C a vector indicating whether or not the observation is fully observed;
+#'    1 denotes yes, 0 denotes no
+#' @param probs vector of proportions for each fold number
+#' @return a vector of folds
+#' @export
+make_folds <- function(y, V = 2, stratified = FALSE,
+                       C = NULL,
+                       probs = rep(1/V, V)) {
   folds <- vector("numeric", length(y))
   if (length(unique(probs)) == 1) {
     if (stratified) {
@@ -69,7 +214,7 @@ scale_est <- function(obs_est = NULL, grad = NULL, scale = "identity") {
         folds_1 <- sample(rep(seq_len(V), length = sum(y == 1)))
         folds_0 <- sample(rep(seq_len(V), length = sum(y == 0)))
         folds[y == 1] <- folds_1
-        folds[y == 0] <- folds_0  
+        folds[y == 0] <- folds_0
       } else {
         folds_11 <- sample(rep(seq_len(V), length = sum(y == 1 & C == 1)))
         folds_10 <- sample(rep(seq_len(V), length = sum(y == 0 & C == 1)))
@@ -95,22 +240,22 @@ scale_est <- function(obs_est = NULL, grad = NULL, scale = "identity") {
         folds_1 <- sample(folds_1)
         folds_0 <- sample(folds_0)
         folds[y == 1] <- folds_1
-        folds[y == 0] <- folds_0  
+        folds[y == 0] <- folds_0
       } else {
         folds_11 <- rep(seq_len(V), probs * sum(y == 1 & C == 1))
         folds_10 <- rep(seq_len(V), probs * sum(y == 1 & C == 0))
         folds_01 <- rep(seq_len(V), probs * sum(y == 0 & C == 1))
         folds_00 <- rep(seq_len(V), probs * sum(y == 0 & C == 0))
-        folds_11 <- c(folds_11, sample(seq_len(V), size = sum(y == 1 & C == 1) - 
+        folds_11 <- c(folds_11, sample(seq_len(V), size = sum(y == 1 & C == 1) -
                                          length(folds_11),
                                        replace = TRUE, prob = probs))
-        folds_01 <- c(folds_01, sample(seq_len(V), size = sum(y == 0 & C == 1) - 
+        folds_01 <- c(folds_01, sample(seq_len(V), size = sum(y == 0 & C == 1) -
                                          length(folds_01),
                                        replace = TRUE, prob = probs))
-        folds_10 <- c(folds_10, sample(seq_len(V), size = sum(y == 1 & C == 0) - 
+        folds_10 <- c(folds_10, sample(seq_len(V), size = sum(y == 1 & C == 0) -
                                          length(folds_10),
                                        replace = TRUE, prob = probs))
-        folds_00 <- c(folds_00, sample(seq_len(V), size = sum(y == 0 & C == 0) - 
+        folds_00 <- c(folds_00, sample(seq_len(V), size = sum(y == 0 & C == 0) -
                                          length(folds_00),
                                        replace = TRUE, prob = probs))
         folds_11 <- sample(folds_11)
@@ -133,46 +278,105 @@ scale_est <- function(obs_est = NULL, grad = NULL, scale = "identity") {
   return(folds)
 }
 
-# -------------------------------------
-# Run a Super Learner for the provided subset of features
-# -------------------------------------
-#
-# @param Y the outcome
-# @param X the covariates
-# @param V the number of folds
-# @param SL.library the library of candidate learners
-# @param s the subset of interest
-# @param folds the CV folds
-# @param verbose should we print progress? defaults to FALSE
-# @param progress_bar the progress bar to print to (only if verbose = TRUE)
-# @param indx the index to pass to progress bar (only if verbose = TRUE)
-# @param ... other arguments to Super Learner
-#
-# @return a list of length V, with the results of predicting on the hold-out data for each v in 1 through V
-# @keywords internal
-run_sl <- function(Y, X, V, SL.library, univariate_SL.library, s, folds,
-                   verbose = FALSE, progress_bar = NULL, indx = 1, weights = rep(1, nrow(X)), ...) {
-  # if verbose, print what we're doing and make sure that SL is verbose
-  L <- list(...)
-  if (is.null(L$family)) {
-    L$family <- gaussian()
+#' Turn folds from 2K-fold cross-fitting into individual K-fold folds
+#'
+#' @param cross_fitting_folds the vector of cross-fitting folds
+#' @param sample_splitting_folds the sample splitting folds
+#' @param C vector of whether or not we measured the observation in phase 2
+#'
+#' @return the two sets of testing folds for K-fold cross-fitting
+#' @export
+make_kfold <- function(cross_fitting_folds,
+                       sample_splitting_folds = rep(1, length(unique(cross_fitting_folds))),
+                       C = rep(1, length(cross_fitting_folds))) {
+  # get the folds for the full and reduced nuisance functions
+  full_folds <- which(sample_splitting_folds == 1)
+  redu_folds <- which(sample_splitting_folds == 2)
+  sample_splitting_vec <- vector("numeric", length = length(cross_fitting_folds))
+  sample_splitting_vec[cross_fitting_folds %in% full_folds] <- 1
+  sample_splitting_vec[cross_fitting_folds %in% redu_folds] <- 2
+  # create K-fold folds, i.e., 1:K for each
+  full_cf_folds <- cross_fitting_folds[cross_fitting_folds %in% full_folds]
+  redu_cf_folds <- cross_fitting_folds[cross_fitting_folds %in% redu_folds]
+  unique_full <- sort(unique(full_cf_folds))
+  unique_redu <- sort(unique(redu_cf_folds))
+  K <- length(unique_full)
+  folds_k <- seq_len(K)
+  k_fold_full <- full_cf_folds
+  k_fold_redu <- redu_cf_folds
+  for (v in seq_len(K)) {
+    k_fold_full <- replace(k_fold_full, full_cf_folds == unique_full[v], folds_k[v])
+    k_fold_redu <- replace(k_fold_redu, redu_cf_folds == unique_redu[v], folds_k[v])
+  }
+  # return a list; the first four values are the cross-fitting folds,
+  # while the last two values replicate the sample-splitting folds
+  list(full = k_fold_full, reduced = k_fold_redu,
+       sample_splitting_folds = sample_splitting_vec)
+}
+
+# For sp_vim -------------------------------------------------------------------
+#' Run a Super Learner for the provided subset of features
+#'
+#' @param Y the outcome
+#' @param X the covariates
+#' @param V the number of folds
+#' @param SL.library the library of candidate learners
+#' @param univariate_SL.library the library of candidate learners for
+#'          single-covariate regressions
+#' @param s the subset of interest
+#' @param cv_folds the CV folds
+#' @param sample_splitting logical; should we use sample-splitting for
+#'   predictiveness estimation?
+#' @param ss_folds the sample-splitting folds; only used if
+#'   \code{sample_splitting = TRUE}
+#' @param verbose should we print progress? defaults to FALSE
+#' @param progress_bar the progress bar to print to (only if verbose = TRUE)
+#' @param indx the index to pass to progress bar (only if verbose = TRUE)
+#' @param weights weights to pass to estimation procedure
+#' @param cross_fitted_se if \code{TRUE}, uses a cross-fitted estimator of
+#'   the standard error; otherwise, uses the entire dataset
+#' @param ... other arguments to Super Learner
+#'
+#' @return a list of length V, with the results of predicting on the hold-out data for each v in 1 through V
+#' @export
+run_sl <- function(Y = NULL, X = NULL, V = 5, SL.library = "SL.glm",
+                   univariate_SL.library = "SL.glm", s = 1, cv_folds = NULL,
+                   sample_splitting = TRUE, ss_folds = NULL, verbose = FALSE,
+                   progress_bar = NULL, indx = 1, weights = rep(1, nrow(X)),
+                   cross_fitted_se = TRUE, ...) {
+  # if verbose, print what we're doing and make sure that SL is verbose;
+  # set up the argument list for the Super Learner / CV.SuperLearner
+  arg_lst <- list(...)
+  if (is.null(arg_lst$family)) {
+    arg_lst$family <- switch(
+      (length(unique(Y)) == 2) + 1, stats::gaussian(), stats::binomial()
+    )
   }
   if (verbose) {
-    # message(paste0("Fitting regression for s = ", paste(s, collapse = ",")))
-    if (is.null(L$cvControl)) {
-      L$cvControl <- list(verbose = TRUE)
-    } else if (grepl("verbose", names(L$cvControl))) {
-      L$cvControl$verbose <- TRUE
+    if (is.null(arg_lst$cvControl)) {
+      arg_lst$cvControl <- list(verbose = TRUE)
+    } else {
+      arg_lst$cvControl$verbose <- TRUE
     }
   }
-  # fit the super learner on each full/reduced pair
+  if (is.null(arg_lst$cvControl)) {
+    arg_lst$cvControl <- list(V = V)
+  } else {
+    arg_lst$cvControl$V <- V
+  }
+  if (is.null(arg_lst$obsWeights)) {
+    arg_lst$obsWeights <- weights
+  }
+  arg_lst_cv <- arg_lst
+  # fit the super learner for a given set of variables
   red_X <- as.data.frame(X[, s, drop = FALSE])
-  if (is.null(L$obsWeights)) {
-    L$obsWeights <- weights
+  if (is.null(cv_folds)) {
+    cv_folds <- make_folds(Y, V = V, stratified = (length(unique(Y)) == 2))
   }
-  if (is.null(folds)) {
-    folds <- .make_folds(Y, V = V, stratified = (length(unique(Y)) == 2))
-  }
+  cf_folds_lst <- lapply(as.list(seq_len(V)), function(v) {
+    which(cv_folds == v)
+  })
+  arg_lst_cv$cvControl$validRows <- cf_folds_lst
   this_sl_lib <- SL.library
   # if univariate regression (i.e., length(s) == 1) then check univariate_SL.library
   # if it exists, use it; otherwise, use the normal library
@@ -187,30 +391,68 @@ run_sl <- function(Y, X, V, SL.library, univariate_SL.library, s, folds,
       }
     }
   }
-  fhat_ful <- list()
-  fhat_red <- list()
-  for (v in 1:V) {
-    # fit super learner
-    this_L <- L
-    this_L$obsWeights <- L$obsWeights[folds != v]
-    new_arg_list <- c(list(Y = Y[folds != v, , drop = FALSE], X = red_X[folds != v, , drop = FALSE], SL.library = this_sl_lib), this_L)
-    if (!is.character(this_sl_lib)) { # only a single learner, so don't do CV
-      fit <- this_sl_lib(Y = Y[folds != v, , drop = FALSE], X = red_X[folds != v, , drop = FALSE], newX = red_X[folds == v, , drop = FALSE],
-                    family = new_arg_list$family, obsWeights = new_arg_list$obsWeights)
-      fitted_v <- fit$fit
-      fhat_ful[[v]] <- fit$pred
-    } else {
-      fit <- do.call(SuperLearner::SuperLearner, new_arg_list)
-      fitted_v <- SuperLearner::predict.SuperLearner(fit, onlySL = TRUE)$pred
-      ## get predictions on the validation fold
-      fhat_ful[[v]] <- SuperLearner::predict.SuperLearner(fit, newdata = red_X[folds == v, , drop = FALSE], onlySL = TRUE)$pred
+  full_arg_lst_cv <- c(arg_lst_cv, list(
+    Y = Y, X = red_X, SL.library = this_sl_lib
+  ))
+  # if a single learner, don't do inner CV
+  if (!is.character(this_sl_lib) | length(this_sl_lib) == 1) {
+    if (is.character(this_sl_lib)) {
+      this_sl_lib <- eval(parse(text = this_sl_lib))
     }
-
+    fitted <- list()
+    for (v in seq_len(V)) {
+      train_v <- (cv_folds != v)
+      test_v <- (cv_folds == v)
+      fit <- this_sl_lib(Y = Y[train_v, , drop = FALSE],
+                         X = red_X[train_v, , drop = FALSE],
+                         newX = red_X[test_v, , drop = FALSE],
+                         family = full_arg_lst_cv$family,
+                         obsWeights = full_arg_lst_cv$obsWeights[train_v])
+      fitted[[v]] <- fit$pred
+    }
+    if (sample_splitting) {
+      fhat <- fitted[ss_folds == 1]
+    } else {
+      fhat <- fitted
+    }
+  } else {
+    # fit a cross-validated Super Learner
+    cv_fit <- do.call(SuperLearner::CV.SuperLearner, full_arg_lst_cv)
+    # extract predictions on correct sampled-split folds
+    fhat <- extract_sampled_split_predictions(
+      cvsl_obj = cv_fit, sample_splitting = sample_splitting, full = TRUE,
+      sample_splitting_folds = switch((sample_splitting) + 1, rep(1, V), ss_folds)
+    )
+    # extract predictions on all validation rows
+    fitted <- extract_sampled_split_predictions(
+      cvsl_obj = cv_fit, sample_splitting = FALSE, full = TRUE,
+      sample_splitting_folds = rep(1, V)
+    )
+  }
+  # if cross_fitted_se, we're done; otherwise, re-fit to the entire dataset
+  if (!cross_fitted_se) {
+    # refit to the entire dataset
+    if (!is.character(this_sl_lib)) {
+      fit <- this_sl_lib(Y = Y, X = red_X, newX = red_X, family = arg_lst$family,
+                         obsWeights = arg_lst$obsWeights)
+      fitted <- fit$pred
+    } else {
+      fit <- do.call(
+        SuperLearner::SuperLearner,
+        args = c(arg_lst, list(
+          Y = Y, X = red_X, SL.library = this_sl_lib
+        ))
+      )
+      fitted <- fit$SL.predict
+    }
+  } else {
+    fit <- NA
   }
   if (verbose) {
     setTxtProgressBar(progress_bar, indx)
   }
-  return(list(preds = fhat_ful, folds = folds, fit = fit))
+  return(list(cf_preds_lst = fhat, cf_folds = cv_folds,
+              ss_folds = ss_folds, fit = fit, fitted = fitted))
 }
 
 # -------------------------------------

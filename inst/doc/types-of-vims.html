@@ -12,7 +12,7 @@
 
 <meta name="author" content="Brian D. Williamson" />
 
-<meta name="date" content="2021-03-01" />
+<meta name="date" content="2021-06-03" />
 
 <title>Types of VIMs</title>
 
@@ -402,7 +402,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Types of VIMs</h1>
 <h4 class="author">Brian D. Williamson</h4>
-<h4 class="date">2021-03-01</h4>
+<h4 class="date">2021-06-03</h4>
 
 
 
@@ -420,8 +420,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb2-5"><a href="#cb2-5"></a>heart &lt;-<span class="st"> </span>heart_data[, <span class="dv">2</span><span class="op">:</span><span class="kw">dim</span>(heart_data)[<span class="dv">2</span>]]</span>
 <span id="cb2-6"><a href="#cb2-6"></a>heart<span class="op">$</span>famhist &lt;-<span class="st"> </span><span class="kw">ifelse</span>(heart<span class="op">$</span>famhist <span class="op">==</span><span class="st"> &quot;Present&quot;</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
 <span id="cb2-7"><a href="#cb2-7"></a>x &lt;-<span class="st"> </span>heart[, <span class="op">-</span><span class="kw">ncol</span>(heart)]</span>
-<span id="cb2-8"><a href="#cb2-8"></a>learners<span class="fl">.2</span> &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;SL.ranger&quot;</span>)</span>
-<span id="cb2-9"><a href="#cb2-9"></a><span class="kw">set.seed</span>(<span class="dv">12345</span>)</span></code></pre></div>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co"># a simple library, to speed up the vignette;</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co"># in general, we recommend fitting a flexible library</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>learners<span class="fl">.2</span> &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;SL.glm&quot;</span>)</span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="kw">set.seed</span>(<span class="dv">12345</span>)</span></code></pre></div>
 </div>
 <div id="conditional-vims" class="section level2">
 <h2>Conditional VIMs</h2>
@@ -429,9 +431,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># note the use of a small V and a small number of SL folds, for illustration only</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a>V &lt;-<span class="st"> </span><span class="dv">2</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a>sl_cvcontrol &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">V =</span> <span class="dv">2</span>)</span>
-<span id="cb3-4"><a href="#cb3-4"></a>fam_vim_cond &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">5</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span>
-<span id="cb3-5"><a href="#cb3-5"></a><span class="co">#&gt; Warning in cv_vim(Y = Y, X = X, f1 = f1, f2 = f2, indx = indx, V = V, type =</span></span>
-<span id="cb3-6"><a href="#cb3-6"></a><span class="co">#&gt; &quot;r_squared&quot;, : Original estimate &lt; 0; returning zero.</span></span></code></pre></div>
+<span id="cb3-4"><a href="#cb3-4"></a>fam_vim_cond &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> heart<span class="op">$</span>chd, <span class="dt">X =</span> x, <span class="dt">indx =</span> <span class="dv">5</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol)</span></code></pre></div>
 </div>
 <div id="marginal-vims" class="section level2">
 <h2>Marginal VIMs</h2>
@@ -456,25 +456,25 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>The three VIMs defined here may be different for a given feature of interest. Indeed, we can see this for family history of heart disease in the South African heart disease study data:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>fam_vim_cond</span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="co">#&gt; Variable importance estimates:</span></span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt;       Estimate SE         95% CI         VIMP &gt; 0 p-value </span></span>
-<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt; s = 5 0        0.07054001 [0, 0.1382559] FALSE    0.843128</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt;       Estimate   SE         95% CI         VIMP &gt; 0 p-value  </span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt; s = 5 0.07167109 0.06971738 [0, 0.2083146] FALSE    0.1519694</span></span>
 <span id="cb6-5"><a href="#cb6-5"></a>fam_vim_marg</span>
 <span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; Variable importance estimates:</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt;       Estimate   SE         95% CI        VIMP &gt; 0 p-value   </span></span>
-<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt; s = 1 0.08121665 0.04706633 [0, 0.173465] TRUE     0.04470819</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt;       Estimate   SE       95% CI         VIMP &gt; 0 p-value  </span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt; s = 1 0.03548058 0.038116 [0, 0.1101866] FALSE    0.1759635</span></span>
 <span id="cb6-9"><a href="#cb6-9"></a><span class="co"># note: need to look at row for s = 5</span></span>
 <span id="cb6-10"><a href="#cb6-10"></a>all_vim_spvim</span>
 <span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt; Variable importance estimates:</span></span>
-<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt;       Estimate    SE         95% CI                   VIMP &gt; 0 p-value     </span></span>
-<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt; s = 1 0.000000000 0.04833387 [0.00000000, 0.09473265] FALSE    0.3961086927</span></span>
-<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt; s = 2 0.040450504 0.05043574 [0.00000000, 0.13930273] FALSE    0.1472266751</span></span>
-<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt; s = 3 0.037930750 0.04992969 [0.00000000, 0.13579114] FALSE    0.1565363443</span></span>
-<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt; s = 4 0.012137175 0.04211513 [0.00000000, 0.09468130] FALSE    0.2787654650</span></span>
-<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt; s = 5 0.128559280 0.03345391 [0.06299082, 0.19412774]  TRUE    0.0000164071</span></span>
-<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt; s = 6 0.008707699 0.03573791 [0.00000000, 0.07875272] FALSE    0.2763457505</span></span>
-<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt; s = 7 0.000000000 0.05207273 [0.00000000, 0.10206067] FALSE    0.4033041778</span></span>
-<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt; s = 8 0.000000000 0.03710618 [0.00000000, 0.07272678] FALSE    0.3664978865</span></span>
-<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt; s = 9 0.123501110 0.04694141 [0.03149763, 0.21550459]  TRUE    0.0019981167</span></span></code></pre></div>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt;       Estimate    SE          95% CI                   VIMP &gt; 0 p-value     </span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt; s = 1 0.025282005 0.020882130 [0.00000000, 0.06621023]  TRUE    0.0468034801</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt; s = 2 0.032711550 0.038879406 [0.00000000, 0.10891379] FALSE    0.1189833920</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt; s = 3 0.042188077 0.035462932 [0.00000000, 0.11169415]  TRUE    0.0494530713</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt; s = 4 0.003771903 0.017848909 [0.00000000, 0.03875512] FALSE    0.4185177004</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt; s = 5 0.028699613 0.040410858 [0.00000000, 0.10790344] FALSE    0.1673468540</span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt; s = 6 0.011832106 0.024125713 [0.00000000, 0.05911764] FALSE    0.2651742646</span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt; s = 7 0.000000000 0.008789328 [0.00000000, 0.01722677] FALSE    0.6037006975</span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt; s = 8 0.000000000 0.010435590 [0.00000000, 0.02045338] FALSE    0.5814124647</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt; s = 9 0.096481520 0.042631794 [0.01292474, 0.18003830]  TRUE    0.0004733727</span></span></code></pre></div>
 <p>This is simply a function of the fact that the VIMs are different population parameters. All three likely provide useful information in practice:</p>
 <ul>
 <li>the marginal VIM provides information about the predictiveness of the covariate in isolation;</li>

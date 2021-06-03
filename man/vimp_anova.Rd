@@ -7,8 +7,8 @@
 vimp_anova(
   Y = NULL,
   X = NULL,
-  f1 = NULL,
-  f2 = NULL,
+  cross_fitted_f1 = NULL,
+  cross_fitted_f2 = NULL,
   indx = 1,
   V = 10,
   run_regression = TRUE,
@@ -16,13 +16,15 @@ vimp_anova(
   alpha = 0.05,
   delta = 0,
   na.rm = FALSE,
-  scale = "identity",
-  folds,
+  cross_fitting_folds = NULL,
   stratified = FALSE,
   C = rep(1, length(Y)),
   Z = NULL,
   ipc_weights = rep(1, length(Y)),
+  scale = "identity",
   ipc_est_type = "aipw",
+  scale_est = TRUE,
+  cross_fitted_se = TRUE,
   ...
 )
 }
@@ -31,94 +33,112 @@ vimp_anova(
 
 \item{X}{the covariates.}
 
-\item{f1}{the predicted values on validation data from a flexible estimation 
-technique regressing Y on X in the training data; a list of length V, 
-where each object is a set of predictions on the validation data.}
+\item{cross_fitted_f1}{the predicted values on validation data from a
+flexible estimation technique regressing Y on X in the training data;
+a list of length V, where each object is a set of predictions on the
+validation data. If sample-splitting is requested, then these must
+be estimated specially; see Details.}
 
-\item{f2}{the predicted values on validation data from a flexible estimation 
-technique regressing the fitted values in \code{f1} on X withholding the 
-columns in \code{indx}; a list of length V, where each object is a set of 
-predictions on the validation data.}
+\item{cross_fitted_f2}{the predicted values on validation data from a
+flexible estimation technique regressing either (a) the fitted values in
+\code{cross_fitted_f1}, or (b) Y, on X withholding the columns in \code{indx};
+a list of length V, where each object is a set of predictions on the
+validation data. If sample-splitting is requested, then these must
+be estimated specially; see Details.}
 
-\item{indx}{the indices of the covariate(s) to calculate variable importance 
+\item{indx}{the indices of the covariate(s) to calculate variable importance
 for; defaults to 1.}
 
-\item{V}{the number of folds for cross-validation, defaults to 10.}
+\item{V}{the number of folds for cross-fitting, defaults to 5. If
+\code{sample_splitting = TRUE}, then a special type of \code{V}-fold cross-fitting
+is done. See Details for a more detailed explanation.}
 
-\item{run_regression}{if outcome Y and covariates X are passed to 
-\code{cv_vim}, and \code{run_regression} is \code{TRUE}, then 
-Super Learner will be used; otherwise, variable importance will be 
-computed using the inputted fitted values.}
+\item{run_regression}{if outcome Y and covariates X are passed to
+\code{cv_vim}, and \code{run_regression} is \code{TRUE}, then Super Learner
+will be used; otherwise, variable importance will be computed using the
+inputted fitted values.}
 
-\item{SL.library}{a character vector of learners to pass to 
-\code{SuperLearner}, if \code{run_regression = TRUE}.
+\item{SL.library}{a character vector of learners to pass to
+\code{SuperLearner}, if \code{f1} and \code{f2} are Y and X, respectively.
 Defaults to \code{SL.glmnet}, \code{SL.xgboost}, and \code{SL.mean}.}
 
-\item{alpha}{the level to compute the confidence interval at. Defaults to 
+\item{alpha}{the level to compute the confidence interval at. Defaults to
 0.05, corresponding to a 95\% confidence interval.}
 
-\item{delta}{the value of the \eqn{\delta}-null (i.e., testing if 
+\item{delta}{the value of the \eqn{\delta}-null (i.e., testing if
 importance < \eqn{\delta}); defaults to 0.}
 
-\item{na.rm}{should we remove NA's in the outcome and fitted values in 
+\item{na.rm}{should we remove NA's in the outcome and fitted values in
 computation? (defaults to \code{FALSE})}
 
-\item{scale}{scale should CIs be computed on original ("identity") or 
-logit ("logit") scale? (defaults to "identity")}
+\item{cross_fitting_folds}{the folds for cross-fitting. Only used if
+\code{run_regression = FALSE}.}
 
-\item{folds}{the folds to use, if f1 and f2 are supplied.}
+\item{stratified}{if run_regression = TRUE, then should the generated folds
+be stratified based on the outcome (helps to ensure class balance across
+cross-fitting folds)}
 
-\item{stratified}{if run_regression = TRUE, then should the generated folds 
-be stratified based on the outcome? (helps to ensure class balance across 
-cross-validation folds)}
-
-\item{C}{the indicator of coarsening (1 denotes observed, 0 denotes 
+\item{C}{the indicator of coarsening (1 denotes observed, 0 denotes
 unobserved).}
 
-\item{Z}{either (i) NULL (the default, in which case the argument 
-\code{C} above must be all ones), or (ii) a character list specifying the 
-variable(s) among Y and X that are thought to play a role in the coarsening 
-mechanism.}
+\item{Z}{either (i) NULL (the default, in which case the argument
+\code{C} above must be all ones), or (ii) a character vector specifying
+the variable(s) among Y and X that are thought to play a role in the
+coarsening mechanism.}
 
-\item{ipc_weights}{weights for the computed influence curve 
-(i.e., inverse probability weights for coarsened-at-random settings).}
+\item{ipc_weights}{weights for the computed influence curve (i.e., inverse
+probability weights for coarsened-at-random settings). Assumed to be
+already inverted (i.e., ipc_weights = 1 / [estimated probability weights]).}
 
-\item{ipc_est_type}{IPC correction, either \code{"ipw"} (for classical 
-inverse probability weighting) or \code{"aipw"} (for augmented inverse
-probability weighting; the default).}
+\item{scale}{should CIs be computed on original ("identity", default) or
+logit ("logit") scale?}
+
+\item{ipc_est_type}{the type of procedure used for coarsened-at-random
+settings; options are "ipw" (for inverse probability weighting) or
+"aipw" (for augmented inverse probability weighting).
+Only used if \code{C} is not all equal to 1.}
+
+\item{scale_est}{should the point estimate be scaled to be greater than 0?
+Defaults to \code{TRUE}.}
+
+\item{cross_fitted_se}{should we use cross-fitting to estimate the standard
+errors (\code{TRUE}, the default) or not (\code{FALSE})?}
 
 \item{...}{other arguments to the estimation tool, see "See also".}
 }
 \value{
-An object of classes \code{vim} and \code{vim_regression}. 
+An object of classes \code{vim} and \code{vim_anova}.
   See Details for more information.
 }
 \description{
-Compute estimates of and confidence intervals for nonparametric ANOVA-based 
-intrinsic variable importance. This is a wrapper function for \code{cv_vim}, 
-with \code{type = "anova"}.
+Compute estimates of and confidence intervals for nonparametric ANOVA-based
+intrinsic variable importance. This is a wrapper function for \code{cv_vim},
+with \code{type = "anova"}. This type
+has limited functionality compared to other
+types; in particular, null hypothesis tests
+are not possible using \code{type = "anova"}.
+If you want to do null hypothesis testing
+on an equivalent population parameter, use
+\code{vimp_rsquared} instead.
 }
 \details{
+We define the population ANOVA
+parameter for the group of features (or  single feature) \eqn{s} by
+\deqn{\psi_{0,s} := E_0\{f_0(X) - f_{0,s}(X)\}^2/var_0(Y),}
+where \eqn{f_0} is the population conditional mean using all features,
+\eqn{f_{0,s}} is the population conditional mean using the features with
+index not in \eqn{s}, and \eqn{E_0} and \eqn{var_0} denote expectation and
+variance under the true data-generating distribution, respectively.
+
+Cross-fitted ANOVA estimates are computed by first
+splitting the data into \eqn{K} folds; then using each fold in turn as a
+hold-out set, constructing estimators \eqn{f_{n,k}} and \eqn{f_{n,k,s}} of
+\eqn{f_0} and \eqn{f_{0,s}}, respectively on the training data and estimator
+\eqn{E_{n,k}} of \eqn{E_0} using the test data; and finally, computing
+\deqn{\psi_{n,s} := K^{(-1)}\sum_{k=1}^K E_{n,k}\{f_{n,k}(X) - f_{n,k,s}(X)\}^2/var_n(Y),}
+where \eqn{var_n} is the empirical variance.
 See the paper by Williamson, Gilbert, Simon, and Carone for more
-details on the mathematics behind this function, and the validity
-of the confidence intervals.
-In the interest of transparency, we return most of the calculations
-within the \code{vim} object. This results in a list containing:
-\itemize{
- \item{s}{ - the column(s) to calculate variable importance for}
- \item{SL.library}{ - the library of learners passed to \code{SuperLearner}}
- \item{full_fit}{ - the fitted values of the chosen method fit to the full data}
- \item{red_fit}{ - the fitted values of the chosen method fit to the reduced data}
- \item{est}{ - the estimated variable importance}
- \item{naive}{ - the naive estimator of variable importance}
- \item{update}{ - the influence curve-based update}
- \item{se}{ - the standard error for the estimated variable importance}
- \item{ci}{ - the \eqn{(1-\alpha) \times 100}\% confidence interval for the variable importance estimate}
- \item{full_mod}{ - the object returned by the estimation procedure for the full data regression (if applicable)}
- \item{red_mod}{ - the object returned by the estimation procedure for the reduced data regression (if applicable)}
- \item{alpha}{ - the level, for confidence interval calculation}
- \item{y}{ - the outcome}
-}
+details on the mathematics behind this function.
 }
 \examples{
 # generate the data
@@ -144,6 +164,6 @@ est <- vimp_anova(y, x, indx = 2,
 
 }
 \seealso{
-\code{\link[SuperLearner]{SuperLearner}} for specific usage of the 
+\code{\link[SuperLearner]{SuperLearner}} for specific usage of the
   \code{SuperLearner} function and package.
 }

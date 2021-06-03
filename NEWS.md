@@ -1,3 +1,37 @@
+# vimp 2.2.1
+
+## Major changes
+
+* Updated the internals of `measure_auc` to hew more closely to `ROCR` and `cvAUC`, using computational tricks to speed up weighted AUC and EIF computation.
+
+## Minor changes
+
+* Added tests for IPW AUC
+
+# vimp 2.2.0
+
+## Major changes
+
+* Added argument `cross_fitted_se` to `cv_vim` and `sp_vim`; this logical option allows the standard error to be estimated using cross-fitting. This can improve performance in cases where flexible algorithms are used to estimate the full and reduced regressions.
+* Added bootstrap-based standard error estimates as an option to both `vim` and `cv_vim`; currently, this option is only available for non-sampled-split calls (i.e., with `sample_splitting = FALSE`)
+* Updated sample-splitting behavior to match more closely with theoretical results (and improve power!): namely, that since estimation of the nuisance regression functions (i.e., the regression of outcome on all covariates and outcome on the reduced set of covariates) can be treated as fixed in making inference, sample-splitting is only necessary for evaluating predictiveness. Thus, the final regression functions from a call to `vim` are based on the entire dataset, while the full and reduced predictiveness (`predictiveness_full` and `predictiveness_reduced`, along with the corresponding confidence intervals) is evaluated using separate portions of the data for the full and reduced regressions.
+* Added argument `sample_splitting` to `vim`, `cv_vim` and `sp_vim`; if `FALSE`, sample-splitting is not used to estimate predictiveness. Note that we recommend using the default, `TRUE`, in all cases, since inference using `sample_splitting = FALSE` will be invalid for variables with truly null variable importance.
+* Updated cross-fitting (also referred to as cross-validation) behavior within `sample_splitting = TRUE` to match more closely with theoretical results (and improve power!). In this case, we first split the data into $2K$ cross-fitting folds, and split these folds equally into two sample-splitting folds. For the nuisance regression using all covariates, for each $k \in \{1, \ldots, K\}$ we set aside the data in sample-splitting fold 1 and cross-fitting fold $k$ [this comprises $1 / (2K)$ of the data]. We train using the remaining observations [comprising $(2K-1)/(2K)$ of the data] not in this testing fold, and we test on the originally withheld data. We repeat for the nuisance regression using the reduced set of covariates, but withhold data in sample-splitting fold 2. This update affects both `cv_vim` and `sp_vim`. If `sample_splitting = FALSE`, then we use standard cross-fitting.
+
+## Minor changes
+
+* Use `>=` in computing the numerator of AUC with inverse probability weights
+* Update `roxygen2` documentation for wrappers (`vimp_*`) to inherit parameters and details from `cv_vim` (reduces potential for documentation mismatches)
+
+# vimp 2.1.10
+
+## Major changes
+None
+
+## Minor changes
+
+* Automatically determine the `family` if it isn't specified; use `stats::binomial()` if there are only two unique outcome values, otherwise use `stats::gaussian()`
+
 # vimp 2.1.9
 
 ## Major changes

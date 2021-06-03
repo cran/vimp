@@ -14,7 +14,7 @@ par(mar = c(5, 12, 4, 2) + 0.1)
 #  # install.packages("devtools")
 #  devtools::install_github("bdwilliamson/vimp")
 
-## ----load-vimp----------------------------------------------------------------
+## ----load-vimp, message = FALSE-----------------------------------------------
 library("vimp")
 
 ## ----gen-data-----------------------------------------------------------------
@@ -31,7 +31,7 @@ y <- (x[,1])^2*(x[,1]+7/5) + (25/9)*(x[,2])^2 + rnorm(n, 0, 1)
 # set up folds for hypothesis testing
 folds <- sample(rep(seq_len(2), length = length(y)))
 
-## ----learner-lib-small--------------------------------------------------------
+## ----learner-lib-small, message = FALSE---------------------------------------
 library("SuperLearner")
 # load specific algorithms
 library("ranger")
@@ -55,7 +55,7 @@ heart$famhist <- ifelse(heart$famhist == "Present", 1, 0)
 heart_folds <- sample(rep(seq_len(2), length = dim(heart)[1]))
 
 ## ----est-heart-regressions-lm-------------------------------------------------
-X <- heart[, -dim(heart)[2]]
+X <- heart[, -ncol(heart)]
 lm_vim_sbp <- vim(Y = heart$chd, X = X, indx = 1, run_regression = TRUE, SL.library = "SL.lm", type = "r_squared")
 lm_vim_tob <- vim(Y = heart$chd, X = X, indx = 2, run_regression = TRUE, SL.library = "SL.lm", type = "r_squared")
 lm_vim_ldl <- vim(Y = heart$chd, X = X, indx = 3, run_regression = TRUE, SL.library = "SL.lm", type = "r_squared")
@@ -74,9 +74,6 @@ lm_mat <- merge_vim(lm_vim_sbp, lm_vim_tob, lm_vim_ldl, lm_vim_adi,
 lm_mat
 
 ## ----full-learner-lib---------------------------------------------------------
-# load the library
-library(SuperLearner)
-
 # create a function for boosted stumps
 SL.gbm.1 <- function(..., interaction.depth = 1) SL.gbm(..., interaction.depth = interaction.depth)
 
@@ -112,17 +109,10 @@ learners <- c("SL.glmnet", "SL.glmnet.0.25", "SL.glmnet.0.5", "SL.glmnet.0.75",
               "SL.gbm.1")
 
 ## ----vimp-with-sl-1, eval = FALSE---------------------------------------------
-#  # load the library
-#  library("vimp")
-#  
-#  # now estimate variable importance
 #  vimp_rsquared(Y = heart$chd, X = X,
 #      indx = 5, run_regression = TRUE, SL.library = learners, V = 5)
 
 ## ----vimp-with-sl-fam, message = FALSE----------------------------------------
-# load the library
-library("vimp")
-
 # small learners library
 learners.2 <- c("SL.ranger")
 # small number of cross-fitting folds
@@ -131,7 +121,9 @@ V <- 2
 sl_cvcontrol <- list(V = 2)
 
 # now estimate variable importance
-fam_vim <- vimp_rsquared(Y = heart$chd, X = as.data.frame(heart[, -dim(heart)[2]]), indx = 5, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+start_time <- Sys.time()
+fam_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 5, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+end_time <- Sys.time()
 
 ## ----print-fam-vim------------------------------------------------------------
 fam_vim
@@ -141,20 +133,17 @@ head(fam_vim$full_fit)
 head(fam_vim$red_fit)
 
 ## ----heart-sl-----------------------------------------------------------------
-# set up the data, removing the columns for alcohol use and chd
-x <- as.data.frame(heart[, -dim(heart)[2]])
-
 # estimate variable importance
-tpa_vim <- vimp_rsquared(Y = heart$chd, X = x, indx = 6, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-alc_vim <- vimp_rsquared(Y = heart$chd, X = x, indx = 8, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-sbp_vim <- vimp_rsquared(Y = heart$chd, X = x, indx = 1, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-tob_vim <- vimp_rsquared(Y = heart$chd, X = x, indx = 2, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-ldl_vim <- vimp_rsquared(Y = heart$chd, X = x, indx = 3, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-adi_vim <- vimp_rsquared(Y = heart$chd, X = x, indx = 4, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-obe_vim <- vimp_rsquared(Y = heart$chd, X = x, indx = 7, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-age_vim <- vimp_rsquared(Y = heart$chd, X = x, indx = 9, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+tpa_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 6, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+alc_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 8, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+sbp_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 1, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+tob_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 2, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+ldl_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 3, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+adi_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 4, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+obe_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 7, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+age_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 9, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
 
-## ----heart-vim, fig.width = 8.5, fig.height = 8-------------------------------
+## ----heart-vim, fig.width = 8.5, fig.height = 8, message = FALSE--------------
 library("dplyr")
 library("tibble")
 library("ggplot2")
@@ -167,10 +156,10 @@ all_vars <- c("Sys. blood press.", "Tobacco consump.", "LDL cholesterol",
               "Adiposity", "Family history", "Type A behavior", "Obesity",
               "Alcohol consump.", "Age")
 
-est_plot_tib <- ests$mat %>% 
+est_plot_tib <- ests$mat %>%
   mutate(
     var_fct = rev(factor(s, levels = ests$mat$s,
-                     labels = all_vars[as.numeric(ests$mat$s)], 
+                     labels = all_vars[as.numeric(ests$mat$s)],
                      ordered = TRUE))
   )
 
@@ -186,14 +175,14 @@ est_plot_tib %>%
 
 ## ----heart-group-vim, fig.width = 8.5, fig.height = 8-------------------------
 # get the estimates
-behav_vim <- vimp_rsquared(Y = heart$chd, X = x, indx = c(2, 6, 8), SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-bios_vim <- vimp_rsquared(Y = heart$chd, X = x, indx = c(1, 3, 4, 5, 7, 9), SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+behav_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = c(2, 6, 8), SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+bios_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = c(1, 3, 4, 5, 7, 9), SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
 
 # combine and plot
 groups <- merge_vim(behav_vim, bios_vim)
 all_grp_nms <- c("Behavioral features", "Biological features")
 
-grp_plot_tib <- groups$mat %>% 
+grp_plot_tib <- groups$mat %>%
   mutate(
     grp_fct = factor(case_when(
       s == "2,6,8" ~ "1",
