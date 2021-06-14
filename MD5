@@ -1,7 +1,7 @@
-7d86a0eb1b5661a856e21b0ab47d8f1b *DESCRIPTION
+b3692b3c809d585ab4d4eef8bbcdb686 *DESCRIPTION
 d36706233049eac18a5fb1e4759c3664 *LICENSE
 0eace040b079c1686e90a607f51c0384 *NAMESPACE
-997ba524fa074cf820a1b80a7ae9fb73 *NEWS.md
+34465f315108e843f041583e69ed72e3 *NEWS.md
 ed2ebf073bccde3d46b8151ef542dad4 *R/average_vim.R
 e50d807354f92eb04efd8e90951f2c4d *R/bootstrap_se.R
 7de79947a19485fc95b00b3c67c616b0 *R/cv_vim.R
@@ -39,13 +39,13 @@ bfda05fa31dbf90f1817c25042b750ae *R/vimp_se.R
 a80d303d321be251bbf680895e1c4e3c *inst/CITATION
 213e8ec8355990806d357cde042bff62 *inst/doc/introduction-to-vimp.R
 5e9e9293fb4cceec86b2a5a2a61ad43e *inst/doc/introduction-to-vimp.Rmd
-f890b64e9c709f2cd4798fb34e0ca646 *inst/doc/introduction-to-vimp.html
+32ae0d3a221301290d886d0d26291453 *inst/doc/introduction-to-vimp.html
 9e11806161d86f8a308468889cb12190 *inst/doc/precomputed-regressions.R
 b179497be5b89ffc425958bd48c75b4e *inst/doc/precomputed-regressions.Rmd
-f8609056f79ff187c21877543e5bf622 *inst/doc/precomputed-regressions.html
+5e7f054fbaf069aacd90e83b5173b761 *inst/doc/precomputed-regressions.html
 e90b59451aadf1a7dc859f26aaa387dc *inst/doc/types-of-vims.R
 68f9d364f295472d8d1afd2373e01983 *inst/doc/types-of-vims.Rmd
-515b87bbd89bb166c2947cb363193947 *inst/doc/types-of-vims.html
+8c103468a5af2ae50199b03b44760795 *inst/doc/types-of-vims.html
 dcdda459c1b5b97345c1c768209874fd *man/average_vim.Rd
 2721922df4df27299a06f10946a43d9e *man/bootstrap_se.Rd
 1867915497714bd3a979907a8c0bf644 *man/check_fitted_values.Rd
@@ -89,7 +89,7 @@ a59705cd3b6f82d9a61704812594415e *man/vimp_deviance.Rd
 d1194c67530e21237796260edbceef62 *man/vimp_se.Rd
 af9ea167bd9bf11aa82ef9fca60ce0e0 *tests/testthat.R
 2a216d4b0dea6357e6c9c21fc6a863c5 *tests/testthat/test-average_vim.R
-1d8c808e00adde40cc5228c7392b2eed *tests/testthat/test-binary_outcomes.R
+9b3791724c89316f84d20b83213efcef *tests/testthat/test-binary_outcomes.R
 d179e0d570eaf4b2c7ba121ab3390797 *tests/testthat/test-bootstrap.R
 7e537e045dc299366815c4c015475c3e *tests/testthat/test-continuous_outcomes.R
 306b5d7a11058c92cab79b9f26d7abb5 *tests/testthat/test-cv_vim.R
