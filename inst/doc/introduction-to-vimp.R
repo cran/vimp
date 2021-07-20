@@ -37,8 +37,9 @@ library("SuperLearner")
 library("ranger")
 
 ## ----est-1--------------------------------------------------------------------
-est_1 <- vimp_rsquared(Y = y, X = x, indx = 1, run_regression = TRUE,
-SL.library = c("SL.ranger", "SL.mean"), V = 2, env = environment())
+est_1 <- vimp_rsquared(Y = y, X = x, indx = 1, run_regression = TRUE, 
+                       SL.library = c("SL.ranger", "SL.mean"), V = 2,
+                       env = environment())
 
 ## ----print-est-1--------------------------------------------------------------
 est_1

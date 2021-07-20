@@ -9,16 +9,18 @@ run_sl(
   X = NULL,
   V = 5,
   SL.library = "SL.glm",
-  univariate_SL.library = "SL.glm",
+  univariate_SL.library = NULL,
   s = 1,
   cv_folds = NULL,
   sample_splitting = TRUE,
   ss_folds = NULL,
+  split = 1,
   verbose = FALSE,
   progress_bar = NULL,
   indx = 1,
   weights = rep(1, nrow(X)),
   cross_fitted_se = TRUE,
+  full = NULL,
   ...
 )
 }
@@ -44,6 +46,9 @@ predictiveness estimation?}
 \item{ss_folds}{the sample-splitting folds; only used if
 \code{sample_splitting = TRUE}}
 
+\item{split}{the split to use for sample-splitting; only used if 
+\code{sample_splitting = TRUE}}
+
 \item{verbose}{should we print progress? defaults to FALSE}
 
 \item{progress_bar}{the progress bar to print to (only if verbose = TRUE)}
@@ -54,6 +59,11 @@ predictiveness estimation?}
 
 \item{cross_fitted_se}{if \code{TRUE}, uses a cross-fitted estimator of
 the standard error; otherwise, uses the entire dataset}
+
+\item{full}{should this be considered a "full" or "reduced" regression?
+If \code{NULL} (the default), this is determined automatically; a full
+regression corresponds to \code{s} being equal to the full covariate vector.
+For SPVIMs, can be entered manually.}
 
 \item{...}{other arguments to Super Learner}
 }

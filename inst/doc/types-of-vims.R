@@ -23,15 +23,18 @@ set.seed(12345)
 
 ## ----est-famhist-cond---------------------------------------------------------
 # note the use of a small V and a small number of SL folds, for illustration only
+set.seed(1234)
 V <- 2
 sl_cvcontrol <- list(V = 2)
-fam_vim_cond <- vimp_rsquared(Y = heart$chd, X = x, indx = 5, SL.library = learners.2, na.rm = TRUE, V = V, cvControl = sl_cvcontrol)
+fam_vim_cond <- vimp_auc(Y = heart$chd, X = x, indx = 5, SL.library = learners.2, na.rm = TRUE, V = V, cvControl = sl_cvcontrol)
 
 ## ----est-famhist-marg---------------------------------------------------------
 # note the use of a small V and a small number of SL folds, for illustration only
-fam_vim_marg <- vimp_rsquared(Y = heart$chd, X = x[, 5, drop = FALSE], indx = 1, SL.library = learners.2, na.rm = TRUE, V = V, cvControl = sl_cvcontrol)
+set.seed(5678)
+fam_vim_marg <- vimp_auc(Y = heart$chd, X = x[, 5, drop = FALSE], indx = 1, SL.library = learners.2, na.rm = TRUE, V = V, cvControl = sl_cvcontrol)
 
 ## ----est-famhist-spvim--------------------------------------------------------
+set.seed(91011)
 all_vim_spvim <- sp_vim(Y = heart$chd, X = x, type = "r_squared", SL.library = learners.2, na.rm = TRUE, V = V, cvControl = sl_cvcontrol, env = environment())
 
 ## ----show-ests----------------------------------------------------------------

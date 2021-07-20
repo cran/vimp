@@ -16,8 +16,56 @@ r2_one <- 0.5 ^ 2 * 1 / true_var
 r2_two <- 0.75 ^ 2 * 1 / true_var
 
 # set up a library for SuperLearner
-learners <- c("SL.glm")
+learners <- c("SL.glm", "SL.mean")
 V <- 2
+
+set.seed(4747)
+test_that("CV-VIM without sample splitting works", {
+  est_no_ss <- cv_vim(Y = y, X = x, indx = 2, V = V, type = "r_squared", 
+                      run_regression = TRUE, SL.library = learners, 
+                      alpha = 0.05, delta = 0, cvControl = list(V = V),
+                      env = environment(), na.rm = TRUE, sample_splitting = FALSE)
+  # check variable importance estimate
+  expect_equal(est_no_ss$est, r2_two, tolerance = 0.1, scale = 1)
+  # expect_equal(sprintf("%.15f", est_no_ss$est), "0.305201823514129")
+})
+
+set.seed(1234)
+test_that("CV-VIM with no SS and a single algorithm", {
+  est_no_ss_single_alg <- cv_vim(Y = y, X = x, indx = 2, V = V, type = "r_squared", 
+                                 run_regression = TRUE, SL.library = "SL.glm", 
+                                 alpha = 0.05, delta = 0, cvControl = list(V = V),
+                                 env = environment(), na.rm = TRUE, sample_splitting = FALSE)
+  # check variable importance estimate
+  expect_equal(est_no_ss_single_alg$est, r2_two, tolerance = 0.1, scale = 1)
+  # expect_equal(sprintf("%.15f", est_no_ss_single_alg$est), "0.305073651770309")
+})
+
+set.seed(4747)
+test_that("CV-VIM with no SS, non-cross-fitted SE, multiple algorithms works", {
+  est_no_ss_non_cf_se <- cv_vim(Y = y, X = x, indx = 2, V = V, type = "r_squared", 
+                                           run_regression = TRUE, SL.library = learners, 
+                                           alpha = 0.05, delta = 0, cvControl = list(V = V),
+                                           env = environment(), na.rm = TRUE, 
+                                           sample_splitting = FALSE, cross_fitted_se = FALSE)
+  # check variable importance estimate
+  expect_equal(est_no_ss_non_cf_se$est, r2_two, tolerance = 0.1, scale = 1)
+  # expect_equal(sprintf("%.15f", est_no_ss_non_cf_se$est), 
+  #              "0.305202533328328")
+})
+
+set.seed(5678)
+test_that("CV-VIM with no SS, non-cross-fitted SE, single algorithm works", {
+  est_no_ss_single_alg_non_cf_se <- cv_vim(Y = y, X = x, indx = 2, V = V, type = "r_squared", 
+                                           run_regression = TRUE, SL.library = "SL.glm", 
+                                           alpha = 0.05, delta = 0, cvControl = list(V = V),
+                                           env = environment(), na.rm = TRUE, 
+                                           sample_splitting = FALSE, cross_fitted_se = FALSE)
+  # check variable importance estimate
+  expect_equal(est_no_ss_single_alg_non_cf_se$est, r2_two, tolerance = 0.1, scale = 1)
+  # expect_equal(sprintf("%.15f", est_no_ss_single_alg_non_cf_se$est), 
+               # "0.305288025743816")
+})
 
 set.seed(101112)
 test_that("Cross-validated variable importance using internally-computed regressions works", {
@@ -39,19 +87,10 @@ test_that("Cross-validated variable importance using internally-computed regress
   expect_silent(format(est)[1])
   expect_output(print(est), "Estimate", fixed = TRUE)
   # check that influence curve worked
-  expect_length(est$eif, length(y))
+  expect_length(est$eif, length(y) / 2)
+  # check that the point estimate is what it is supposed to be
+  # expect_equal(sprintf("%.15f", est$est), "0.307418610446996")
 })
-
-set.seed(4747)
-test_that("CV-VIM without sample splitting works", {
-  est <- cv_vim(Y = y, X = x, indx = 2, V = V, type = "r_squared", 
-                run_regression = TRUE, SL.library = learners, 
-                alpha = 0.05, delta = 0, cvControl = list(V = V),
-                env = environment(), na.rm = TRUE, sample_splitting = FALSE)
-  # check variable importance estimate
-  expect_equal(est$est, r2_two, tolerance = 0.1, scale = 1)
-})
-
 
 # cross-fitted estimates of the full and reduced regressions,
 # for point estimate of variable importance.
@@ -82,70 +121,69 @@ reduced_cv_preds <- extract_sampled_split_predictions(
   cvsl_obj = reduced_cv_fit, sample_splitting = TRUE, 
   sample_splitting_folds = sample_splitting_folds, full = FALSE
 )
-fhat_ful_lst <- extract_sampled_split_predictions(
-  cvsl_obj = full_cv_fit, sample_splitting = FALSE, 
-  sample_splitting_folds = rep(1, 4), full = TRUE
-)
-fhat_red_lst <- extract_sampled_split_predictions(
-  cvsl_obj = reduced_cv_fit, sample_splitting = FALSE, 
-  sample_splitting_folds = rep(2, 4), full = FALSE
-)
 set.seed(5678)
-# refit on the whole dataset (for estimating the efficient influence function)
+# refit without cross-fitting (for non-cross-fitted SE estimation)
+cf_folds_1 <- sort(unique(cross_fitting_folds))[sample_splitting_folds == 1]
+full_ss_folds <- ifelse(cross_fitting_folds %in% cf_folds_1, 1, 2)
 full_fit <- SuperLearner::SuperLearner(
-  Y = Y, X = x, SL.library = learners, cvControl = list(V = V)
+  Y = Y[full_ss_folds == 1, ], X = x[full_ss_folds == 1, ], 
+  SL.library = learners, cvControl = list(V = V)
 )
 fhat_ful <- SuperLearner::predict.SuperLearner(full_fit, onlySL = TRUE)$pred
 reduced_fit <- SuperLearner::SuperLearner(
-  Y = Y, X = x[, -indx, drop = FALSE], SL.library = learners, 
-  cvControl = list(V = V)
+  Y = Y[full_ss_folds == 2, ], X = x[full_ss_folds == 2, -indx, drop = FALSE], 
+  SL.library = learners, cvControl = list(V = V)
 )
 fhat_red <- SuperLearner::predict.SuperLearner(reduced_fit, onlySL = TRUE)$pred
 test_that("Cross-validated variable importance using externally-computed regressions works", {
-  est <- cv_vim(Y = y, cross_fitted_f1 = full_cv_preds, 
-                cross_fitted_f2 = reduced_cv_preds, f1 = fhat_ful_lst,
-                f2 = fhat_red_lst, indx = 2, delta = 0, V = V, type = "r_squared", 
-                cross_fitting_folds = cross_fitting_folds, 
-                sample_splitting_folds = sample_splitting_folds,
-                run_regression = FALSE, alpha = 0.05, na.rm = TRUE)
+  est_prefit <- cv_vim(Y = y, cross_fitted_f1 = full_cv_preds, 
+                       cross_fitted_f2 = reduced_cv_preds, indx = 2, delta = 0, V = V, 
+                       type = "r_squared", cross_fitting_folds = cross_fitting_folds, 
+                       sample_splitting_folds = sample_splitting_folds,
+                       run_regression = FALSE, alpha = 0.05, na.rm = TRUE)
   # check variable importance estimate
-  expect_equal(est$est, r2_two, tolerance = 0.1, scale = 1)
+  expect_equal(est_prefit$est, r2_two, tolerance = 0.1, scale = 1)
   # check full predictiveness estimate
-  expect_equal(est$predictiveness_full, 0.44, tolerance = 0.1, scale = 1)
+  expect_equal(est_prefit$predictiveness_full, 0.44, tolerance = 0.1, scale = 1)
   # check that the SE, CI work
-  expect_length(est$ci, 2)
-  expect_length(est$se, 1)
+  expect_length(est_prefit$ci, 2)
+  expect_length(est_prefit$se, 1)
   # check that the p-value worked
-  expect_length(est$p_value, 1)
-  expect_true(est$test)
+  expect_length(est_prefit$p_value, 1)
+  expect_true(est_prefit$test)
   # check that printing, plotting, etc. work
-  expect_silent(format(est)[1])
-  expect_output(print(est), "Estimate", fixed = TRUE)
+  expect_silent(format(est_prefit)[1])
+  expect_output(print(est_prefit), "Estimate", fixed = TRUE)
   # check that influence curve worked
-  expect_length(est$eif, length(y))
+  expect_length(est_prefit$eif, length(y) / 2)
+  # check the actual value of the point estimate
+  # expect_equal(sprintf("%.15f", est_prefit$est), "0.311079577886281")
 })
 test_that("Cross-validated variable importance using externally-computed regressions and non-cross-fitted SEs works", {
-  est <- cv_vim(Y = y, cross_fitted_f1 = full_cv_preds, 
-                cross_fitted_f2 = reduced_cv_preds, f1 = fhat_ful,
-                f2 = fhat_red, indx = 2, delta = 0, V = V, type = "r_squared", 
-                cross_fitting_folds = cross_fitting_folds, 
-                sample_splitting_folds = sample_splitting_folds,
-                run_regression = FALSE, alpha = 0.05, na.rm = TRUE, cross_fitted_se = FALSE)
+  est_prefit_no_cf_se <- cv_vim(Y = y, cross_fitted_f1 = full_cv_preds, 
+                                cross_fitted_f2 = reduced_cv_preds, f1 = fhat_ful,
+                                f2 = fhat_red, indx = 2, delta = 0, V = V, type = "r_squared", 
+                                cross_fitting_folds = cross_fitting_folds, 
+                                sample_splitting_folds = sample_splitting_folds,
+                                run_regression = FALSE, alpha = 0.05, na.rm = TRUE, 
+                                cross_fitted_se = FALSE)
   # check variable importance estimate
-  expect_equal(est$est, r2_two, tolerance = 0.1, scale = 1)
+  expect_equal(est_prefit_no_cf_se$est, r2_two, tolerance = 0.1, scale = 1)
   # check full predictiveness estimate
-  expect_equal(est$predictiveness_full, 0.44, tolerance = 0.1, scale = 1)
+  expect_equal(est_prefit_no_cf_se$predictiveness_full, 0.44, tolerance = 0.1, scale = 1)
   # check that the SE, CI work
-  expect_length(est$ci, 2)
-  expect_length(est$se, 1)
+  expect_length(est_prefit_no_cf_se$ci, 2)
+  expect_length(est_prefit_no_cf_se$se, 1)
   # check that the p-value worked
-  expect_length(est$p_value, 1)
-  expect_true(est$test)
+  expect_length(est_prefit_no_cf_se$p_value, 1)
+  expect_true(est_prefit_no_cf_se$test)
   # check that printing, plotting, etc. work
-  expect_silent(format(est)[1])
-  expect_output(print(est), "Estimate", fixed = TRUE)
+  expect_silent(format(est_prefit_no_cf_se)[1])
+  expect_output(print(est_prefit_no_cf_se), "Estimate", fixed = TRUE)
   # check that influence curve worked
-  expect_length(est$eif, length(y))
+  expect_length(est_prefit_no_cf_se$eif, length(y) / 2)
+  # check the actual value of the point estimate
+  # expect_equal(sprintf("%.15f", est_prefit_no_cf_se$est), "0.311079577886281")
 })
 
 test_that("Measures of predictiveness work", {
