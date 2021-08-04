@@ -8,38 +8,37 @@ knitr::opts_chunk$set(
 library("vimp")
 library("SuperLearner")
 
-## ----load-heart-data----------------------------------------------------------
-## read in the data from the Elements website
-library("RCurl")
-heart_data <- read.csv(text = getURL("http://web.stanford.edu/~hastie/ElemStatLearn/datasets/SAheart.data"), header = TRUE, stringsAsFactors = FALSE)
-## minor data cleaning
-heart <- heart_data[, 2:dim(heart_data)[2]]
-heart$famhist <- ifelse(heart$famhist == "Present", 1, 0)
-x <- heart[, -ncol(heart)]
-# a simple library, to speed up the vignette;
-# in general, we recommend fitting a flexible library
-learners.2 <- c("SL.glm")
-set.seed(12345)
+## ----load-vrc01-data----------------------------------------------------------
+# read in the data
+data("vrc01")
+# subset to the columns of interest for this analysis
+library("dplyr")
+library("tidyselect")
+# retain only the columns of interest for this analysis
+y <- vrc01$ic50.censored
+X <- vrc01 %>%
+  select(starts_with("geog"), starts_with("subtype"), starts_with("length"))
+learners <- "SL.glm"
 
-## ----est-famhist-cond---------------------------------------------------------
+## ----est-subtype-01AE-cond, warning = FALSE-----------------------------------
 # note the use of a small V and a small number of SL folds, for illustration only
 set.seed(1234)
 V <- 2
 sl_cvcontrol <- list(V = 2)
-fam_vim_cond <- vimp_auc(Y = heart$chd, X = x, indx = 5, SL.library = learners.2, na.rm = TRUE, V = V, cvControl = sl_cvcontrol)
+subtype_01_AE_cond <- vimp_auc(Y = y, X = X, indx = 5, SL.library = learners, na.rm = TRUE, V = V, cvControl = sl_cvcontrol)
 
-## ----est-famhist-marg---------------------------------------------------------
+## ----est-subtype-01AE-marg, warning = FALSE-----------------------------------
 # note the use of a small V and a small number of SL folds, for illustration only
 set.seed(5678)
-fam_vim_marg <- vimp_auc(Y = heart$chd, X = x[, 5, drop = FALSE], indx = 1, SL.library = learners.2, na.rm = TRUE, V = V, cvControl = sl_cvcontrol)
+subtype_01_AE_marg <- vimp_auc(Y = y, X = X[, 5, drop = FALSE], indx = 1, SL.library = learners, na.rm = TRUE, V = V, cvControl = sl_cvcontrol)
 
-## ----est-famhist-spvim--------------------------------------------------------
+## ----est-famhist-spvim, warning = FALSE---------------------------------------
 set.seed(91011)
-all_vim_spvim <- sp_vim(Y = heart$chd, X = x, type = "r_squared", SL.library = learners.2, na.rm = TRUE, V = V, cvControl = sl_cvcontrol, env = environment())
+all_vim_spvim <- sp_vim(Y = y, X = X, type = "auc", SL.library = learners, na.rm = TRUE, V = V, cvControl = sl_cvcontrol, env = environment())
 
 ## ----show-ests----------------------------------------------------------------
-fam_vim_cond
-fam_vim_marg
+subtype_01_AE_cond
+subtype_01_AE_marg
 # note: need to look at row for s = 5
 all_vim_spvim
 

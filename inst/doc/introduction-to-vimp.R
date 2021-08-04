@@ -36,8 +36,8 @@ library("SuperLearner")
 # load specific algorithms
 library("ranger")
 
-## ----est-1--------------------------------------------------------------------
-est_1 <- vimp_rsquared(Y = y, X = x, indx = 1, run_regression = TRUE, 
+## ----est-1, warning = FALSE---------------------------------------------------
+est_1 <- vimp_rsquared(Y = y, X = x, indx = 1, run_regression = TRUE,
                        SL.library = c("SL.ranger", "SL.mean"), V = 2,
                        env = environment())
 
@@ -45,33 +45,31 @@ est_1 <- vimp_rsquared(Y = y, X = x, indx = 1, run_regression = TRUE,
 est_1
 print(est_1)
 
-## ----load-heart-data----------------------------------------------------------
-# read in the data from the Elements website
-library("RCurl")
-heart_data <- read.csv(text = getURL("http://web.stanford.edu/~hastie/ElemStatLearn/datasets/SAheart.data"), header = TRUE, stringsAsFactors = FALSE)
-# minor data cleaning
-heart <- heart_data[, 2:dim(heart_data)[2]]
-heart$famhist <- ifelse(heart$famhist == "Present", 1, 0)
-# sample-splitting folds for hypothesis testing
-heart_folds <- sample(rep(seq_len(2), length = dim(heart)[1]))
+## ----load-vrc01-data----------------------------------------------------------
+# read in the data
+data("vrc01")
 
-## ----est-heart-regressions-lm-------------------------------------------------
-X <- heart[, -ncol(heart)]
-lm_vim_sbp <- vim(Y = heart$chd, X = X, indx = 1, run_regression = TRUE, SL.library = "SL.lm", type = "r_squared")
-lm_vim_tob <- vim(Y = heart$chd, X = X, indx = 2, run_regression = TRUE, SL.library = "SL.lm", type = "r_squared")
-lm_vim_ldl <- vim(Y = heart$chd, X = X, indx = 3, run_regression = TRUE, SL.library = "SL.lm", type = "r_squared")
-lm_vim_adi <- vim(Y = heart$chd, X = X, indx = 4, run_regression = TRUE, SL.library = "SL.lm", type = "r_squared")
-lm_vim_fam <- vim(Y = heart$chd, X = X, indx = 5, run_regression = TRUE, SL.library = "SL.lm", type = "r_squared")
-lm_vim_tpa <- vim(Y = heart$chd, X = X, indx = 6, run_regression = TRUE, SL.library = "SL.lm", type = "r_squared")
-lm_vim_obe <- vim(Y = heart$chd, X = X, indx = 7, run_regression = TRUE, SL.library = "SL.lm", type = "r_squared")
-lm_vim_alc <- vim(Y = heart$chd, X = X, indx = 8, run_regression = TRUE, SL.library = "SL.lm", type = "r_squared")
-lm_vim_age <- vim(Y = heart$chd, X = X, indx = 9, run_regression = TRUE, SL.library = "SL.lm", type = "r_squared")
-
-# make a table with the estimates using the merge_vim() function
+## ----subset-data--------------------------------------------------------------
 library("dplyr")
-lm_mat <- merge_vim(lm_vim_sbp, lm_vim_tob, lm_vim_ldl, lm_vim_adi,
-                lm_vim_fam, lm_vim_tpa, lm_vim_obe, lm_vim_alc, lm_vim_age)
-# print out the matrix
+library("tidyselect")
+# retain only the columns of interest for this analysis
+y <- vrc01$ic50.censored
+X <- vrc01 %>%
+  select(starts_with("geog"), starts_with("subtype"), starts_with("length"))
+
+## ----est-regressions-lm, warning = FALSE--------------------------------------
+geog_indx <- max(which(grepl("geog", names(X))))
+set.seed(1234)
+for (i in seq_len(ncol(X) - geog_indx)) {
+  # note that we're using a small number of cross-fitting folds for speed
+  lm_vim <- vim(Y = y, X = X, indx = geog_indx + i, run_regression = TRUE, SL.library = "SL.lm", type = "r_squared", cvControl = list(V = 2))
+  if (i == 1) {
+    lm_mat <- lm_vim
+  } else {
+    lm_mat <- merge_vim(lm_mat, lm_vim)
+  }
+}
+# print out the importance
 lm_mat
 
 ## ----full-learner-lib---------------------------------------------------------
@@ -110,10 +108,10 @@ learners <- c("SL.glmnet", "SL.glmnet.0.25", "SL.glmnet.0.5", "SL.glmnet.0.75",
               "SL.gbm.1")
 
 ## ----vimp-with-sl-1, eval = FALSE---------------------------------------------
-#  vimp_rsquared(Y = heart$chd, X = X,
+#  vimp_rsquared(Y = y, X = X,
 #      indx = 5, run_regression = TRUE, SL.library = learners, V = 5)
 
-## ----vimp-with-sl-fam, message = FALSE----------------------------------------
+## ----vimp-with-sl-fam, message = FALSE, warning = FALSE-----------------------
 # small learners library
 learners.2 <- c("SL.ranger")
 # small number of cross-fitting folds
@@ -122,45 +120,40 @@ V <- 2
 sl_cvcontrol <- list(V = 2)
 
 # now estimate variable importance
+set.seed(5678)
 start_time <- Sys.time()
-fam_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 5, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+subtype_01_AE_vim <- vimp_rsquared(Y = y, X = X, indx = 5, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol, family = binomial())
 end_time <- Sys.time()
 
-## ----print-fam-vim------------------------------------------------------------
-fam_vim
+## ----print-vim----------------------------------------------------------------
+subtype_01_AE_vim
 
-## ----look-at-fam-ests---------------------------------------------------------
-head(fam_vim$full_fit)
-head(fam_vim$red_fit)
+## ----look-at-ests-------------------------------------------------------------
+head(subtype_01_AE_vim$full_fit[[1]])
+head(subtype_01_AE_vim$red_fit[[1]])
 
-## ----heart-sl-----------------------------------------------------------------
-# estimate variable importance
-tpa_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 6, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-alc_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 8, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-sbp_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 1, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-tob_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 2, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-ldl_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 3, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-adi_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 4, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-obe_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 7, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-age_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = 9, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+## ----vrc01-sl, warning = FALSE------------------------------------------------
+ests <- subtype_01_AE_vim
+set.seed(1234)
+for (i in seq_len(ncol(X) - geog_indx - 1)) {
+  # note that we're using a small number of cross-fitting folds for speed
+  this_vim <- vimp_rsquared(Y = y, X = X, indx = geog_indx + i + 1, run_regression = TRUE, SL.library = learners.2, V = V, cvControl = sl_cvcontrol, family = binomial())
+  ests <- merge_vim(ests, this_vim)
+}
 
-## ----heart-vim, fig.width = 8.5, fig.height = 8, message = FALSE--------------
-library("dplyr")
-library("tibble")
+## ----vrc01-vim, fig.width = 8.5, fig.height = 8, message = FALSE--------------
 library("ggplot2")
 library("cowplot")
 theme_set(theme_cowplot())
-# combine the objects together
-ests <- merge_vim(sbp_vim, tob_vim, ldl_vim, adi_vim,
-                fam_vim, tpa_vim, obe_vim, alc_vim, age_vim)
-all_vars <- c("Sys. blood press.", "Tobacco consump.", "LDL cholesterol",
-              "Adiposity", "Family history", "Type A behavior", "Obesity",
-              "Alcohol consump.", "Age")
+all_vars <- c(paste0("Subtype is ", c("01_AE", "02_AG", "07_BC", "A1", "A1C", "A1D",
+                                      "B", "C", "D", "O", "Other")),
+              paste0("Length of ", c("Env", "gp120", "V5", "V5 outliers", "Loop E",
+                                     "Loop E outliers")))
 
 est_plot_tib <- ests$mat %>%
   mutate(
     var_fct = rev(factor(s, levels = ests$mat$s,
-                     labels = all_vars[as.numeric(ests$mat$s)],
+                     labels = all_vars[as.numeric(ests$mat$s) - geog_indx],
                      ordered = TRUE))
   )
 
@@ -172,22 +165,23 @@ est_plot_tib %>%
   xlab(expression(paste("Variable importance estimates: ", R^2, sep = ""))) +
   ylab("") +
   ggtitle("Estimated individual feature importance") +
-  labs(subtitle = "in the South African heart disease study data")
+  labs(subtitle = "in the VRC01 data (considering only geographic confounders, subtype, and viral geometry)")
 
-## ----heart-group-vim, fig.width = 8.5, fig.height = 8-------------------------
+## ----vrc01-group-vim, fig.width = 8.5, fig.height = 8-------------------------
 # get the estimates
-behav_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = c(2, 6, 8), SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
-bios_vim <- vimp_rsquared(Y = heart$chd, X = X, indx = c(1, 3, 4, 5, 7, 9), SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+set.seed(91011)
+subtype_vim <- vimp_rsquared(Y = y, X = X, indx = 5:15, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
+geometry_vim <- vimp_rsquared(Y = y, X = X, indx = 16:21, SL.library = learners.2, na.rm = TRUE, env = environment(), V = V, cvControl = sl_cvcontrol)
 
 # combine and plot
-groups <- merge_vim(behav_vim, bios_vim)
-all_grp_nms <- c("Behavioral features", "Biological features")
+groups <- merge_vim(subtype_vim, geometry_vim)
+all_grp_nms <- c("Viral subtype", "Viral geometry")
 
 grp_plot_tib <- groups$mat %>%
   mutate(
     grp_fct = factor(case_when(
-      s == "2,6,8" ~ "1",
-      s == "1,3,4,5,7,9" ~ "2"
+      s == "5,6,7,8,9,10,11,12,13,14,15" ~ "1",
+      s == "16,17,18,19,20,21" ~ "2"
     ), levels = c("1", "2"),  labels = all_grp_nms, ordered = TRUE)
   )
 grp_plot_tib %>%
@@ -197,5 +191,5 @@ grp_plot_tib %>%
   xlab(expression(paste("Variable importance estimates: ", R^2, sep = ""))) +
   ylab("") +
   ggtitle("Estimated feature group importance") +
-  labs(subtitle = "in the South African heart disease study data")
+  labs(subtitle = "in the VRC01 data (considering only geographic confounders, subtype, and viral geometry)")
 

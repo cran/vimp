@@ -1,3 +1,15 @@
+# vimp 2.2.4
+
+## Major changes
+
+* None
+
+## Minor changes
+
+* Allow for odd number of folds in cross-fit and sampled-split VIM estimation
+* Add `vrc01` data as an exported object
+* Change dataset for vignettes to `vrc01` data
+
 # vimp 2.2.3
 
 ## Major changes
