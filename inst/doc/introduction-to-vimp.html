@@ -12,7 +12,7 @@
 
 <meta name="author" content="Brian D. Williamson" />
 
-<meta name="date" content="2021-08-03" />
+<meta name="date" content="2021-08-16" />
 
 <title>Introduction to vimp</title>
 
@@ -402,7 +402,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Introduction to <code>vimp</code></h1>
 <h4 class="author">Brian D. Williamson</h4>
-<h4 class="date">2021-08-03</h4>
+<h4 class="date">2021-08-16</h4>
 
 
 
@@ -624,7 +624,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb21-10"><a href="#cb21-10"></a>start_time &lt;-<span class="st"> </span><span class="kw">Sys.time</span>()</span>
 <span id="cb21-11"><a href="#cb21-11"></a>subtype_<span class="dv">01</span>_AE_vim &lt;-<span class="st"> </span><span class="kw">vimp_rsquared</span>(<span class="dt">Y =</span> y, <span class="dt">X =</span> X, <span class="dt">indx =</span> <span class="dv">5</span>, <span class="dt">SL.library =</span> learners<span class="fl">.2</span>, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>, <span class="dt">env =</span> <span class="kw">environment</span>(), <span class="dt">V =</span> V, <span class="dt">cvControl =</span> sl_cvcontrol, <span class="dt">family =</span> <span class="kw">binomial</span>())</span>
 <span id="cb21-12"><a href="#cb21-12"></a>end_time &lt;-<span class="st"> </span><span class="kw">Sys.time</span>()</span></code></pre></div>
-<p>This code takes approximately 0.663 seconds to run on a (not very fast) PC. I can display these estimates:</p>
+<p>This code takes approximately 0.646 seconds to run on a (not very fast) PC. I can display these estimates:</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>subtype_<span class="dv">01</span>_AE_vim</span></code></pre></div>
 <pre><code>## Variable importance estimates:
 ##       Estimate   SE         95% CI         VIMP &gt; 0 p-value   
