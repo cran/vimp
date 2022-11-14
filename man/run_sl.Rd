@@ -21,6 +21,7 @@ run_sl(
   weights = rep(1, nrow(X)),
   cross_fitted_se = TRUE,
   full = NULL,
+  vector = TRUE,
   ...
 )
 }
@@ -46,7 +47,7 @@ predictiveness estimation?}
 \item{ss_folds}{the sample-splitting folds; only used if
 \code{sample_splitting = TRUE}}
 
-\item{split}{the split to use for sample-splitting; only used if 
+\item{split}{the split to use for sample-splitting; only used if
 \code{sample_splitting = TRUE}}
 
 \item{verbose}{should we print progress? defaults to FALSE}
@@ -64,6 +65,8 @@ the standard error; otherwise, uses the entire dataset}
 If \code{NULL} (the default), this is determined automatically; a full
 regression corresponds to \code{s} being equal to the full covariate vector.
 For SPVIMs, can be entered manually.}
+
+\item{vector}{should we return a vector (\code{TRUE}) or a list (\code{FALSE})?}
 
 \item{...}{other arguments to Super Learner}
 }

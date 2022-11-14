@@ -8,11 +8,14 @@ extract_sampled_split_predictions(
   cvsl_obj = NULL,
   sample_splitting = TRUE,
   sample_splitting_folds = NULL,
-  full = TRUE
+  full = TRUE,
+  preds = NULL,
+  cross_fitting_folds = NULL,
+  vector = TRUE
 )
 }
 \arguments{
-\item{cvsl_obj}{An object of class \code{"CV.SuperLearner"}}
+\item{cvsl_obj}{An object of class \code{"CV.SuperLearner"}; must be entered unless \code{preds} is specified.}
 
 \item{sample_splitting}{logical; should we use sample-splitting or not?
 Defaults to \code{TRUE}.}
@@ -21,11 +24,17 @@ Defaults to \code{TRUE}.}
 
 \item{full}{logical; is this the fit to all covariates (\code{TRUE}) or not
 (\code{FALSE})?}
+
+\item{preds}{a vector of predictions; must be entered unless \code{cvsl_obj} is specified.}
+
+\item{cross_fitting_folds}{a vector of folds that were used in cross-fitting.}
+
+\item{vector}{logical; should we return a vector (where each element is
+the prediction when the corresponding row is in the validation fold) or a
+list?}
 }
 \value{
-The predictions on validation data in each split-sample fold; a
-  list of length two, each element of which is a list with the predictions
-  on the split-sample cross-validation data.
+The predictions on validation data in each split-sample fold.
 }
 \description{
 Use the cross-validated Super Learner and a set of specified sample-splitting

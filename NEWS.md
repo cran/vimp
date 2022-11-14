@@ -1,3 +1,79 @@
+# vimp 2.3.0
+
+## Major changes
+
+* Predictiveness measures now have their own `S3` class, which makes internal code cleaner and facilitates simpler addition of new predictiveness measures.
+* In this version, the default return value of `extract_sampled_split_predictions` is a vector, not a list. This facilitates proper use in the new version of the package.
+
+## Minor changes
+
+* You can now specify `truncate = FALSE` in `vimp_ci`
+
+# vimp 2.2.11
+
+## Major changes
+
+* You can now compute variable importance using the average value under the optimal treatment rule. This includes functions `measure_avg_value` (computes the average value and efficient influence function) and updates to `vim`, `cv_vim`, and `sp_vim`.
+
+## Minor changes
+
+* None
+
+# vimp 2.2.10
+
+## Major changes
+
+* None
+
+## Minor changes
+
+* Specify `method` and `family` for weighted EIF estimation within outer functions (`vim`, `cv_vim`, `sp_vim`) rather than the `measure*` functions. This allows compatibility for binary outcomes.
+* Added a vignette for coarsened-data settings.
+
+# vimp 2.2.9
+
+## Major changes
+
+* None
+
+## Minor changes
+
+* Allow for unequal numbers of cross-fitting folds between full and reduced predictiveness
+
+# vimp 2.2.8
+
+## Major changes
+
+* None
+
+## Minor changes
+
+* Return objects in `sp_vim` that are necessary to compute the test statistics
+
+# vimp 2.2.7
+
+## Major changes
+
+* None
+
+## Minor changes
+
+* Allow `parallel` argument to be specified for calls to `CV.SuperLearner` but not for calls to `SuperLearner`
+
+# vimp 2.2.6
+
+## Major changes
+
+* None
+
+## Minor changes
+
+* Allow different types of bootstrap interval (e.g., percentile) to be computed
+* More precise documentation for `Z` in coarsened-data settings; allow case-insensitive specification of covariate names/positions when creating `Z`
+* `V` defaults to 5 if no cross-fitting folds are specified externally
+* More precise documentation for `cross_fitted_f1` and `cross_fitted_f2` in `cv_vim`
+* Allow non-list `cross_fitted_f1` and `cross_fitted_f2` in `cv_vim`
+
 # vimp 2.2.5
 
 ## Major changes
@@ -90,7 +166,7 @@ None
 
 # vimp 2.1.8
 
-## Major changes 
+## Major changes
 None
 
 ## Minor changes
