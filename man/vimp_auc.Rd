@@ -18,13 +18,14 @@ vimp_auc(
   alpha = 0.05,
   delta = 0,
   na.rm = FALSE,
+  final_point_estimate = "split",
   cross_fitting_folds = NULL,
   sample_splitting_folds = NULL,
   stratified = TRUE,
   C = rep(1, length(Y)),
   Z = NULL,
   ipc_weights = rep(1, length(Y)),
-  scale = "identity",
+  scale = "logit",
   ipc_est_type = "aipw",
   scale_est = TRUE,
   cross_fitted_se = TRUE,
@@ -43,7 +44,10 @@ either (a) a vector, where each element is
 the predicted value when that observation is part of the validation fold;
 or (b) a list of length V, where each element in the list is a set of predictions on the
 corresponding validation data fold.
-If sample-splitting is requested, then these must be estimated specially; see Details.}
+If sample-splitting is requested, then these must be estimated specially; see Details. However,
+the resulting vector should be the same length as \code{Y}; if using a list, then the summed
+length of each element across the list should be the same length as \code{Y} (i.e.,
+each observation is included in the predictions).}
 
 \item{cross_fitted_f2}{the predicted values on validation data from a
 flexible estimation technique regressing either (a) the fitted values in
@@ -52,7 +56,10 @@ Provided as either (a) a vector, where each element is
 the predicted value when that observation is part of the validation fold;
 or (b) a list of length V, where each element in the list is a set of predictions on the
 corresponding validation data fold.
-If sample-splitting is requested, then these must be estimated specially; see Details.}
+If sample-splitting is requested, then these must be estimated specially; see Details. However,
+the resulting vector should be the same length as \code{Y}; if using a list, then the summed
+length of each element across the list should be the same length as \code{Y} (i.e.,
+each observation is included in the predictions).}
 
 \item{f1}{the fitted values from a flexible estimation technique
 regressing Y on X. If sample-splitting is requested, then these must be
@@ -91,6 +98,12 @@ importance < \eqn{\delta}); defaults to 0.}
 \item{na.rm}{should we remove NAs in the outcome and fitted values
 in computation? (defaults to \code{FALSE})}
 
+\item{final_point_estimate}{if sample splitting is used, should the final point estimates
+be based on only the sample-split folds used for inference (\code{"split"}, the default),
+or should they instead be based on the full dataset (\code{"full"}) or the average
+across the point estimates from each sample split (\code{"average"})? All three
+options result in valid point estimates -- sample-splitting is only required for valid inference.}
+
 \item{cross_fitting_folds}{the folds for cross-fitting. Only used if
 \code{run_regression = FALSE}.}
 
@@ -119,14 +132,14 @@ Assumed to be already inverted (i.e., ipc_weights = 1 / [estimated
 probability weights]).}
 
 \item{scale}{should CIs be computed on original ("identity") or
-logit ("logit") scale?}
+another scale? (options are "log" and "logit")}
 
 \item{ipc_est_type}{the type of procedure used for coarsened-at-random
 settings; options are "ipw" (for inverse probability weighting) or
 "aipw" (for augmented inverse probability weighting).
 Only used if \code{C} is not all equal to 1.}
 
-\item{scale_est}{should the point estimate be scaled to be greater than 0?
+\item{scale_est}{should the point estimate be scaled to be greater than or equal to 0?
 Defaults to \code{TRUE}.}
 
 \item{cross_fitted_se}{should we use cross-fitting to estimate the standard

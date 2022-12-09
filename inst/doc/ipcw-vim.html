@@ -12,7 +12,7 @@
 
 <meta name="author" content="Brian D. Williamson" />
 
-<meta name="date" content="2022-11-10" />
+<meta name="date" content="2022-12-09" />
 
 <title>Variable importance with coarsened data</title>
 
@@ -364,7 +364,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Variable importance with coarsened
 data</h1>
 <h4 class="author">Brian D. Williamson</h4>
-<h4 class="date">2022-11-10</h4>
+<h4 class="date">2022-12-09</h4>
 
 
 
@@ -449,8 +449,12 @@ missingness. We generate data as follows:</p>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>est <span class="ot">&lt;-</span> <span class="fu">vim</span>(<span class="at">Y =</span> obs_y, <span class="at">X =</span> x_df, <span class="at">indx =</span> <span class="dv">2</span>, <span class="at">type =</span> <span class="st">&quot;r_squared&quot;</span>, <span class="at">run_regression =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>           <span class="at">SL.library =</span> learners, <span class="at">alpha =</span> <span class="fl">0.05</span>, <span class="at">delta =</span> <span class="dv">0</span>, <span class="at">C =</span> C, <span class="at">Z =</span> <span class="fu">c</span>(<span class="st">&quot;Y&quot;</span>, <span class="st">&quot;1&quot;</span>),</span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>           <span class="at">ipc_weights =</span> ipc_weights, <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> V))</span></code></pre></div>
-<pre><code>## Warning in predict.lm(object, newdata, se.fit, scale = 1, type = if (type == :
-## prediction from a rank-deficient fit may be misleading</code></pre>
+<pre><code>## Warning: All algorithms have zero weight</code></pre>
+<pre><code>## Warning: All metalearner coefficients are zero, predictions will all be equal to
+## 0
+
+## Warning: All metalearner coefficients are zero, predictions will all be equal to
+## 0</code></pre>
 </div>
 <div id="example-with-two-phase-sampling" class="section level2">
 <h2>Example with two-phase sampling</h2>
@@ -460,38 +464,38 @@ missingness. We generate data as follows:</p>
 second-phase sample, and further measure covariate <code>X2</code> on
 these participants. This is an example of a two-phase study. We generate
 data as follows:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">4747</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">replicate</span>(p, stats<span class="sc">::</span><span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="dv">1</span>))</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># apply the function to the x&#39;s</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> x[, <span class="dv">1</span>] <span class="sc">+</span> <span class="fl">0.75</span> <span class="sc">*</span> x[, <span class="dv">2</span>] <span class="sc">+</span> stats<span class="sc">::</span><span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="dv">1</span>)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># make this a two-phase study, assume that X2 is only measured on</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># subjects in the second phase; note C = 1 is inclusion</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>C <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fu">exp</span>(y <span class="sc">+</span> <span class="fl">0.1</span> <span class="sc">*</span> x[, <span class="dv">1</span>]) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(y <span class="sc">+</span> <span class="fl">0.1</span> <span class="sc">*</span> x[, <span class="dv">1</span>])))</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>tmp_x <span class="ot">&lt;-</span> x</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>tmp_x[C <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> tmp_x</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>x_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(x)</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>full_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Y =</span> y, x_df, <span class="at">C =</span> C)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">4747</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">replicate</span>(p, stats<span class="sc">::</span><span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># apply the function to the x&#39;s</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> x[, <span class="dv">1</span>] <span class="sc">+</span> <span class="fl">0.75</span> <span class="sc">*</span> x[, <span class="dv">2</span>] <span class="sc">+</span> stats<span class="sc">::</span><span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># make this a two-phase study, assume that X2 is only measured on</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># subjects in the second phase; note C = 1 is inclusion</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>C <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fu">exp</span>(y <span class="sc">+</span> <span class="fl">0.1</span> <span class="sc">*</span> x[, <span class="dv">1</span>]) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(y <span class="sc">+</span> <span class="fl">0.1</span> <span class="sc">*</span> x[, <span class="dv">1</span>])))</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>tmp_x <span class="ot">&lt;-</span> x</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>tmp_x[C <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> tmp_x</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>x_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(x)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>full_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Y =</span> y, x_df, <span class="at">C =</span> C)</span></code></pre></div>
 <p>If we want to estimate variable importance of <code>X2</code>, we
 need to use the coarsened-data arguments in <code>vimp</code>. This can
 be accomplished in the following manner:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;vimp&quot;</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;SuperLearner&quot;</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># estimate the probability of being included only in the first phase sample</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>ipc_weights <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">predict</span>(<span class="fu">glm</span>(C <span class="sc">~</span> y <span class="sc">+</span> V1, <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>, <span class="at">data =</span> full_df),</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># set up the SL</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>learners <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>V <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># estimate vim for X2</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>est <span class="ot">&lt;-</span> <span class="fu">vim</span>(<span class="at">Y =</span> y, <span class="at">X =</span> x_df, <span class="at">indx =</span> <span class="dv">2</span>, <span class="at">type =</span> <span class="st">&quot;r_squared&quot;</span>, <span class="at">run_regression =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>           <span class="at">SL.library =</span> learners, <span class="at">alpha =</span> <span class="fl">0.05</span>, <span class="at">delta =</span> <span class="dv">0</span>, <span class="at">C =</span> C, <span class="at">Z =</span> <span class="fu">c</span>(<span class="st">&quot;Y&quot;</span>, <span class="st">&quot;1&quot;</span>),</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>           <span class="at">ipc_weights =</span> ipc_weights, <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> V), <span class="at">method =</span> <span class="st">&quot;method.CC_LS&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;vimp&quot;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;SuperLearner&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># estimate the probability of being included only in the first phase sample</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>ipc_weights <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">predict</span>(<span class="fu">glm</span>(C <span class="sc">~</span> y <span class="sc">+</span> V1, <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>, <span class="at">data =</span> full_df),</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># set up the SL</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>learners <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;SL.glm&quot;</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>V <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># estimate vim for X2</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>est <span class="ot">&lt;-</span> <span class="fu">vim</span>(<span class="at">Y =</span> y, <span class="at">X =</span> x_df, <span class="at">indx =</span> <span class="dv">2</span>, <span class="at">type =</span> <span class="st">&quot;r_squared&quot;</span>, <span class="at">run_regression =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>           <span class="at">SL.library =</span> learners, <span class="at">alpha =</span> <span class="fl">0.05</span>, <span class="at">delta =</span> <span class="dv">0</span>, <span class="at">C =</span> C, <span class="at">Z =</span> <span class="fu">c</span>(<span class="st">&quot;Y&quot;</span>, <span class="st">&quot;1&quot;</span>),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>           <span class="at">ipc_weights =</span> ipc_weights, <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> V), <span class="at">method =</span> <span class="st">&quot;method.CC_LS&quot;</span>)</span></code></pre></div>
 <pre><code>## Loading required package: quadprog</code></pre>
 <pre><code>## Warning: package &#39;quadprog&#39; was built under R version 4.0.3</code></pre>
 </div>

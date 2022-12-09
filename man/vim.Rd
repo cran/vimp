@@ -19,9 +19,11 @@ vim(
   na.rm = FALSE,
   sample_splitting = TRUE,
   sample_splitting_folds = NULL,
+  final_point_estimate = "split",
   stratified = FALSE,
   C = rep(1, length(Y)),
   Z = NULL,
+  ipc_scale = "identity",
   ipc_weights = rep(1, length(Y)),
   ipc_est_type = "aipw",
   scale_est = TRUE,
@@ -41,11 +43,15 @@ vim(
 variable should be part of \code{X}, with its name provided in \code{exposure_name}.}
 
 \item{f1}{the fitted values from a flexible estimation technique
-regressing Y on X.}
+regressing Y on X. A vector of the same length as \code{Y}; if sample-splitting
+is desired, then the value of \code{f1} at each position should be the result
+of predicting from a model trained without that observation.}
 
 \item{f2}{the fitted values from a flexible estimation technique
 regressing either (a) \code{f1} or (b) Y on X withholding the columns in
-\code{indx}.}
+\code{indx}. A vector of the same length as \code{Y}; if sample-splitting
+is desired, then the value of \code{f2} at each position should be the result
+of predicting from a model trained without that observation.}
 
 \item{indx}{the indices of the covariate(s) to calculate variable
 importance for; defaults to 1.}
@@ -71,20 +77,26 @@ Defaults to 0.05, corresponding to a 95\% confidence interval.}
 importance < \eqn{\delta}); defaults to 0.}
 
 \item{scale}{should CIs be computed on original ("identity") or
-logit ("logit") scale?}
+another scale? (options are "log" and "logit")}
 
 \item{na.rm}{should we remove NAs in the outcome and fitted values
 in computation? (defaults to \code{FALSE})}
 
 \item{sample_splitting}{should we use sample-splitting to estimate the full and
 reduced predictiveness? Defaults to \code{TRUE}, since inferences made using
-\code{sample_splitting = FALSE} will be invalid for variable with truly zero
+\code{sample_splitting = FALSE} will be invalid for variables with truly zero
 importance.}
 
 \item{sample_splitting_folds}{the folds used for sample-splitting;
 these identify the observations that should be used to evaluate
 predictiveness based on the full and reduced sets of covariates, respectively.
 Only used if \code{run_regression = FALSE}.}
+
+\item{final_point_estimate}{if sample splitting is used, should the final point estimates
+be based on only the sample-split folds used for inference (\code{"split"}, the default),
+or should they instead be based on the full dataset (\code{"full"}) or the average
+across the point estimates from each sample split (\code{"average"})? All three
+options result in valid point estimates -- sample-splitting is only required for valid inference.}
 
 \item{stratified}{if run_regression = TRUE, then should the generated
 folds be stratified based on the outcome (helps to ensure class balance
@@ -100,6 +112,9 @@ role in the coarsening mechanism. To specify the outcome, use \code{"Y"}; to
 specify covariates, use a character number corresponding to the desired
 position in X (e.g., \code{"1"}).}
 
+\item{ipc_scale}{what scale should the inverse probability weight correction be applied on (if any)?
+Defaults to "identity". (other options are "log" and "logit")}
+
 \item{ipc_weights}{weights for the computed influence curve (i.e.,
 inverse probability weights for coarsened-at-random settings).
 Assumed to be already inverted (i.e., ipc_weights = 1 / [estimated
@@ -110,7 +125,7 @@ settings; options are "ipw" (for inverse probability weighting) or
 "aipw" (for augmented inverse probability weighting).
 Only used if \code{C} is not all equal to 1.}
 
-\item{scale_est}{should the point estimate be scaled to be greater than 0?
+\item{scale_est}{should the point estimate be scaled to be greater than or equal to 0?
 Defaults to \code{TRUE}.}
 
 \item{nuisance_estimators_full}{(only used if \code{type = "average_value"})
@@ -219,29 +234,23 @@ est_1 <- vim(y, x, indx = 2, type = "accuracy",
 # using pre-computed fitted values
 set.seed(4747)
 V <- 2
-y_1 <- y[est_1$sample_splitting_folds == 1]
-y_2 <- y[est_1$sample_splitting_folds == 2]
-x_1 <- subset(x, est_1$sample_splitting_folds == 1)
-x_2 <- subset(x, est_1$sample_splitting_folds == 2)
-full_fit <- SuperLearner::SuperLearner(Y = y_1, X = x_1,
-                                       SL.library = learners,
-                                       cvControl = list(V = V))
+full_fit <- SuperLearner::CV.SuperLearner(Y = y, X = x,
+                                          SL.library = learners,
+                                          cvControl = list(V = 2),
+                                          innerCvControl = list(list(V = V)))
 full_fitted <- SuperLearner::predict.SuperLearner(full_fit)$pred
 # fit the data with only X1
-full_fit_2 <- SuperLearner::SuperLearner(Y = y_2, X = x_2,
-                                         SL.library = learners,
-                                         cvControl = list(V = V))
-full_fitted_2 <- SuperLearner::predict.SuperLearner(full_fit_2)$pred
-reduced_fit <- SuperLearner::SuperLearner(Y = full_fitted_2,
-                                          X = x_2[, -2, drop = FALSE],
-                                          SL.library = learners,
-                                          cvControl = list(V = V))
+reduced_fit <- SuperLearner::CV.SuperLearner(Y = full_fitted,
+                                             X = x[, -2, drop = FALSE],
+                                             SL.library = learners,
+                                             cvControl = list(V = 2, validRows = full_fit$folds),
+                                             innerCvControl = list(list(V = V)))
 reduced_fitted <- SuperLearner::predict.SuperLearner(reduced_fit)$pred
 
 est_2 <- vim(Y = y, f1 = full_fitted, f2 = reduced_fitted,
             indx = 2, run_regression = FALSE, alpha = 0.05,
             stratified = TRUE, type = "accuracy",
-            sample_splitting_folds = est_1$sample_splitting_folds)
+            sample_splitting_folds = get_cv_sl_folds(full_fit$folds))
 
 }
 \seealso{

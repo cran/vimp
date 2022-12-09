@@ -433,9 +433,14 @@ run_sl <- function(Y = NULL, X = NULL, V = 5, SL.library = "SL.glm",
     }
   }
   arg_lst_bool <- is.null(arg_lst$cvControl) |
-    ifelse(!is.null(arg_lst$cvControl), (arg_lst$cvControl$V != V) & (cross_fitted_se), FALSE)
+    ifelse(!is.null(arg_lst$cvControl), arg_lst$cvControl$V != V, FALSE)
   if (arg_lst_bool) {
-    arg_lst$cvControl <- list(V = ifelse(V == 1, 5, V))
+    if (V > 1) {
+      arg_lst$innerCvControl <- list(list(V = switch(as.numeric(!is.null(arg_lst$cvControl$V)) + 1, 5, arg_lst$cvControl$V),
+                                          stratifyCV = switch(as.numeric(!is.null(arg_lst$cvControl$stratifyCV)) + 1,
+                                                              FALSE, arg_lst$cvControl$stratifyCV)))
+    }
+    arg_lst$cvControl$V <- ifelse(V == 1, 5, V)
   }
   if (is.null(arg_lst$obsWeights)) {
     arg_lst$obsWeights <- weights
@@ -485,20 +490,16 @@ run_sl <- function(Y = NULL, X = NULL, V = 5, SL.library = "SL.glm",
       preds <- NA
       preds_vector <- NA
     } else {
-      pred_indx <- 1
       for (v in seq_len(V)) {
         train_v <- (cv_folds != v)
         test_v <- (cv_folds == v)
-        if (ss_folds[v] == split | !sample_splitting) {
-          fit <- this_sl_lib(Y = Y[train_v, , drop = FALSE],
-                             X = red_X[train_v, , drop = FALSE],
-                             newX = red_X[test_v, , drop = FALSE],
-                             family = full_arg_lst_cv$family,
-                             obsWeights = full_arg_lst_cv$obsWeights[train_v])
-          preds[[pred_indx]] <- fit$pred
-          preds_vector[test_v] <- fit$pred
-          pred_indx <- pred_indx + 1
-        }
+        fit <- this_sl_lib(Y = Y[train_v, , drop = FALSE],
+                           X = red_X[train_v, , drop = FALSE],
+                           newX = red_X[test_v, , drop = FALSE],
+                           family = full_arg_lst_cv$family,
+                           obsWeights = full_arg_lst_cv$obsWeights[train_v])
+        preds[[v]] <- fit$pred
+        preds_vector[test_v] <- fit$pred
       }
       preds_vector <- preds_vector[!is.na(preds_vector)]
     }
@@ -512,7 +513,7 @@ run_sl <- function(Y = NULL, X = NULL, V = 5, SL.library = "SL.glm",
     preds_vector <- NA
   } else {
     # fit a cross-validated Super Learner
-    fit <- do.call(SuperLearner::CV.SuperLearner, full_arg_lst_cv)
+    fit <- suppressWarnings(do.call(SuperLearner::CV.SuperLearner, full_arg_lst_cv))
     # extract predictions on correct sampled-split folds
     if (is.null(full)) {
       all_equal_s <- all.equal(s, 1:ncol(X))
@@ -521,11 +522,7 @@ run_sl <- function(Y = NULL, X = NULL, V = 5, SL.library = "SL.glm",
     } else {
       is_full <- full
     }
-    preds <- extract_sampled_split_predictions(
-      cvsl_obj = fit, sample_splitting = sample_splitting, full = is_full,
-      sample_splitting_folds = switch((sample_splitting) + 1, rep(1, V), ss_folds),
-      vector = vector
-    )
+    preds <- fit$SL.predict
   }
   # if cross_fitted_se, we're done; otherwise, re-fit to the entire dataset
   if (!cross_fitted_se) {
@@ -550,7 +547,7 @@ run_sl <- function(Y = NULL, X = NULL, V = 5, SL.library = "SL.glm",
       }
       fit_se <- do.call(
         SuperLearner::SuperLearner,
-        args = c(arg_lst, list(
+        args = c(arg_lst[-which(names(arg_lst) == "innerCvControl")], list(
           Y = Y[bool, ], X = red_X[bool, , drop = FALSE],
           SL.library = this_sl_lib
         ))

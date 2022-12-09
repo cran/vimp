@@ -14,6 +14,7 @@ cv_vim(
   indx = 1,
   V = ifelse(is.null(cross_fitting_folds), 5, length(unique(cross_fitting_folds))),
   sample_splitting = TRUE,
+  final_point_estimate = "split",
   sample_splitting_folds = NULL,
   cross_fitting_folds = NULL,
   stratified = FALSE,
@@ -26,6 +27,7 @@ cv_vim(
   na.rm = FALSE,
   C = rep(1, length(Y)),
   Z = NULL,
+  ipc_scale = "identity",
   ipc_weights = rep(1, length(Y)),
   ipc_est_type = "aipw",
   scale_est = TRUE,
@@ -51,7 +53,10 @@ either (a) a vector, where each element is
 the predicted value when that observation is part of the validation fold;
 or (b) a list of length V, where each element in the list is a set of predictions on the
 corresponding validation data fold.
-If sample-splitting is requested, then these must be estimated specially; see Details.}
+If sample-splitting is requested, then these must be estimated specially; see Details. However,
+the resulting vector should be the same length as \code{Y}; if using a list, then the summed
+length of each element across the list should be the same length as \code{Y} (i.e.,
+each observation is included in the predictions).}
 
 \item{cross_fitted_f2}{the predicted values on validation data from a
 flexible estimation technique regressing either (a) the fitted values in
@@ -60,7 +65,10 @@ Provided as either (a) a vector, where each element is
 the predicted value when that observation is part of the validation fold;
 or (b) a list of length V, where each element in the list is a set of predictions on the
 corresponding validation data fold.
-If sample-splitting is requested, then these must be estimated specially; see Details.}
+If sample-splitting is requested, then these must be estimated specially; see Details. However,
+the resulting vector should be the same length as \code{Y}; if using a list, then the summed
+length of each element across the list should be the same length as \code{Y} (i.e.,
+each observation is included in the predictions).}
 
 \item{f1}{the fitted values from a flexible estimation technique
 regressing Y on X. If sample-splitting is requested, then these must be
@@ -82,8 +90,14 @@ is done. See Details for a more detailed explanation.}
 
 \item{sample_splitting}{should we use sample-splitting to estimate the full and
 reduced predictiveness? Defaults to \code{TRUE}, since inferences made using
-\code{sample_splitting = FALSE} will be invalid for variable with truly zero
+\code{sample_splitting = FALSE} will be invalid for variables with truly zero
 importance.}
+
+\item{final_point_estimate}{if sample splitting is used, should the final point estimates
+be based on only the sample-split folds used for inference (\code{"split"}, the default),
+or should they instead be based on the full dataset (\code{"full"}) or the average
+across the point estimates from each sample split (\code{"average"})? All three
+options result in valid point estimates -- sample-splitting is only required for valid inference.}
 
 \item{sample_splitting_folds}{the folds used for sample-splitting;
 these identify the observations that should be used to evaluate
@@ -118,7 +132,7 @@ Defaults to 0.05, corresponding to a 95\% confidence interval.}
 importance < \eqn{\delta}); defaults to 0.}
 
 \item{scale}{should CIs be computed on original ("identity") or
-logit ("logit") scale?}
+another scale? (options are "log" and "logit")}
 
 \item{na.rm}{should we remove NAs in the outcome and fitted values
 in computation? (defaults to \code{FALSE})}
@@ -133,6 +147,9 @@ role in the coarsening mechanism. To specify the outcome, use \code{"Y"}; to
 specify covariates, use a character number corresponding to the desired
 position in X (e.g., \code{"1"}).}
 
+\item{ipc_scale}{what scale should the inverse probability weight correction be applied on (if any)?
+Defaults to "identity". (other options are "log" and "logit")}
+
 \item{ipc_weights}{weights for the computed influence curve (i.e.,
 inverse probability weights for coarsened-at-random settings).
 Assumed to be already inverted (i.e., ipc_weights = 1 / [estimated
@@ -143,7 +160,7 @@ settings; options are "ipw" (for inverse probability weighting) or
 "aipw" (for augmented inverse probability weighting).
 Only used if \code{C} is not all equal to 1.}
 
-\item{scale_est}{should the point estimate be scaled to be greater than 0?
+\item{scale_est}{should the point estimate be scaled to be greater than or equal to 0?
 Defaults to \code{TRUE}.}
 
 \item{nuisance_estimators_full}{(only used if \code{type = "average_value"})
@@ -302,6 +319,7 @@ full_cv_fit <- suppressWarnings(SuperLearner::CV.SuperLearner(
 Y = Y, X = x, SL.library = learners, cvControl = list(V = 2 * V),
 innerCvControl = list(list(V = V))
 ))
+full_cv_preds <- full_cv_fit$SL.predict
 # use the same cross-fitting folds for reduced
 reduced_cv_fit <- suppressWarnings(SuperLearner::CV.SuperLearner(
     Y = Y, X = x[, -indx, drop = FALSE], SL.library = learners,
@@ -310,17 +328,11 @@ reduced_cv_fit <- suppressWarnings(SuperLearner::CV.SuperLearner(
     ),
     innerCvControl = list(list(V = V))
 ))
-# extract the predictions on split portions of the data,
+reduced_cv_preds <- reduced_cv_fit$SL.predict
 # for hypothesis testing
 cross_fitting_folds <- get_cv_sl_folds(full_cv_fit$folds)
 set.seed(1234)
 sample_splitting_folds <- make_folds(unique(cross_fitting_folds), V = 2)
-full_cv_preds <- extract_sampled_split_predictions(
-    full_cv_fit, sample_splitting_folds = sample_splitting_folds, full = TRUE, vector = TRUE
-)
-reduced_cv_preds <- extract_sampled_split_predictions(
-    reduced_cv_fit, sample_splitting_folds = sample_splitting_folds, full = FALSE, vector = TRUE
-)
 set.seed(5678)
 est <- cv_vim(Y = y, cross_fitted_f1 = full_cv_preds,
 cross_fitted_f2 = reduced_cv_preds, indx = 2, delta = 0, V = V, type = "r_squared",

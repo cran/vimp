@@ -19,30 +19,39 @@ y <- vrc01$ic50.censored
 X <- vrc01 %>%
   select(starts_with("geog"), starts_with("subtype"), starts_with("length"))
 set.seed(1234)
-vrc01_folds <- make_folds(y = y, V = 2, stratified = TRUE)
+vrc01_folds <- make_folds(y = y, V = 2)
 
 ## ----est-regressions-lm, warning = FALSE--------------------------------------
 library("rlang")
 vrc01_subset <- vrc01 %>%
   select(ic50.censored, starts_with("geog"), starts_with("subtype"), starts_with("length")) %>%
   rename(y = ic50.censored)
-vrc01_1 <- subset(vrc01_subset, vrc01_folds == 1)
-full_mod <- lm(y ~ ., data = vrc01_1)
-full_fit <- predict(full_mod)
+# estimate prediction function on each subset, predict on held-out fold
+full_fit <- vector("numeric", length = nrow(vrc01))
+for (v in 1:2) {
+  train_v <- subset(vrc01_subset, vrc01_folds != v)
+  test_v <- subset(vrc01_subset, vrc01_folds == v)
+  full_mod <- glm(y ~ ., data = train_v)
+  full_fit[vrc01_folds == v] <- predict(full_mod, newdata = test_v)
+}
 
 # estimate the reduced conditional means for each of the individual variables
 # remove the outcome for the predictor matrix
-vrc01_2 <- subset(vrc01_subset, vrc01_folds == 2)
-X_2 <- vrc01_2 %>% select(-y)
-# get the full regression fit and use as outcome for reduced regressions; this may provide some stability in this analysis
-full_fit_2 <- predict(lm(y ~ ., data = vrc01_2))
 geog_indx <- max(which(grepl("geog", names(X))))
-for (i in seq_len(ncol(X_2) - geog_indx)) {
-  this_name <- names(X_2)[i + geog_indx]
-  red_fit <- predict(lm(full_fit_2 ~ ., data = X_2 %>% select(-!!this_name)))
+for (i in seq_len(ncol(X) - geog_indx)) {
+  this_name <- names(X)[i + geog_indx]
+  red_fit <- vector("numeric", length = nrow(vrc01))
+  for (v in 1:2) {
+    train_v <- subset(vrc01_subset, vrc01_folds != v)
+    test_v <- subset(vrc01_subset, vrc01_folds == v)
+    red_fit[vrc01_folds == v] <- suppressWarnings(
+      predict(glm(y ~ .,  data = train_v %>% select(-!!this_name)), 
+              newdata = test_v)  
+    )
+  }
   this_vim <- vim(Y = y, f1 = full_fit, f2 = red_fit, indx = i + geog_indx,
                   run_regression = FALSE, type = "r_squared",
-                  sample_splitting_folds = vrc01_folds)
+                  sample_splitting_folds = vrc01_folds, scale = "logit")
   if (i == 1) {
     lm_mat <- this_vim
   } else {
@@ -57,35 +66,30 @@ learners <- "SL.ranger"
 # estimate the full regression function
 V <- 2
 set.seed(4747)
-full_cv_fit <- SuperLearner::CV.SuperLearner(
+full_cv_fit <- suppressWarnings(
+  SuperLearner::CV.SuperLearner(
   Y = y, X = X, SL.library = learners, cvControl = list(V = 2 * V),
-  innerCvControl = list(list(V = V))
+  innerCvControl = list(list(V = V)), family = binomial()
+)
 )
 # get a numeric vector of cross-fitting folds
 cross_fitting_folds <- get_cv_sl_folds(full_cv_fit$folds)
 # get sample splitting folds
 set.seed(1234)
 sample_splitting_folds <- make_folds(unique(cross_fitting_folds), V = 2)
-# extract the predictions on split portions of the data, for hypothesis testing
-full_cv_preds <- extract_sampled_split_predictions(
-  cvsl_obj = full_cv_fit, sample_splitting = TRUE,
-  sample_splitting_folds = sample_splitting_folds, full = TRUE
-)
+full_cv_preds <- full_cv_fit$SL.predict
 
 ## ----estimate-reduced-regressions-with-cf, message = FALSE, warning = FALSE----
 vars <- names(X)[(geog_indx + 1):ncol(X)]
 set.seed(1234)
 for (i in seq_len(length(vars))) {
   # use "eval" and "parse" to assign the objects of interest to avoid duplicating code
-  eval(parse(text = paste0("reduced_", vars[i], "_cv_fit <- SuperLearner::CV.SuperLearner(
+  eval(parse(text = paste0("reduced_", vars[i], "_cv_fit <- suppressWarnings(SuperLearner::CV.SuperLearner(
   Y = y, X = X[, -(geog_indx + i), drop = FALSE], SL.library = learners,
   cvControl = SuperLearner::SuperLearner.CV.control(V = 2 * V, validRows = full_cv_fit$folds),
-  innerCvControl = list(list(V = V))
-)")))
-  eval(parse(text = paste0("reduced_", vars[i], "_cv_preds <- extract_sampled_split_predictions(
-  cvsl_obj = reduced_", vars[i], "_cv_fit, sample_splitting = TRUE,
-  sample_splitting_folds = sample_splitting_folds, full = FALSE
-)")))
+  innerCvControl = list(list(V = V)), family = binomial()
+))")))
+  eval(parse(text = paste0("reduced_", vars[i], "_cv_preds <- reduced_", vars[i], "_cv_fit$SL.predict")))
 }
 
 ## ----cf-vims------------------------------------------------------------------
@@ -95,7 +99,7 @@ for (i in seq_len(length(vars))) {
   cross_fitted_f1 = full_cv_preds, cross_fitted_f2 = reduced_", vars[i], "_cv_preds,
   indx = (geog_indx + i), cross_fitting_folds = cross_fitting_folds,
   sample_splitting_folds = sample_splitting_folds, run_regression = FALSE, alpha = 0.05,
-  V = V, na.rm = TRUE)")))
+  V = V, na.rm = TRUE, scale = 'logit')")))
 }
 cf_ests <- merge_vim(cf_subtype.is.01_AE_vim,
                      cf_subtype.is.02_AG_vim, cf_subtype.is.07_BC_vim,
@@ -134,33 +138,33 @@ cf_est_plot_tib %>%
 
 ## ----cf-group-vim, fig.width = 8.5, fig.height = 8, warning = FALSE-----------
 set.seed(91011)
-reduced_subtype_cv_fit <- SuperLearner::CV.SuperLearner(
+reduced_subtype_cv_fit <- suppressWarnings(
+  SuperLearner::CV.SuperLearner(
   Y = y, X = X[, -c(5:15), drop = FALSE], SL.library = learners,
   cvControl = SuperLearner::SuperLearner.CV.control(V = 2 * V, validRows = full_cv_fit$folds),
-  innerCvControl = list(list(V = V))
+  innerCvControl = list(list(V = V)), family = binomial()
 )
-reduced_subtype_cv_preds <- extract_sampled_split_predictions(
-  cvsl_obj = reduced_subtype_cv_fit, sample_splitting = TRUE,
-  sample_splitting_folds = sample_splitting_folds, full = FALSE
 )
-reduced_geometry_cv_fit <- SuperLearner::CV.SuperLearner(
+reduced_subtype_cv_preds <- reduced_subtype_cv_fit$SL.predict
+reduced_geometry_cv_fit <- suppressWarnings(
+  SuperLearner::CV.SuperLearner(
   Y = y, X = X[, -c(16:21), drop = FALSE], SL.library = learners,
   cvControl = SuperLearner::SuperLearner.CV.control(V = 2 * V, validRows = full_cv_fit$folds),
-  innerCvControl = list(list(V = V))
+  innerCvControl = list(list(V = V)), family = binomial()
 )
-reduced_geometry_cv_preds <- extract_sampled_split_predictions(
-  cvsl_obj = reduced_geometry_cv_fit, sample_splitting = TRUE,
-  sample_splitting_folds = sample_splitting_folds, full = FALSE
 )
+reduced_geometry_cv_preds <- reduced_geometry_cv_fit$SL.predict
 cf_subtype_vim <- vimp_rsquared(
   Y = y, cross_fitted_f1 = full_cv_preds, cross_fitted_f2 = reduced_subtype_cv_preds,
   indx = 5:15, run_regression = FALSE, V = V,
-  cross_fitting_folds = cross_fitting_folds, sample_splitting_folds = sample_splitting_folds
+  cross_fitting_folds = cross_fitting_folds, sample_splitting_folds = sample_splitting_folds,
+  scale = "logit"
 )
 cf_geometry_vim <- vimp_rsquared(
   Y = y, cross_fitted_f1 = full_cv_preds, cross_fitted_f2 = reduced_geometry_cv_preds,
   indx = 16:21, run_regression = FALSE, V = V,
-  cross_fitting_folds = cross_fitting_folds, sample_splitting_folds = sample_splitting_folds
+  cross_fitting_folds = cross_fitting_folds, sample_splitting_folds = sample_splitting_folds,
+  scale = "logit"
 )
 cf_groups <- merge_vim(cf_subtype_vim, cf_geometry_vim)
 all_grp_nms <- c("Viral subtype", "Viral geometry")

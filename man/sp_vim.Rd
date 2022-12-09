@@ -18,8 +18,10 @@ sp_vim(
   stratified = FALSE,
   verbose = FALSE,
   sample_splitting = TRUE,
+  final_point_estimate = "split",
   C = rep(1, length(Y)),
   Z = NULL,
+  ipc_scale = "identity",
   ipc_weights = rep(1, length(Y)),
   ipc_est_type = "aipw",
   scale = "identity",
@@ -73,8 +75,14 @@ progress? (defaults to \code{FALSE})}
 
 \item{sample_splitting}{should we use sample-splitting to estimate the full and
 reduced predictiveness? Defaults to \code{TRUE}, since inferences made using
-\code{sample_splitting = FALSE} will be invalid for variable with truly zero
+\code{sample_splitting = FALSE} will be invalid for variables with truly zero
 importance.}
+
+\item{final_point_estimate}{if sample splitting is used, should the final point estimates
+be based on only the sample-split folds used for inference (\code{"split"}, the default),
+or should they instead be based on the full dataset (\code{"full"}) or the average
+across the point estimates from each sample split (\code{"average"})? All three
+options result in valid point estimates -- sample-splitting is only required for valid inference.}
 
 \item{C}{the indicator of coarsening (1 denotes observed, 0 denotes
 unobserved).}
@@ -85,6 +93,9 @@ specifying the variable(s) among Y and X that are thought to play a
 role in the coarsening mechanism. To specify the outcome, use \code{"Y"}; to
 specify covariates, use a character number corresponding to the desired
 position in X (e.g., \code{"1"}).}
+
+\item{ipc_scale}{what scale should the inverse probability weight correction be applied on (if any)?
+Defaults to "identity". (other options are "log" and "logit")}
 
 \item{ipc_weights}{weights for the computed influence curve (i.e.,
 inverse probability weights for coarsened-at-random settings).
@@ -97,9 +108,9 @@ settings; options are "ipw" (for inverse probability weighting) or
 Only used if \code{C} is not all equal to 1.}
 
 \item{scale}{should CIs be computed on original ("identity") or
-logit ("logit") scale?}
+another scale? (options are "log" and "logit")}
 
-\item{scale_est}{should the point estimate be scaled to be greater than 0?
+\item{scale_est}{should the point estimate be scaled to be greater than or equal to 0?
 Defaults to \code{TRUE}.}
 
 \item{cross_fitted_se}{should we use cross-fitting to estimate the standard
