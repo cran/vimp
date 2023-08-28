@@ -8,7 +8,7 @@
 #'
 #' @section Author(s):
 #' \bold{Maintainer}: Brian Williamson \url{https://bdwilliamson.github.io/}
-#' \bold{Contributor}: Jean Feng \url{https://www.jeanfeng.com}
+#' \bold{Contributors}: Jean Feng \url{https://www.jeanfeng.com}, Charlie Wolock \url{https://cwolock.github.io/}
 #'
 #' Methodology authors:
 #' \itemize{
@@ -44,9 +44,10 @@
 #' We suggest several other packages: xgboost, ranger, gam, glmnet, polspline,
 #' and quadprog allow a flexible library of candidate learners in the Super
 #' Learner; ggplot2 and cowplot help with plotting variable
-#' importance estimates; testthat and covr help with unit tests; and
+#' importance estimates; testthat, WeightedROC, cvAUC, and covr help with unit tests; and
 #' knitr, rmarkdown, and tidyselect help with the vignettes and examples.
 #'
 #' @docType package
 #' @name vimp
-NULL
+#' @keywords internal
+"_PACKAGE"

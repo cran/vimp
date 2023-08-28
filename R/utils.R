@@ -84,6 +84,18 @@ check_fitted_values <- function(Y = NULL, f1 = NULL, f2 = NULL,
                   "regression on the reduced set of covariates, or (b) ",
                   "a regression of Y on the reduced set of covariates."))
     }
+    if (is.numeric(cross_fitted_f1)) {
+      if (length(cross_fitted_f1) != length(Y)) {
+        stop(paste0("There must be a predicted value for each observation ",
+                    "in the dataset."))
+      }
+    } else {
+      if (length(cross_fitted_f1) != V) {
+        stop(paste0("There must be a predicted value for each observation ",
+                    "in the dataset, in a list of length equal to the number ",
+                    "of cross-fitting folds."))
+      }
+    }
     if (is.null(f1) & !cross_fitted_se) {
       stop(paste0("You must enter an estimator of the population-optimal predictor",
                   " using all covariates."))
@@ -215,9 +227,14 @@ scale_est <- function(obs_est = NULL, grad = NULL, scale = "identity") {
 #' @inheritParams measure_accuracy
 #'
 #' @return the projection of the EIF onto the fully-observed variables
+#' @importFrom stats rnorm
 estimate_eif_projection <- function(obs_grad = NULL, C = NULL, Z = NULL,
                                     ipc_fit_type = NULL, ipc_eif_preds = NULL, ...) {
   if (ipc_fit_type != "external") {
+    if (length(unique(obs_grad)) == 1) {
+      noisy_obs_grad <- stats::rnorm(length(obs_grad), mean = obs_grad, sd = 1e-5)
+      obs_grad <- noisy_obs_grad
+    }
     ipc_eif_mod <- SuperLearner::SuperLearner(
       Y = obs_grad, X = Z[C == 1, , drop = FALSE], ...
     )

@@ -1,3 +1,20 @@
+# vimp 2.3.3
+
+## Major changes
+
+* Add clustered bootstrap and associated unit tests
+
+## Minor changes
+
+* Update software author list
+* Fix roxygen2 CRAN bug for package documentation
+
+# vimp 2.3.2
+
+## Major changes
+
+* Fixed bugs introduced in 2.3.1 for `final_point_estimate = "average"`
+
 # vimp 2.3.1
 
 ## Major changes

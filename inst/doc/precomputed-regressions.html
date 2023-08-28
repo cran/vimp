@@ -12,7 +12,7 @@
 
 <meta name="author" content="Brian D. Williamson" />
 
-<meta name="date" content="2022-12-09" />
+<meta name="date" content="2023-08-28" />
 
 <title>Using precomputed regression function estimates in vimp</title>
 
@@ -31,23 +31,23 @@ document.addEventListener('DOMContentLoaded', function(e) {
 </script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
 
 <style type="text/css">
-  code {
-    white-space: pre;
-  }
-  .sourceCode {
-    overflow: visible;
-  }
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
@@ -65,55 +65,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -147,25 +146,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 <style type="text/css">
-/* for pandoc --citeproc since 2.11 */
+
 div.csl-bib-body { }
 div.csl-entry {
-  clear: both;
+clear: both;
 }
 .hanging div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
+margin-left:2em;
+text-indent:-2em;
 }
 div.csl-left-margin {
-  min-width:2em;
-  float:left;
+min-width:2em;
+float:left;
 }
 div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
+margin-left:2em;
+padding-left:1em;
 }
 div.csl-indent {
-  margin-left: 2em;
+margin-left: 2em;
 }
 </style>
 
@@ -364,12 +363,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Using precomputed regression function
 estimates in <code>vimp</code></h1>
 <h4 class="author">Brian D. Williamson</h4>
-<h4 class="date">2022-12-09</h4>
+<h4 class="date">2023-08-28</h4>
 
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;vimp&quot;</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;SuperLearner&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;vimp&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;SuperLearner&quot;</span>)</span></code></pre></div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>In the <a href="introduction-to-vimp.html">main vignette</a>, we
@@ -383,17 +382,17 @@ vignette, I discuss how to use precomputed regression function estimates
 with <code>vimp</code>. The results of this analysis replicate the
 analysis in the <a href="introduction-to-vimp.html">main
 vignette</a>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read in the data</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;vrc01&quot;</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># subset to the columns of interest for this analysis</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;dplyr&quot;</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;tidyselect&quot;</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># retain only the columns of interest for this analysis</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> vrc01<span class="sc">$</span>ic50.censored</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> vrc01 <span class="sc">%&gt;%</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;geog&quot;</span>), <span class="fu">starts_with</span>(<span class="st">&quot;subtype&quot;</span>), <span class="fu">starts_with</span>(<span class="st">&quot;length&quot;</span>))</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>vrc01_folds <span class="ot">&lt;-</span> <span class="fu">make_folds</span>(<span class="at">y =</span> y, <span class="at">V =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># read in the data</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;vrc01&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co"># subset to the columns of interest for this analysis</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;dplyr&quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;tidyselect&quot;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co"># retain only the columns of interest for this analysis</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>y <span class="ot">&lt;-</span> vrc01<span class="sc">$</span>ic50.censored</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>X <span class="ot">&lt;-</span> vrc01 <span class="sc">%&gt;%</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;geog&quot;</span>), <span class="fu">starts_with</span>(<span class="st">&quot;subtype&quot;</span>), <span class="fu">starts_with</span>(<span class="st">&quot;length&quot;</span>))</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>vrc01_folds <span class="ot">&lt;-</span> <span class="fu">make_folds</span>(<span class="at">y =</span> y, <span class="at">V =</span> <span class="dv">2</span>)</span></code></pre></div>
 </div>
 <div id="using-precomputed-regression-function-estimates-without-cross-fitting" class="section level2">
 <h2>Using precomputed regression function estimates without
@@ -405,63 +404,63 @@ first start by fitting only linear regression models. In this section,
 we use the function <code>vim()</code>; this function does not use
 cross-fitting to estimate variable importance, and greatly simplifies
 the code for precomputed regression models.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;rlang&quot;</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>vrc01_subset <span class="ot">&lt;-</span> vrc01 <span class="sc">%&gt;%</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ic50.censored, <span class="fu">starts_with</span>(<span class="st">&quot;geog&quot;</span>), <span class="fu">starts_with</span>(<span class="st">&quot;subtype&quot;</span>), <span class="fu">starts_with</span>(<span class="st">&quot;length&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">y =</span> ic50.censored)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># estimate prediction function on each subset, predict on held-out fold</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>full_fit <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">&quot;numeric&quot;</span>, <span class="at">length =</span> <span class="fu">nrow</span>(vrc01))</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (v <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  train_v <span class="ot">&lt;-</span> <span class="fu">subset</span>(vrc01_subset, vrc01_folds <span class="sc">!=</span> v)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  test_v <span class="ot">&lt;-</span> <span class="fu">subset</span>(vrc01_subset, vrc01_folds <span class="sc">==</span> v)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  full_mod <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> ., <span class="at">data =</span> train_v)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  full_fit[vrc01_folds <span class="sc">==</span> v] <span class="ot">&lt;-</span> <span class="fu">predict</span>(full_mod, <span class="at">newdata =</span> test_v)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># estimate the reduced conditional means for each of the individual variables</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># remove the outcome for the predictor matrix</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>geog_indx <span class="ot">&lt;-</span> <span class="fu">max</span>(<span class="fu">which</span>(<span class="fu">grepl</span>(<span class="st">&quot;geog&quot;</span>, <span class="fu">names</span>(X))))</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">ncol</span>(X) <span class="sc">-</span> geog_indx)) {</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  this_name <span class="ot">&lt;-</span> <span class="fu">names</span>(X)[i <span class="sc">+</span> geog_indx]</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  red_fit <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">&quot;numeric&quot;</span>, <span class="at">length =</span> <span class="fu">nrow</span>(vrc01))</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (v <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    train_v <span class="ot">&lt;-</span> <span class="fu">subset</span>(vrc01_subset, vrc01_folds <span class="sc">!=</span> v)</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    test_v <span class="ot">&lt;-</span> <span class="fu">subset</span>(vrc01_subset, vrc01_folds <span class="sc">==</span> v)</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    red_fit[vrc01_folds <span class="sc">==</span> v] <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>      <span class="fu">predict</span>(<span class="fu">glm</span>(y <span class="sc">~</span> .,  <span class="at">data =</span> train_v <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-!!</span>this_name)), </span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>              <span class="at">newdata =</span> test_v)  </span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  this_vim <span class="ot">&lt;-</span> <span class="fu">vim</span>(<span class="at">Y =</span> y, <span class="at">f1 =</span> full_fit, <span class="at">f2 =</span> red_fit, <span class="at">indx =</span> i <span class="sc">+</span> geog_indx,</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>                  <span class="at">run_regression =</span> <span class="cn">FALSE</span>, <span class="at">type =</span> <span class="st">&quot;r_squared&quot;</span>,</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sample_splitting_folds =</span> vrc01_folds, <span class="at">scale =</span> <span class="st">&quot;logit&quot;</span>)</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (i <span class="sc">==</span> <span class="dv">1</span>) {</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    lm_mat <span class="ot">&lt;-</span> this_vim</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    lm_mat <span class="ot">&lt;-</span> <span class="fu">merge_vim</span>(lm_mat, this_vim)</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="co"># print out the matrix</span></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>lm_mat</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Variable importance estimates:</span></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        Estimate  SE         95% CI                  VIMP &gt; 0 p-value   </span></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 21 0.1709232 0.07644511 [0.06683172, 0.3724340] TRUE     0.01267934</span></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 17 0.1662249 0.07767087 [0.06232601, 0.3742047] TRUE     0.01617256</span></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 14 0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 9  0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 12 0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 5  0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 15 0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 8  0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 13 0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 11 0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 6  0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 10 0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 7  0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 20 0.1638964 0.07774146 [0.06057232, 0.3734127] TRUE     0.01750584</span></span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 19 0.1626376 0.07934585 [0.05837835, 0.3782914] TRUE     0.02019537</span></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 16 0.1597680 0.07730619 [0.05794103, 0.3702210] TRUE     0.01938165</span></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; s = 18 0.1542358 0.07595770 [0.05504322, 0.3634327] TRUE     0.02115043</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;rlang&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>vrc01_subset <span class="ot">&lt;-</span> vrc01 <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="fu">select</span>(ic50.censored, <span class="fu">starts_with</span>(<span class="st">&quot;geog&quot;</span>), <span class="fu">starts_with</span>(<span class="st">&quot;subtype&quot;</span>), <span class="fu">starts_with</span>(<span class="st">&quot;length&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">y =</span> ic50.censored)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co"># estimate prediction function on each subset, predict on held-out fold</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>full_fit <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">&quot;numeric&quot;</span>, <span class="at">length =</span> <span class="fu">nrow</span>(vrc01))</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="cf">for</span> (v <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  train_v <span class="ot">&lt;-</span> <span class="fu">subset</span>(vrc01_subset, vrc01_folds <span class="sc">!=</span> v)</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  test_v <span class="ot">&lt;-</span> <span class="fu">subset</span>(vrc01_subset, vrc01_folds <span class="sc">==</span> v)</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  full_mod <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> ., <span class="at">data =</span> train_v)</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  full_fit[vrc01_folds <span class="sc">==</span> v] <span class="ot">&lt;-</span> <span class="fu">predict</span>(full_mod, <span class="at">newdata =</span> test_v)</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>}</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co"># estimate the reduced conditional means for each of the individual variables</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co"># remove the outcome for the predictor matrix</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>geog_indx <span class="ot">&lt;-</span> <span class="fu">max</span>(<span class="fu">which</span>(<span class="fu">grepl</span>(<span class="st">&quot;geog&quot;</span>, <span class="fu">names</span>(X))))</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">ncol</span>(X) <span class="sc">-</span> geog_indx)) {</span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>  this_name <span class="ot">&lt;-</span> <span class="fu">names</span>(X)[i <span class="sc">+</span> geog_indx]</span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>  red_fit <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">&quot;numeric&quot;</span>, <span class="at">length =</span> <span class="fu">nrow</span>(vrc01))</span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>  <span class="cf">for</span> (v <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>    train_v <span class="ot">&lt;-</span> <span class="fu">subset</span>(vrc01_subset, vrc01_folds <span class="sc">!=</span> v)</span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>    test_v <span class="ot">&lt;-</span> <span class="fu">subset</span>(vrc01_subset, vrc01_folds <span class="sc">==</span> v)</span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>    red_fit[vrc01_folds <span class="sc">==</span> v] <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(</span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>      <span class="fu">predict</span>(<span class="fu">glm</span>(y <span class="sc">~</span> .,  <span class="at">data =</span> train_v <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-!!</span>this_name)), </span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>              <span class="at">newdata =</span> test_v)  </span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>    )</span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>  }</span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a>  this_vim <span class="ot">&lt;-</span> <span class="fu">vim</span>(<span class="at">Y =</span> y, <span class="at">f1 =</span> full_fit, <span class="at">f2 =</span> red_fit, <span class="at">indx =</span> i <span class="sc">+</span> geog_indx,</span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a>                  <span class="at">run_regression =</span> <span class="cn">FALSE</span>, <span class="at">type =</span> <span class="st">&quot;r_squared&quot;</span>,</span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a>                  <span class="at">sample_splitting_folds =</span> vrc01_folds, <span class="at">scale =</span> <span class="st">&quot;logit&quot;</span>)</span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a>  <span class="cf">if</span> (i <span class="sc">==</span> <span class="dv">1</span>) {</span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a>    lm_mat <span class="ot">&lt;-</span> this_vim</span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a>    lm_mat <span class="ot">&lt;-</span> <span class="fu">merge_vim</span>(lm_mat, this_vim)</span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a>  }</span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a>}</span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co"># print out the matrix</span></span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a>lm_mat</span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co">#&gt; Variable importance estimates:</span></span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a><span class="co">#&gt;        Estimate  SE         95% CI                  VIMP &gt; 0 p-value   </span></span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a><span class="co">#&gt; s = 21 0.1709232 0.07644511 [0.06683172, 0.3724340] TRUE     0.01267934</span></span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a><span class="co">#&gt; s = 17 0.1662249 0.07767087 [0.06232601, 0.3742047] TRUE     0.01617256</span></span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a><span class="co">#&gt; s = 9  0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
+<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a><span class="co">#&gt; s = 14 0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
+<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a><span class="co">#&gt; s = 5  0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
+<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a><span class="co">#&gt; s = 12 0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
+<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a><span class="co">#&gt; s = 11 0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
+<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a><span class="co">#&gt; s = 8  0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
+<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a><span class="co">#&gt; s = 15 0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
+<span id="cb3-50"><a href="#cb3-50" tabindex="-1"></a><span class="co">#&gt; s = 10 0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
+<span id="cb3-51"><a href="#cb3-51" tabindex="-1"></a><span class="co">#&gt; s = 13 0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
+<span id="cb3-52"><a href="#cb3-52" tabindex="-1"></a><span class="co">#&gt; s = 7  0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
+<span id="cb3-53"><a href="#cb3-53" tabindex="-1"></a><span class="co">#&gt; s = 6  0.1641874 0.07765390 [0.06085506, 0.3732460] TRUE     0.01724274</span></span>
+<span id="cb3-54"><a href="#cb3-54" tabindex="-1"></a><span class="co">#&gt; s = 20 0.1638964 0.07774146 [0.06057232, 0.3734127] TRUE     0.01750584</span></span>
+<span id="cb3-55"><a href="#cb3-55" tabindex="-1"></a><span class="co">#&gt; s = 19 0.1626376 0.07934585 [0.05837835, 0.3782914] TRUE     0.02019537</span></span>
+<span id="cb3-56"><a href="#cb3-56" tabindex="-1"></a><span class="co">#&gt; s = 16 0.1597680 0.07730619 [0.05794103, 0.3702210] TRUE     0.01938165</span></span>
+<span id="cb3-57"><a href="#cb3-57" tabindex="-1"></a><span class="co">#&gt; s = 18 0.1542358 0.07595770 [0.05504322, 0.3634327] TRUE     0.02115043</span></span></code></pre></div>
 </div>
 </div>
 <div id="estimating-variable-importance-for-a-single-variable-using-precomputed-regression-function-estimates" class="section level2">
@@ -482,179 +481,179 @@ folds for cross-fitted variable importance estimation (as we did in the
 entails running <code>CV.SuperLearner</code> with <span class="math inline">\(2V = 4\)</span> folds.</p>
 <p>First, we estimate the regression function based on all
 variables:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>learners <span class="ot">&lt;-</span> <span class="st">&quot;SL.ranger&quot;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># estimate the full regression function</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>V <span class="ot">&lt;-</span> <span class="dv">2</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">4747</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>full_cv_fit <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  SuperLearner<span class="sc">::</span><span class="fu">CV.SuperLearner</span>(</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y =</span> y, <span class="at">X =</span> X, <span class="at">SL.library =</span> learners, <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> <span class="dv">2</span> <span class="sc">*</span> V),</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">innerCvControl =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="at">V =</span> V)), <span class="at">family =</span> <span class="fu">binomial</span>()</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># get a numeric vector of cross-fitting folds</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>cross_fitting_folds <span class="ot">&lt;-</span> <span class="fu">get_cv_sl_folds</span>(full_cv_fit<span class="sc">$</span>folds)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># get sample splitting folds</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>sample_splitting_folds <span class="ot">&lt;-</span> <span class="fu">make_folds</span>(<span class="fu">unique</span>(cross_fitting_folds), <span class="at">V =</span> <span class="dv">2</span>)</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>full_cv_preds <span class="ot">&lt;-</span> full_cv_fit<span class="sc">$</span>SL.predict</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>learners <span class="ot">&lt;-</span> <span class="st">&quot;SL.ranger&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co"># estimate the full regression function</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>V <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">4747</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>full_cv_fit <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  SuperLearner<span class="sc">::</span><span class="fu">CV.SuperLearner</span>(</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="at">Y =</span> y, <span class="at">X =</span> X, <span class="at">SL.library =</span> learners, <span class="at">cvControl =</span> <span class="fu">list</span>(<span class="at">V =</span> <span class="dv">2</span> <span class="sc">*</span> V),</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  <span class="at">innerCvControl =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="at">V =</span> V)), <span class="at">family =</span> <span class="fu">binomial</span>()</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>)</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>)</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co"># get a numeric vector of cross-fitting folds</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>cross_fitting_folds <span class="ot">&lt;-</span> <span class="fu">get_cv_sl_folds</span>(full_cv_fit<span class="sc">$</span>folds)</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co"># get sample splitting folds</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>sample_splitting_folds <span class="ot">&lt;-</span> <span class="fu">make_folds</span>(<span class="fu">unique</span>(cross_fitting_folds), <span class="at">V =</span> <span class="dv">2</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>full_cv_preds <span class="ot">&lt;-</span> full_cv_fit<span class="sc">$</span>SL.predict</span></code></pre></div>
 <p>Next, to estimate the importance of each variable, we need to
 estimate the reduced regression function for each variable:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>vars <span class="ot">&lt;-</span> <span class="fu">names</span>(X)[(geog_indx <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span><span class="fu">ncol</span>(X)]</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">length</span>(vars))) {</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># use &quot;eval&quot; and &quot;parse&quot; to assign the objects of interest to avoid duplicating code</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">eval</span>(<span class="fu">parse</span>(<span class="at">text =</span> <span class="fu">paste0</span>(<span class="st">&quot;reduced_&quot;</span>, vars[i], <span class="st">&quot;_cv_fit &lt;- suppressWarnings(SuperLearner::CV.SuperLearner(</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="st">  Y = y, X = X[, -(geog_indx + i), drop = FALSE], SL.library = learners,</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="st">  cvControl = SuperLearner::SuperLearner.CV.control(V = 2 * V, validRows = full_cv_fit$folds),</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="st">  innerCvControl = list(list(V = V)), family = binomial()</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="st">))&quot;</span>)))</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">eval</span>(<span class="fu">parse</span>(<span class="at">text =</span> <span class="fu">paste0</span>(<span class="st">&quot;reduced_&quot;</span>, vars[i], <span class="st">&quot;_cv_preds &lt;- reduced_&quot;</span>, vars[i], <span class="st">&quot;_cv_fit$SL.predict&quot;</span>)))</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>vars <span class="ot">&lt;-</span> <span class="fu">names</span>(X)[(geog_indx <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span><span class="fu">ncol</span>(X)]</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">length</span>(vars))) {</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="co"># use &quot;eval&quot; and &quot;parse&quot; to assign the objects of interest to avoid duplicating code</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="fu">eval</span>(<span class="fu">parse</span>(<span class="at">text =</span> <span class="fu">paste0</span>(<span class="st">&quot;reduced_&quot;</span>, vars[i], <span class="st">&quot;_cv_fit &lt;- suppressWarnings(SuperLearner::CV.SuperLearner(</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="st">  Y = y, X = X[, -(geog_indx + i), drop = FALSE], SL.library = learners,</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="st">  cvControl = SuperLearner::SuperLearner.CV.control(V = 2 * V, validRows = full_cv_fit$folds),</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="st">  innerCvControl = list(list(V = V)), family = binomial()</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="st">))&quot;</span>)))</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  <span class="fu">eval</span>(<span class="fu">parse</span>(<span class="at">text =</span> <span class="fu">paste0</span>(<span class="st">&quot;reduced_&quot;</span>, vars[i], <span class="st">&quot;_cv_preds &lt;- reduced_&quot;</span>, vars[i], <span class="st">&quot;_cv_fit$SL.predict&quot;</span>)))</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>}</span></code></pre></div>
 <p>Then we can plug these values into <code>vimp_rsquared()</code> (or
 equivalently, <code>cv_vim()</code> with
 <code>type = &quot;r_squared&quot;</code>) as follows:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">length</span>(vars))) {</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># again, use &quot;eval&quot; and &quot;parse&quot; to assign the objects of interest to avoid duplicating code</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">eval</span>(<span class="fu">parse</span>(<span class="at">text =</span> <span class="fu">paste0</span>(<span class="st">&quot;cf_&quot;</span>, vars[i], <span class="st">&quot;_vim &lt;- vimp_rsquared(Y = y,</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">  cross_fitted_f1 = full_cv_preds, cross_fitted_f2 = reduced_&quot;</span>, vars[i], <span class="st">&quot;_cv_preds,</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="st">  indx = (geog_indx + i), cross_fitting_folds = cross_fitting_folds,</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="st">  sample_splitting_folds = sample_splitting_folds, run_regression = FALSE, alpha = 0.05,</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="st">  V = V, na.rm = TRUE, scale = &#39;logit&#39;)&quot;</span>)))</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>cf_ests <span class="ot">&lt;-</span> <span class="fu">merge_vim</span>(cf_subtype.is<span class="fl">.01</span>_AE_vim,</span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>                     cf_subtype.is<span class="fl">.02</span>_AG_vim, cf_subtype.is<span class="fl">.07</span>_BC_vim,</span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>                     cf_subtype.is.A1_vim, cf_subtype.is.A1C_vim,</span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>                     cf_subtype.is.A1D_vim, cf_subtype.is.B_vim,</span>
-<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>                     cf_subtype.is.C_vim, cf_subtype.is.D_vim,</span>
-<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>                     cf_subtype.is.O_vim, cf_subtype.is.Other_vim,</span>
-<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>                     cf_length.env_vim, cf_length.gp120_vim, cf_length.loop.e_vim,</span>
-<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>                     cf_length.loop.e.outliers_vim, cf_length.v5_vim,</span>
-<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>                     cf_length.v5.outliers_vim)</span>
-<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>all_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">&quot;Subtype is &quot;</span>, <span class="fu">c</span>(<span class="st">&quot;01_AE&quot;</span>, <span class="st">&quot;02_AG&quot;</span>, <span class="st">&quot;07_BC&quot;</span>, <span class="st">&quot;A1&quot;</span>, <span class="st">&quot;A1C&quot;</span>, <span class="st">&quot;A1D&quot;</span>,</span>
-<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;O&quot;</span>, <span class="st">&quot;Other&quot;</span>)),</span>
-<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>              <span class="fu">paste0</span>(<span class="st">&quot;Length of &quot;</span>, <span class="fu">c</span>(<span class="st">&quot;Env&quot;</span>, <span class="st">&quot;gp120&quot;</span>, <span class="st">&quot;V5&quot;</span>, <span class="st">&quot;V5 outliers&quot;</span>, <span class="st">&quot;Loop E&quot;</span>,</span>
-<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">&quot;Loop E outliers&quot;</span>)))</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="fu">length</span>(vars))) {</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="co"># again, use &quot;eval&quot; and &quot;parse&quot; to assign the objects of interest to avoid duplicating code</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="fu">eval</span>(<span class="fu">parse</span>(<span class="at">text =</span> <span class="fu">paste0</span>(<span class="st">&quot;cf_&quot;</span>, vars[i], <span class="st">&quot;_vim &lt;- vimp_rsquared(Y = y,</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="st">  cross_fitted_f1 = full_cv_preds, cross_fitted_f2 = reduced_&quot;</span>, vars[i], <span class="st">&quot;_cv_preds,</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="st">  indx = (geog_indx + i), cross_fitting_folds = cross_fitting_folds,</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="st">  sample_splitting_folds = sample_splitting_folds, run_regression = FALSE, alpha = 0.05,</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="st">  V = V, na.rm = TRUE, scale = &#39;logit&#39;)&quot;</span>)))</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>}</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a></span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a></span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a></span>
+<span id="cb6-39"><a href="#cb6-39" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-40"><a href="#cb6-40" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a></span>
+<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-43"><a href="#cb6-43" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-44"><a href="#cb6-44" tabindex="-1"></a></span>
+<span id="cb6-45"><a href="#cb6-45" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-46"><a href="#cb6-46" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-47"><a href="#cb6-47" tabindex="-1"></a></span>
+<span id="cb6-48"><a href="#cb6-48" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-49"><a href="#cb6-49" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-50"><a href="#cb6-50" tabindex="-1"></a></span>
+<span id="cb6-51"><a href="#cb6-51" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-52"><a href="#cb6-52" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-53"><a href="#cb6-53" tabindex="-1"></a></span>
+<span id="cb6-54"><a href="#cb6-54" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-55"><a href="#cb6-55" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-56"><a href="#cb6-56" tabindex="-1"></a>cf_ests <span class="ot">&lt;-</span> <span class="fu">merge_vim</span>(cf_subtype.is<span class="fl">.01</span>_AE_vim,</span>
+<span id="cb6-57"><a href="#cb6-57" tabindex="-1"></a>                     cf_subtype.is<span class="fl">.02</span>_AG_vim, cf_subtype.is<span class="fl">.07</span>_BC_vim,</span>
+<span id="cb6-58"><a href="#cb6-58" tabindex="-1"></a>                     cf_subtype.is.A1_vim, cf_subtype.is.A1C_vim,</span>
+<span id="cb6-59"><a href="#cb6-59" tabindex="-1"></a>                     cf_subtype.is.A1D_vim, cf_subtype.is.B_vim,</span>
+<span id="cb6-60"><a href="#cb6-60" tabindex="-1"></a>                     cf_subtype.is.C_vim, cf_subtype.is.D_vim,</span>
+<span id="cb6-61"><a href="#cb6-61" tabindex="-1"></a>                     cf_subtype.is.O_vim, cf_subtype.is.Other_vim,</span>
+<span id="cb6-62"><a href="#cb6-62" tabindex="-1"></a>                     cf_length.env_vim, cf_length.gp120_vim, cf_length.loop.e_vim,</span>
+<span id="cb6-63"><a href="#cb6-63" tabindex="-1"></a>                     cf_length.loop.e.outliers_vim, cf_length.v5_vim,</span>
+<span id="cb6-64"><a href="#cb6-64" tabindex="-1"></a>                     cf_length.v5.outliers_vim)</span>
+<span id="cb6-65"><a href="#cb6-65" tabindex="-1"></a>all_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">&quot;Subtype is &quot;</span>, <span class="fu">c</span>(<span class="st">&quot;01_AE&quot;</span>, <span class="st">&quot;02_AG&quot;</span>, <span class="st">&quot;07_BC&quot;</span>, <span class="st">&quot;A1&quot;</span>, <span class="st">&quot;A1C&quot;</span>, <span class="st">&quot;A1D&quot;</span>,</span>
+<span id="cb6-66"><a href="#cb6-66" tabindex="-1"></a>                                      <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;O&quot;</span>, <span class="st">&quot;Other&quot;</span>)),</span>
+<span id="cb6-67"><a href="#cb6-67" tabindex="-1"></a>              <span class="fu">paste0</span>(<span class="st">&quot;Length of &quot;</span>, <span class="fu">c</span>(<span class="st">&quot;Env&quot;</span>, <span class="st">&quot;gp120&quot;</span>, <span class="st">&quot;V5&quot;</span>, <span class="st">&quot;V5 outliers&quot;</span>, <span class="st">&quot;Loop E&quot;</span>,</span>
+<span id="cb6-68"><a href="#cb6-68" tabindex="-1"></a>                                     <span class="st">&quot;Loop E outliers&quot;</span>)))</span></code></pre></div>
 <p>And we can view them all simultaneously by plotting:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;ggplot2&quot;</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;cowplot&quot;</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_cowplot</span>())</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>cf_est_plot_tib <span class="ot">&lt;-</span> cf_ests<span class="sc">$</span>mat <span class="sc">%&gt;%</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">var_fct =</span> <span class="fu">rev</span>(<span class="fu">factor</span>(s, <span class="at">levels =</span> cf_ests<span class="sc">$</span>mat<span class="sc">$</span>s,</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">labels =</span> all_vars[<span class="fu">as.numeric</span>(cf_ests<span class="sc">$</span>mat<span class="sc">$</span>s) <span class="sc">-</span> geog_indx],</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">ordered =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># plot</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>cf_est_plot_tib <span class="sc">%&gt;%</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> est, <span class="at">y =</span> var_fct)) <span class="sc">+</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbarh</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> cil, <span class="at">xmax =</span> ciu)) <span class="sc">+</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Variable importance estimates: &quot;</span>, R<span class="sc">^</span><span class="dv">2</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>))) <span class="sc">+</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;&quot;</span>) <span class="sc">+</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Estimated individual feature importance&quot;</span>) <span class="sc">+</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="st">&quot;in the VRC01 data (considering only geographic confounders, subtype, and viral geometry)&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;ggplot2&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;cowplot&quot;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_cowplot</span>())</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>cf_est_plot_tib <span class="ot">&lt;-</span> cf_ests<span class="sc">$</span>mat <span class="sc">%&gt;%</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>    <span class="at">var_fct =</span> <span class="fu">rev</span>(<span class="fu">factor</span>(s, <span class="at">levels =</span> cf_ests<span class="sc">$</span>mat<span class="sc">$</span>s,</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>                     <span class="at">labels =</span> all_vars[<span class="fu">as.numeric</span>(cf_ests<span class="sc">$</span>mat<span class="sc">$</span>s) <span class="sc">-</span> geog_indx],</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>                     <span class="at">ordered =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>  )</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co"># plot</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>cf_est_plot_tib <span class="sc">%&gt;%</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> est, <span class="at">y =</span> var_fct)) <span class="sc">+</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="fu">geom_errorbarh</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> cil, <span class="at">xmax =</span> ciu)) <span class="sc">+</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Variable importance estimates: &quot;</span>, R<span class="sc">^</span><span class="dv">2</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>))) <span class="sc">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;&quot;</span>) <span class="sc">+</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Estimated individual feature importance&quot;</span>) <span class="sc">+</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="st">&quot;in the VRC01 data (considering only geographic confounders, subtype, and viral geometry)&quot;</span>)</span></code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
 </div>
 <div id="estimating-variable-importance-for-a-group-of-variables-using-precomputed-regression-function-estimates" class="section level2">
 <h2>Estimating variable importance for a group of variables using
 precomputed regression function estimates</h2>
 <p>Finally, we can estimate and plot group importance:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">91011</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>reduced_subtype_cv_fit <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  SuperLearner<span class="sc">::</span><span class="fu">CV.SuperLearner</span>(</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y =</span> y, <span class="at">X =</span> X[, <span class="sc">-</span><span class="fu">c</span>(<span class="dv">5</span><span class="sc">:</span><span class="dv">15</span>), <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="at">SL.library =</span> learners,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cvControl =</span> SuperLearner<span class="sc">::</span><span class="fu">SuperLearner.CV.control</span>(<span class="at">V =</span> <span class="dv">2</span> <span class="sc">*</span> V, <span class="at">validRows =</span> full_cv_fit<span class="sc">$</span>folds),</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">innerCvControl =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="at">V =</span> V)), <span class="at">family =</span> <span class="fu">binomial</span>()</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>reduced_subtype_cv_preds <span class="ot">&lt;-</span> reduced_subtype_cv_fit<span class="sc">$</span>SL.predict</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>reduced_geometry_cv_fit <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  SuperLearner<span class="sc">::</span><span class="fu">CV.SuperLearner</span>(</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y =</span> y, <span class="at">X =</span> X[, <span class="sc">-</span><span class="fu">c</span>(<span class="dv">16</span><span class="sc">:</span><span class="dv">21</span>), <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="at">SL.library =</span> learners,</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">cvControl =</span> SuperLearner<span class="sc">::</span><span class="fu">SuperLearner.CV.control</span>(<span class="at">V =</span> <span class="dv">2</span> <span class="sc">*</span> V, <span class="at">validRows =</span> full_cv_fit<span class="sc">$</span>folds),</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">innerCvControl =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="at">V =</span> V)), <span class="at">family =</span> <span class="fu">binomial</span>()</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>reduced_geometry_cv_preds <span class="ot">&lt;-</span> reduced_geometry_cv_fit<span class="sc">$</span>SL.predict</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>cf_subtype_vim <span class="ot">&lt;-</span> <span class="fu">vimp_rsquared</span>(</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y =</span> y, <span class="at">cross_fitted_f1 =</span> full_cv_preds, <span class="at">cross_fitted_f2 =</span> reduced_subtype_cv_preds,</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">indx =</span> <span class="dv">5</span><span class="sc">:</span><span class="dv">15</span>, <span class="at">run_regression =</span> <span class="cn">FALSE</span>, <span class="at">V =</span> V,</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">cross_fitting_folds =</span> cross_fitting_folds, <span class="at">sample_splitting_folds =</span> sample_splitting_folds,</span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">scale =</span> <span class="st">&quot;logit&quot;</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>cf_geometry_vim <span class="ot">&lt;-</span> <span class="fu">vimp_rsquared</span>(</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">Y =</span> y, <span class="at">cross_fitted_f1 =</span> full_cv_preds, <span class="at">cross_fitted_f2 =</span> reduced_geometry_cv_preds,</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">indx =</span> <span class="dv">16</span><span class="sc">:</span><span class="dv">21</span>, <span class="at">run_regression =</span> <span class="cn">FALSE</span>, <span class="at">V =</span> V,</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">cross_fitting_folds =</span> cross_fitting_folds, <span class="at">sample_splitting_folds =</span> sample_splitting_folds,</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">scale =</span> <span class="st">&quot;logit&quot;</span></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>cf_groups <span class="ot">&lt;-</span> <span class="fu">merge_vim</span>(cf_subtype_vim, cf_geometry_vim)</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>all_grp_nms <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Viral subtype&quot;</span>, <span class="st">&quot;Viral geometry&quot;</span>)</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>grp_plot_tib <span class="ot">&lt;-</span> cf_groups<span class="sc">$</span>mat <span class="sc">%&gt;%</span></span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">grp_fct =</span> <span class="fu">factor</span>(<span class="fu">case_when</span>(</span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>      s <span class="sc">==</span> <span class="st">&quot;5,6,7,8,9,10,11,12,13,14,15&quot;</span> <span class="sc">~</span> <span class="st">&quot;1&quot;</span>,</span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>      s <span class="sc">==</span> <span class="st">&quot;16,17,18,19,20,21&quot;</span> <span class="sc">~</span> <span class="st">&quot;2&quot;</span></span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>    ), <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>),  <span class="at">labels =</span> all_grp_nms, <span class="at">ordered =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>grp_plot_tib <span class="sc">%&gt;%</span></span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> est, <span class="at">y =</span> grp_fct)) <span class="sc">+</span></span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbarh</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> cil, <span class="at">xmax =</span> ciu)) <span class="sc">+</span></span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Variable importance estimates: &quot;</span>, R<span class="sc">^</span><span class="dv">2</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>))) <span class="sc">+</span></span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;&quot;</span>) <span class="sc">+</span></span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Estimated feature group importance&quot;</span>) <span class="sc">+</span></span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="st">&quot;in the VRC01 data (considering only geographic confounders, subtype, and viral geometry)&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">91011</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>reduced_subtype_cv_fit <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  SuperLearner<span class="sc">::</span><span class="fu">CV.SuperLearner</span>(</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">Y =</span> y, <span class="at">X =</span> X[, <span class="sc">-</span><span class="fu">c</span>(<span class="dv">5</span><span class="sc">:</span><span class="dv">15</span>), <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="at">SL.library =</span> learners,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="at">cvControl =</span> SuperLearner<span class="sc">::</span><span class="fu">SuperLearner.CV.control</span>(<span class="at">V =</span> <span class="dv">2</span> <span class="sc">*</span> V, <span class="at">validRows =</span> full_cv_fit<span class="sc">$</span>folds),</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="at">innerCvControl =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="at">V =</span> V)), <span class="at">family =</span> <span class="fu">binomial</span>()</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>)</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>)</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>reduced_subtype_cv_preds <span class="ot">&lt;-</span> reduced_subtype_cv_fit<span class="sc">$</span>SL.predict</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>reduced_geometry_cv_fit <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>  SuperLearner<span class="sc">::</span><span class="fu">CV.SuperLearner</span>(</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>  <span class="at">Y =</span> y, <span class="at">X =</span> X[, <span class="sc">-</span><span class="fu">c</span>(<span class="dv">16</span><span class="sc">:</span><span class="dv">21</span>), <span class="at">drop =</span> <span class="cn">FALSE</span>], <span class="at">SL.library =</span> learners,</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>  <span class="at">cvControl =</span> SuperLearner<span class="sc">::</span><span class="fu">SuperLearner.CV.control</span>(<span class="at">V =</span> <span class="dv">2</span> <span class="sc">*</span> V, <span class="at">validRows =</span> full_cv_fit<span class="sc">$</span>folds),</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>  <span class="at">innerCvControl =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="at">V =</span> V)), <span class="at">family =</span> <span class="fu">binomial</span>()</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>)</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>)</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>reduced_geometry_cv_preds <span class="ot">&lt;-</span> reduced_geometry_cv_fit<span class="sc">$</span>SL.predict</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>cf_subtype_vim <span class="ot">&lt;-</span> <span class="fu">vimp_rsquared</span>(</span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>  <span class="at">Y =</span> y, <span class="at">cross_fitted_f1 =</span> full_cv_preds, <span class="at">cross_fitted_f2 =</span> reduced_subtype_cv_preds,</span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a>  <span class="at">indx =</span> <span class="dv">5</span><span class="sc">:</span><span class="dv">15</span>, <span class="at">run_regression =</span> <span class="cn">FALSE</span>, <span class="at">V =</span> V,</span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>  <span class="at">cross_fitting_folds =</span> cross_fitting_folds, <span class="at">sample_splitting_folds =</span> sample_splitting_folds,</span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a>  <span class="at">scale =</span> <span class="st">&quot;logit&quot;</span></span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a>)</span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a>cf_geometry_vim <span class="ot">&lt;-</span> <span class="fu">vimp_rsquared</span>(</span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a>  <span class="at">Y =</span> y, <span class="at">cross_fitted_f1 =</span> full_cv_preds, <span class="at">cross_fitted_f2 =</span> reduced_geometry_cv_preds,</span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a>  <span class="at">indx =</span> <span class="dv">16</span><span class="sc">:</span><span class="dv">21</span>, <span class="at">run_regression =</span> <span class="cn">FALSE</span>, <span class="at">V =</span> V,</span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a>  <span class="at">cross_fitting_folds =</span> cross_fitting_folds, <span class="at">sample_splitting_folds =</span> sample_splitting_folds,</span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a>  <span class="at">scale =</span> <span class="st">&quot;logit&quot;</span></span>
+<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a>)</span>
+<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a>cf_groups <span class="ot">&lt;-</span> <span class="fu">merge_vim</span>(cf_subtype_vim, cf_geometry_vim)</span>
+<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a>all_grp_nms <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Viral subtype&quot;</span>, <span class="st">&quot;Viral geometry&quot;</span>)</span>
+<span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a></span>
+<span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a>grp_plot_tib <span class="ot">&lt;-</span> cf_groups<span class="sc">$</span>mat <span class="sc">%&gt;%</span></span>
+<span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a>    <span class="at">grp_fct =</span> <span class="fu">factor</span>(<span class="fu">case_when</span>(</span>
+<span id="cb8-36"><a href="#cb8-36" tabindex="-1"></a>      s <span class="sc">==</span> <span class="st">&quot;5,6,7,8,9,10,11,12,13,14,15&quot;</span> <span class="sc">~</span> <span class="st">&quot;1&quot;</span>,</span>
+<span id="cb8-37"><a href="#cb8-37" tabindex="-1"></a>      s <span class="sc">==</span> <span class="st">&quot;16,17,18,19,20,21&quot;</span> <span class="sc">~</span> <span class="st">&quot;2&quot;</span></span>
+<span id="cb8-38"><a href="#cb8-38" tabindex="-1"></a>    ), <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>),  <span class="at">labels =</span> all_grp_nms, <span class="at">ordered =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-39"><a href="#cb8-39" tabindex="-1"></a>  )</span>
+<span id="cb8-40"><a href="#cb8-40" tabindex="-1"></a>grp_plot_tib <span class="sc">%&gt;%</span></span>
+<span id="cb8-41"><a href="#cb8-41" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> est, <span class="at">y =</span> grp_fct)) <span class="sc">+</span></span>
+<span id="cb8-42"><a href="#cb8-42" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb8-43"><a href="#cb8-43" tabindex="-1"></a>  <span class="fu">geom_errorbarh</span>(<span class="fu">aes</span>(<span class="at">xmin =</span> cil, <span class="at">xmax =</span> ciu)) <span class="sc">+</span></span>
+<span id="cb8-44"><a href="#cb8-44" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Variable importance estimates: &quot;</span>, R<span class="sc">^</span><span class="dv">2</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>))) <span class="sc">+</span></span>
+<span id="cb8-45"><a href="#cb8-45" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;&quot;</span>) <span class="sc">+</span></span>
+<span id="cb8-46"><a href="#cb8-46" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Estimated feature group importance&quot;</span>) <span class="sc">+</span></span>
+<span id="cb8-47"><a href="#cb8-47" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="st">&quot;in the VRC01 data (considering only geographic confounders, subtype, and viral geometry)&quot;</span>)</span></code></pre></div>
 <p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAzAAAAMACAMAAADMrHKEAAAA5FBMVEUAAAAAADoAAGYAOjoAOmYAOpAAZrY6AAA6ADo6AGY6OgA6Ojo6OmY6OpA6ZmY6ZpA6ZrY6kLY6kNtmAABmADpmOgBmOjpmZgBmZjpmZmZmkJBmkLZmkNtmtrZmtttmtv+QOgCQOjqQZgCQZjqQZmaQkGaQtpCQttuQ27aQ29uQ2/+2ZgC2Zjq2kDq2kGa2tma2tpC2tra2ttu225C229u22/+2/7a2/9u2///bkDrbkGbbtmbbtpDb25Db27bb29vb2//b/7bb/9vb////tmb/trb/25D/27b/29v//7b//9v///9cW8oaAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAgAElEQVR4nO3dD3/b1pXmcciJJLdpN1nJns42TahtNmnXzExnppOOOcnOtjGXrsT3/34W9w8ugMtDicemzUe6v+/nE1skQeAenPsQACkz3RbAwbpTDwB4TAgM4EBgAAcCAzgQGMCBwAAOBAZwIDCAA4EBHAgM4KAWmFVXXFiP3153z16/++rX09W+/Z/9Vq7efWVH9Z6F4SN5TIF5++XB8yosapkG5u6muz8w+1byQbxXYD7qSNv2eAJz90/2Mcewf9FpYDaX905Rx/ZO7PGM9AkQDMye1/z1npM016JVYM7fvMtK1DyekT4B4oH56R/6Q80nX/bzehmPOud/C2cu/cnUs//4puvOfrf96WXX/eqHsOjbby77e8LPedE327t/7u/65Ou4pvDz2e8mcyst1R9jpkvtrqQf0KKMq7/zq5fdsx9mz9mO6/96PV8sre9Xf8iVjSsKN/6zf8KXJbG3+wqrFp2sMW/m5VDuOPi4lXHXxN149vmbYZzzkcNDOzDDCVo/G6rAZJ8Nsz4cL6KzV2WuD4t9sR0uWKZnekNgpksZK6kDs7PmJN/z2Wyx7Y95m1fb3cB8Nj/vvN1X2HzR6RrzZn6ftzYZfHjSJ2UNw24MP++OHC6CgelKe8Mk6l/Nl3GqpYNDmVf9A2HZizh5F2H2hInyfZxK+TjSP/715Nn9M3663D0lmy5lr2QWmGc/3P119pykX/rTH+J0nizWb+HsD9u3aYB1YPo1vL0e17C3sNmiszUOm8kjnQ5+9qT+8fM4toutMXK4qAfm7OvhpKUKzKJctZeD0t//5ZtuMtf7RUMg+r8utvkZYdkqMNOljJXsBCZsqn7ONj6y2A4L5MWGO9OG6sBcbGdXH3sLmy06W+OwmXEtZfCrMvirIUnhdO+1MXK4SAcmnT+kE/YqMGEK5ENEum6I5+bddK4PpyjhdGV403b3on+6lLGSncDk+To+J4qzcTuMJS823JmGu3MNsy3J227vKWy66HyNw3Eij3Q6+FU5Dbwqw9iaI4ePYGAm1zB336Sz8i/fPBiYZbis/beVGZj4yhonTX/f3sD0C+yu5IHADDNxEshxsfLRyvKewMzWcH9gxjLSGqvATAc/Dcz0E57dkcNHOzB9ZP7lH0OPLx4KzHhBMg3M9EPK/UcY46pmFpgy9SaBqc5ozMDsHGHGFa1m53ZlDXsCUxa97wgzG/w9RxjOxd6LemCCTZyNqdf3BCa/yl5tp4tWJ//mNUxZyljJMKClceiYpq++hllM7izXMOOK9l/DWIHZfw2zyIWMrw/LncBMxrYwRg4XwcCMJw3p7Z3tj8OhYJjfdmD6u/K7VPmBZX6vKSyb3iX70XiXbLKUtZL67a8hCWXNSV7/fLHZe1qzFa3iX29f7r5LZgVmXLR+l2wxFjIb/Cww5R3CFLJq5HCRDky5dbaIM2ryOYx1DZNcDIu+uX1ZLoLnjyf56dOlrJVcxzs+myVhtuYof77xj7PFyvjzOdW4ov2fw1iBmSw6XWMZTRrpdPCzwAxPCqveHTlctAOTPuk/+zx+Xr3pe33+l73vkn3fv8J+8XM6X4+Lhs/wf9m/rKc32eIn8V/+aPxqzGQpayVv/yE8uponYbrmJDz10z+s54vlz+X/Pf08WVG4kv8x/OpBef69F/2TRSdrLJtJI50Ofh6Y/En/D/bI4aEWmEdufeBr9+rwTw4di+LDIzDH0U/rT19vD744IDCPFYE5jvIBx2HvPhGYx4rAHEm8tug++fqwD9AJzGNFYAAHAgM4EBjAgcAADgQGcCAwgAOBARwIDOBAYAAHAgM4iAXm9rr6NZD1Yve+bfjnJ/lf3d7dXAxftXWV7+iGb3hYd+VXITe/mP0T9vX0VyTXO6u/u3n4l1HGUa3r37e0BvzQSt7TsKLDV7j/K0YHO3U9ZHNZdsm7lzXf6m4977zLqjHdvni3f0InFpha2D3mLlrnX7Dq/+4zM96zTv+0Kv4jy/6PvPtvr5/tDYyx+pXr3++6J9bo6IFxPOHBf4bw7oF5n7Ie2uq7rnv3pfjdvjfnsQbm9jpN6mX4Zoj4Y/wr9+zuJtwdo5P/PbwnMM6ePNLAPPiEJx6YQ04jDGKBSQH56nr81+rhXyX/9rJ8hUU5j1jGCIQXyhyYkJ3tKr9s/L/XuX2rfrH+qLMeA9Ov5Ozb0JXwT3oXaRNv8o1kXb5fNactbLSMKv4i/xDjsrI8tNsX33bP/jIrYjksst1dWb+SmOjhkLasVleeUB6KG3g9DHfz/LvLvMK0j8qoyj8zsMsIRcQ9k++M/wR8MQ7arOt1Lr2Y7or+j83lby/z9yt0579PdZURzrs3VNstJnt23Gpu3vrsj2FXzkouE3/vvtpchvVdbWaTJs2ksKbfDDt89U6HGMnAhC8lGs6lJrdX8Xsq8j4fdumr7eQIM2QnLvA8rCEnZQzMMs6T8CVFYZ/1f8cODDfSInGXxoeu4pleOJwNo4jbXYfvX1lMVjYM7fY6flHHZNBlkTiMamX9kuv4hYWL+dhKpcMTykNxA2W4/TRY5GXKCsehb+8pIy443jkEph70rK6h9LKHp7siBqYsvdjmusoI590bdnMa3u6uSo1c9i+Wi+285CEw+/dVHMYq/kPt8N9kTHFNZYe/25mBZGCuyuF9ejvNgfV4tb9NR5WcklW3mJ2Zp/2R90oJTFrvMrxUv0q34iaGG2mbV+M5fjqxW4cZlkYxrCk8bVzZMLT83HHQZRFzZXGSLnK2jdWVJ8wfKsNNE3AVvqqjrHC2E/aWERac3DkEphr0vK71/Lx2O90VKTBxNGHptFv7uuYjnK5i0gBjV63iNwVflXpm7XpoX8X1VZNmXNOww8f3KDwkAzMeeae315OD9Tbt0nhjeJdssT0gMOmH4d7xLCbfGLZZNpP+zjMsTaq0quFVNK6sDK2MvQx6uj1jZYvw0plPDnZXV55QHipnJOt0PrnYVlN+MZsI95SxsO+cDbqua56Y6a5IgZmOJtVV7qu6NynC3FVx96Y1zUvOt+7ZV/GH4Y9ZBem5ww4/4H0Pw2MKTFeCMTy0Sv8Hh3i1H79e+MFTslXpSn9u++zPw0vWcCM+Me7r9KKfOzyZTCmfi3HzsWvD0HYCs9oNzGRlOXXLq/nYyurKE1bzwAzDzTVWgXk+nmrsLWMMTHXnbGvzuobSi8muiIGJG+v/TOd7sa4ywqp7kyLMXRWm9TIclybXZePS9+6reWCmFaTnDjv86QemOudcnv98M6YkvZ88XMithx24qgJTXpnKbi1TZzwlu+8Ikzadpmj1Mjc813eEuX3xx/yRwO7q9hxhynDtwBz7CLMdCy+nTGMXxo1Xx7tY1xiY+oph1oCdXdXvjL/k3Tgv2T7CTEs0jjDTmVR2+JMPzNi0ZH323fPxAjF10n5beecapr8SXKevTF2M51brckpmX8NMAjObcavJidJOYMoi5srSEeuznPLd1VXXMOVifRhuukLIr8Qlgfdfw0y3bFzYzAY9r6v6qdweL0LK9cpim+uaj3DWvmkDdnZVf8f/iJcx+fH50g/vq+GPWQXDcTLt8Cd6DXM13o77cnyFGwrPgUlvpsQDzd1N9cHl5GIzrCS8u5JereKX219ty42ovEsW1ly/k7TOq463h5WVoe0EZt+7ZJPXgNXsrfLZ6qx3ycorbXyztCwzXeH41uHeMtIszHem15fJCaVd11D60Kzh9vD0yWjStwjGHOX76u5tJw2ot5p2Rvr60ckRZlz63n01C8ykgvLcvMOf0Ltk05OfLr61WK40pp9A5sLL3Bi/kTW9ZK/GX40xPoeJj4YdvUz/Y750Y1x45wOMPIp1+tLVcmY9fhiQXxGrIsL/J+xP5Yyw/uBjsZ1ec5RlS6XTz2HCQ+Nmw3DTJx+LaoX3fw4zXXBYe9hpX02u0+y6htLLleJ6+P7Z9PQymrhLh7eihvuGVZVnD0UYW00rn+7K+dL37qt5YMrDw0wqO/xJfA4jYefs4b3Vb8jObH49a9w9y+489G5nFe9tc9D/ITPWZYzwsGcf5N79ulfa4e/YZQJj8P0u2b3ihLn/8nJ19fCyex46UWDWh30dbljKGOFhz37AAft1r7TDn+bvkp3GO/6akWk9fy91x+ZybNw9y9oPnSgw3x9w8p/rMkZ4yLMf9tB+3SsP7In+tjKghcAADgQGcCAwgAOBARwIDOBAYAAHAgM4iAVGbDhARWyGig0HqIjNULHhABWxGSo2HKAiNkPFhgNUxGao2HCAitgMFRsOUBGboWLDASpiM1RsOEBFbIaKDQeoiM1QseEAFbEZKjYcoCI2Q8WGA1TEZqjYcICK2AwVGw5QEZuhYsMBKmIzVGw4QEVshooNB6iIzVCx4QAVsRkqNhygIjZDxYYDVMRmqNhwgIrYDBUbDlARm6FiwwEqYjNUbDhARWyGig0HqIjNULHhABWxGSo2HKAiNkPFhgNUxGao2HCAitgMFRsOUBGboWLDASpiM1RsOEBFbIaKDQeoiM1QseEAFbEZKjYcoCI2Q8WGA1TEZqjYcICK2AwVGw5QEZuhYsMBKmIzVGw4QEVshooNB6iIzVCx4QAVsRkqNhygIjZD7x+O2GDxhBw6t8TmIIHBaRAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnA4VmDubp69zj9c3F4vqkd37znQes/zCAxO42hHmHW3mP09866B2fs8AoPTOFpgbq8v4t/L8zfWgwQGT8LxrmGW8Zzs9voqTvPbF992/R3LrgtHnDLx+9tn35692m5X/QNX4Z51+mFz+dV1/8PmMi6fHw63zv8W1vSbkMbVxWHD6Z97YFWA0/ECs7kMM33dpyEG5jocaZb9FF/le4IQqnXX3xHu3FxepTO4cHDaXIZ7Q8ZW4b/8cFnTur/z7mY83Nw3nK4jMfhQjheY/mp/m87I0jTv03D74lUKUg5MytTy7FV8NKTg7ib+cPYqpif/sSgPj2vqf9g8fxVH8lAgOuDDOVpg4qEhRiJN83w4WHddubWOZ219PMJxKEYjRWj4YfijPDyuqT9WrSZXRxxhcBpHDEyY2SE0k8D0lyLP/jweYVYlMDmtOTD9w/PADA+Pa+qztrw6cDjkBR/MMT+4XJ7/HE/LyjQvKbCPMNvhJM0+wkzX1J/d/fHFq0OHQ17woRwzMOuz7+JlRpnmMSDrrrqGWYVrmHzCNrmGmQSmPDwG5u7ms+n71QQGp3HMwAyTenaEub3urux3ycLV/+RdsukRaXh4eJN6G87uJmdkBAYnctTfJcuTenYNc/ZqOTmiLPuLmj+F4074oCWdoHX5c5hpYMrDy+78b/no9HxyRkZgcCIn+OXLdf6tM5/Nr6e/QUBgcBofNTD5Teerh5fctZo9i8DgND7uESa+X/wuv1a2uZz/ihqBwWnw72EABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzgQGAABwIDOBAYwIHAAA4EBnAgMIADgQEcCAzg8CQDA5ya2AwVGw5QEZuhYsMBKmIzVGw4QEVshooNB6iIzVCx4QAVsRkqNhygIjZDxYYDVMRmqNhwgIrYDBUbDlARm6FiwwEqYjNUbDhARWyGig0HqIjNULHhABWxGSo2HKAiNkPFhgNUxGao2HCAitgMFRsOUBGboWLDASpiM1RsOEBFbIaKDQeoiM1QseEAFbEZKjYcoCI2Q8WGA1TEZqjYcICK2AwVGw5QEZuhYsMBKmIzVGw4QEVshooNB6iIzdADhiM24o+jyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1gsDYmixaklgnCIytyaIliXWCwNiaLFqSWCcIjK3JoiWJdYLA2JosWpJYJwiMrcmiJYl1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" /><!-- --></p>
 </div>
 <div id="conclusion" class="section level2">
@@ -674,7 +673,7 @@ in nearly all cases when using flexible machine learning tools.</p>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-magaret2019" class="csl-entry">
 Magaret, CA, DC Benkeser, BD Williamson, et al. 2019. <span>“Prediction
-of <span>Vrc01</span> Neutralization Sensitivity by <span>HIV</span>-1
+of <span>VRC01</span> Neutralization Sensitivity by <span>HIV</span>-1
 Gp160 Sequence Features.”</span> <em>PLOS Computational Biology</em>. <a href="https://doi.org/10.1371/journal.pcbi.1006952">https://doi.org/10.1371/journal.pcbi.1006952</a>.
 </div>
 </div>
