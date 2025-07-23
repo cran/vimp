@@ -12,7 +12,7 @@
 
 <meta name="author" content="Brian D. Williamson" />
 
-<meta name="date" content="2023-08-28" />
+<meta name="date" content="2025-07-23" />
 
 <title>Using precomputed regression function estimates in vimp</title>
 
@@ -51,7 +51,7 @@ overflow: visible;
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -150,6 +150,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; }
 div.csl-bib-body { }
 div.csl-entry {
 clear: both;
+margin-bottom: 0em;
 }
 .hanging div.csl-entry {
 margin-left:2em;
@@ -363,7 +364,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Using precomputed regression function
 estimates in <code>vimp</code></h1>
 <h4 class="author">Brian D. Williamson</h4>
-<h4 class="date">2023-08-28</h4>
+<h4 class="date">2025-07-23</h4>
 
 
 
@@ -523,64 +524,49 @@ equivalently, <code>cv_vim()</code> with
 <span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>}</span>
 <span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
 <span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
 <span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
 <span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a></span>
-<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
 <span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
 <span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a></span>
-<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
 <span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
 <span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a></span>
-<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
 <span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
 <span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a></span>
-<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a></span>
+<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
+<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
+<span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
 <span id="cb6-39"><a href="#cb6-39" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
 <span id="cb6-40"><a href="#cb6-40" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a></span>
-<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-43"><a href="#cb6-43" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-44"><a href="#cb6-44" tabindex="-1"></a></span>
-<span id="cb6-45"><a href="#cb6-45" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-46"><a href="#cb6-46" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-47"><a href="#cb6-47" tabindex="-1"></a></span>
-<span id="cb6-48"><a href="#cb6-48" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-49"><a href="#cb6-49" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-50"><a href="#cb6-50" tabindex="-1"></a></span>
-<span id="cb6-51"><a href="#cb6-51" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-52"><a href="#cb6-52" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-53"><a href="#cb6-53" tabindex="-1"></a></span>
-<span id="cb6-54"><a href="#cb6-54" tabindex="-1"></a><span class="co">#&gt; Warning in cv_vim(type = &quot;r_squared&quot;, Y = Y, X = X, cross_fitted_f1 =</span></span>
-<span id="cb6-55"><a href="#cb6-55" tabindex="-1"></a><span class="co">#&gt; cross_fitted_f1, : Original estimate &lt; 0; returning zero.</span></span>
-<span id="cb6-56"><a href="#cb6-56" tabindex="-1"></a>cf_ests <span class="ot">&lt;-</span> <span class="fu">merge_vim</span>(cf_subtype.is<span class="fl">.01</span>_AE_vim,</span>
-<span id="cb6-57"><a href="#cb6-57" tabindex="-1"></a>                     cf_subtype.is<span class="fl">.02</span>_AG_vim, cf_subtype.is<span class="fl">.07</span>_BC_vim,</span>
-<span id="cb6-58"><a href="#cb6-58" tabindex="-1"></a>                     cf_subtype.is.A1_vim, cf_subtype.is.A1C_vim,</span>
-<span id="cb6-59"><a href="#cb6-59" tabindex="-1"></a>                     cf_subtype.is.A1D_vim, cf_subtype.is.B_vim,</span>
-<span id="cb6-60"><a href="#cb6-60" tabindex="-1"></a>                     cf_subtype.is.C_vim, cf_subtype.is.D_vim,</span>
-<span id="cb6-61"><a href="#cb6-61" tabindex="-1"></a>                     cf_subtype.is.O_vim, cf_subtype.is.Other_vim,</span>
-<span id="cb6-62"><a href="#cb6-62" tabindex="-1"></a>                     cf_length.env_vim, cf_length.gp120_vim, cf_length.loop.e_vim,</span>
-<span id="cb6-63"><a href="#cb6-63" tabindex="-1"></a>                     cf_length.loop.e.outliers_vim, cf_length.v5_vim,</span>
-<span id="cb6-64"><a href="#cb6-64" tabindex="-1"></a>                     cf_length.v5.outliers_vim)</span>
-<span id="cb6-65"><a href="#cb6-65" tabindex="-1"></a>all_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">&quot;Subtype is &quot;</span>, <span class="fu">c</span>(<span class="st">&quot;01_AE&quot;</span>, <span class="st">&quot;02_AG&quot;</span>, <span class="st">&quot;07_BC&quot;</span>, <span class="st">&quot;A1&quot;</span>, <span class="st">&quot;A1C&quot;</span>, <span class="st">&quot;A1D&quot;</span>,</span>
-<span id="cb6-66"><a href="#cb6-66" tabindex="-1"></a>                                      <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;O&quot;</span>, <span class="st">&quot;Other&quot;</span>)),</span>
-<span id="cb6-67"><a href="#cb6-67" tabindex="-1"></a>              <span class="fu">paste0</span>(<span class="st">&quot;Length of &quot;</span>, <span class="fu">c</span>(<span class="st">&quot;Env&quot;</span>, <span class="st">&quot;gp120&quot;</span>, <span class="st">&quot;V5&quot;</span>, <span class="st">&quot;V5 outliers&quot;</span>, <span class="st">&quot;Loop E&quot;</span>,</span>
-<span id="cb6-68"><a href="#cb6-68" tabindex="-1"></a>                                     <span class="st">&quot;Loop E outliers&quot;</span>)))</span></code></pre></div>
+<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a>cf_ests <span class="ot">&lt;-</span> <span class="fu">merge_vim</span>(cf_subtype.is<span class="fl">.01</span>_AE_vim,</span>
+<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a>                     cf_subtype.is<span class="fl">.02</span>_AG_vim, cf_subtype.is<span class="fl">.07</span>_BC_vim,</span>
+<span id="cb6-43"><a href="#cb6-43" tabindex="-1"></a>                     cf_subtype.is.A1_vim, cf_subtype.is.A1C_vim,</span>
+<span id="cb6-44"><a href="#cb6-44" tabindex="-1"></a>                     cf_subtype.is.A1D_vim, cf_subtype.is.B_vim,</span>
+<span id="cb6-45"><a href="#cb6-45" tabindex="-1"></a>                     cf_subtype.is.C_vim, cf_subtype.is.D_vim,</span>
+<span id="cb6-46"><a href="#cb6-46" tabindex="-1"></a>                     cf_subtype.is.O_vim, cf_subtype.is.Other_vim,</span>
+<span id="cb6-47"><a href="#cb6-47" tabindex="-1"></a>                     cf_length.env_vim, cf_length.gp120_vim, cf_length.loop.e_vim,</span>
+<span id="cb6-48"><a href="#cb6-48" tabindex="-1"></a>                     cf_length.loop.e.outliers_vim, cf_length.v5_vim,</span>
+<span id="cb6-49"><a href="#cb6-49" tabindex="-1"></a>                     cf_length.v5.outliers_vim)</span>
+<span id="cb6-50"><a href="#cb6-50" tabindex="-1"></a>all_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">&quot;Subtype is &quot;</span>, <span class="fu">c</span>(<span class="st">&quot;01_AE&quot;</span>, <span class="st">&quot;02_AG&quot;</span>, <span class="st">&quot;07_BC&quot;</span>, <span class="st">&quot;A1&quot;</span>, <span class="st">&quot;A1C&quot;</span>, <span class="st">&quot;A1D&quot;</span>,</span>
+<span id="cb6-51"><a href="#cb6-51" tabindex="-1"></a>                                      <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>, <span class="st">&quot;O&quot;</span>, <span class="st">&quot;Other&quot;</span>)),</span>
+<span id="cb6-52"><a href="#cb6-52" tabindex="-1"></a>              <span class="fu">paste0</span>(<span class="st">&quot;Length of &quot;</span>, <span class="fu">c</span>(<span class="st">&quot;Env&quot;</span>, <span class="st">&quot;gp120&quot;</span>, <span class="st">&quot;V5&quot;</span>, <span class="st">&quot;V5 outliers&quot;</span>, <span class="st">&quot;Loop E&quot;</span>,</span>
+<span id="cb6-53"><a href="#cb6-53" tabindex="-1"></a>                                     <span class="st">&quot;Loop E outliers&quot;</span>)))</span></code></pre></div>
 <p>And we can view them all simultaneously by plotting:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;ggplot2&quot;</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;cowplot&quot;</span>)</span>
@@ -670,7 +656,7 @@ in nearly all cases when using flexible machine learning tools.</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-magaret2019" class="csl-entry">
 Magaret, CA, DC Benkeser, BD Williamson, et al. 2019. <span>“Prediction
 of <span>VRC01</span> Neutralization Sensitivity by <span>HIV</span>-1

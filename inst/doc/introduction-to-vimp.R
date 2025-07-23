@@ -6,13 +6,13 @@ opts_knit$set(cache = FALSE, verbose = TRUE, global.par = TRUE)
 par(mar = c(5, 12, 4, 2) + 0.1)
 
 ## ----install-vimp, eval = FALSE-----------------------------------------------
-#  install.packages("vimp")
+# install.packages("vimp")
 
 ## ----devtools-install-vimp, eval = FALSE--------------------------------------
-#  # only run if you don't have devtools
-#  # previously installed
-#  # install.packages("devtools")
-#  devtools::install_github("bdwilliamson/vimp")
+# # only run if you don't have devtools
+# # previously installed
+# # install.packages("devtools")
+# devtools::install_github("bdwilliamson/vimp")
 
 ## ----load-vimp, message = FALSE-----------------------------------------------
 library("vimp")
@@ -108,8 +108,8 @@ learners <- c("SL.glmnet", "SL.glmnet.0.25", "SL.glmnet.0.5", "SL.glmnet.0.75",
               "SL.gbm.1")
 
 ## ----vimp-with-sl-1, eval = FALSE---------------------------------------------
-#  vimp_rsquared(Y = y, X = X,
-#      indx = 5, run_regression = TRUE, SL.library = learners, V = 5, family = binomial())
+# vimp_rsquared(Y = y, X = X,
+#     indx = 5, run_regression = TRUE, SL.library = learners, V = 5, family = binomial())
 
 ## ----vimp-with-sl-fam, message = FALSE, warning = FALSE-----------------------
 # small learners library
