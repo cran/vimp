@@ -1,7 +1,7 @@
 Package: vimp
 Type: Package
 Title: Perform Inference on Algorithm-Agnostic Variable Importance
-Version: 2.3.5
+Version: 2.3.6
 Authors@R: 
     c(person(given = "Brian D.",
              family = "Williamson",
@@ -41,7 +41,7 @@ RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 LazyData: true
 NeedsCompilation: no
-Packaged: 2025-07-23 18:30:39 UTC; L107067
+Packaged: 2025-08-28 19:51:37 UTC; L107067
 Author: Brian D. Williamson [aut, cre] (ORCID:
     <https://orcid.org/0000-0002-7024-548X>),
   Jean Feng [ctb],
@@ -50,4 +50,4 @@ Author: Brian D. Williamson [aut, cre] (ORCID:
   Marco Carone [ths] (ORCID: <https://orcid.org/0000-0003-2106-0953>)
 Maintainer: Brian D. Williamson <brian.d.williamson@kp.org>
 Repository: CRAN
-Date/Publication: 2025-07-23 19:00:02 UTC
+Date/Publication: 2025-08-28 20:10:02 UTC
